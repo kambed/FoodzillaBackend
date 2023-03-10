@@ -1,0 +1,13 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: foodzillabackend
+  datasource:
+    username: ${MYSQL_USER:#{user}}
+    password: ${MYSQL_PASSWORD:#{password}}
+    url: ${MYSQL_URL}
+  jpa:
+    properties:
+      hibernate:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect

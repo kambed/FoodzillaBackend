@@ -1,0 +1,28 @@
+version: '3.3'
+services:
+  db:
+    image: mysql:5.7
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - '${MYSQL_LOCAL_PORT}:${MYSQL_DOCKER_PORT}'
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - ./src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./src/main/resources/testData.sql:/docker-entrypoint-initdb.d/testData.sql
+  app:
+    depends_on:
+      db:
+        condition: service_healthy
+    build: .
+    env_file: .env
+    restart: unless-stopped
+    ports:
+      - '${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}'
+    volumes:
+      - .m2:/root/.m2
+volumes:
+  db:
