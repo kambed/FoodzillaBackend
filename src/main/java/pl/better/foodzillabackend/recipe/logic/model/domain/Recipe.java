@@ -56,4 +56,34 @@ public class Recipe {
             joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
+
+    public Recipe(Long id,
+                  String name,
+                  String description,
+                  int timeOfPreparation,
+                  int numberOfSteps,
+                  String steps,
+                  int numberOfIngredients,
+                  int calories,
+                  int fat,
+                  int sugar,
+                  int sodium,
+                  int protein,
+                  int saturatedFat,
+                  int carbohydrates) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.timeOfPreparation = timeOfPreparation;
+        this.numberOfSteps = numberOfSteps;
+        this.steps = steps;
+        this.numberOfIngredients = numberOfIngredients;
+        this.calories = calories;
+        this.fat = fat;
+        this.sugar = sugar;
+        this.sodium = sodium;
+        this.protein = protein;
+        this.saturatedFat = saturatedFat;
+        this.carbohydrates = carbohydrates;
+    }
 }
