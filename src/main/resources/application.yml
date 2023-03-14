@@ -8,6 +8,7 @@ spring:
     password: ${MYSQL_PASSWORD:#{password}}
     url: ${MYSQL_URL}
   jpa:
+    open-in-view: false
     properties:
       hibernate:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
