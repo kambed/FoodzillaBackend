@@ -2,19 +2,19 @@ create table recipe
 (
     id                    int auto_increment
         primary key,
-    name                  varchar(250)  not null,
-    description            varchar(1000) null,
-    time_of_preparation   int           null,
-    number_of_steps       int           null,
-    steps                 blob          null,
-    number_of_ingredients int           null,
-    calories              int           null,
-    fat                   int           null,
-    sugar                 int           null,
-    sodium                int           null,
-    protein               int           null,
-    saturated_fat         int           null,
-    carbohydrates         int           null
+    name                  varchar(250) null,
+    description           blob null,
+    time_of_preparation   int null,
+    number_of_steps       int null,
+    steps                 blob null,
+    number_of_ingredients int null,
+    calories              float null,
+    fat                   float null,
+    sugar                 float null,
+    sodium                float null,
+    protein               float null,
+    saturated_fat         float null,
+    carbohydrates         float null
 );
 
 create table ingredient
@@ -61,16 +61,16 @@ create table user
         primary key
 );
 
-create table reviews
+create table review
 (
     id        int auto_increment
         primary key,
-    user_id   int           not null,
-    recipe_id int           not null,
-    review    varchar(1000) null,
-    rating    int           null,
-    constraint reviews_recipe_null_fk
+    user_id   int not null,
+    recipe_id int not null,
+    review    blob null,
+    rating    int null,
+    constraint review_recipe_null_fk
         foreign key (recipe_id) references recipe (id),
-    constraint reviews_user_null_fk
+    constraint review_user_null_fk
         foreign key (user_id) references user (id)
 );
