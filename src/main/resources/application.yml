@@ -5,7 +5,7 @@ spring:
     name: foodzillabackend
   graphql:
     graphiql:
-      path: /graphiql
+      enabled: true
   datasource:
     username: ${MYSQL_USER:#{user}}
     password: ${MYSQL_PASSWORD:#{password}}
