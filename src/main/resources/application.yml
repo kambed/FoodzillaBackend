@@ -3,6 +3,10 @@ spring:
     import: optional:file:.env[.properties]
   application:
     name: foodzillabackend
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
   datasource:
     username: ${MYSQL_USER:#{user}}
     password: ${MYSQL_PASSWORD:#{password}}
