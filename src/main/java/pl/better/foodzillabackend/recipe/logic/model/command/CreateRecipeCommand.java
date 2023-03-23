@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import pl.better.foodzillabackend.recipe.logic.model.domain.Ingredient;
+import pl.better.foodzillabackend.recipe.logic.model.domain.Tag;
 
 import java.util.List;
 import java.util.Set;
@@ -33,7 +35,7 @@ public record CreateRecipeCommand(
         int saturatedFat,
         @Min(0)
         int carbohydrates,
-        Set<String> ingredients,
-        Set<String> tags
+        Set<Ingredient> ingredients,
+        Set<Tag> tags
 ) {
 }

@@ -9,15 +9,20 @@ import pl.better.foodzillabackend.recipe.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Tag;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
+import pl.better.foodzillabackend.recipe.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.recipe.logic.repository.TagRepository;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class RecipeService {
     private final RecipeRepository recipeRepository;
+    private final IngredientRepository ingredientRepository;
+    private final TagRepository tagRepository;
     private final RecipeDtoMapper recipeDtoMapper;
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id: %s not found";
 
@@ -32,21 +37,13 @@ public class RecipeService {
     }
 
     public RecipeDto createNewRecipeAndSaveInDb(CreateRecipeCommand command) {
-        Set<Ingredient> ingredients = new HashSet<>();
-        command.ingredients().forEach(i -> {
-            //TODO: use ingredient repo to find existing ingredient or create new if not present
-        });
-        Set<Tag> tags = new HashSet<>();
-        command.tags().forEach(i -> {
-            //TODO: use tags repo to find existing tag or create new if not present
-        });
         Recipe recipe = new Recipe(
                 command.name(),
                 command.description(),
                 command.timeOfPreparation(),
                 command.steps().size(),
                 command.steps(),
-                ingredients.size(),
+                command.ingredients().size(),
                 command.calories(),
                 command.fat(),
                 command.sugar(),
@@ -55,8 +52,18 @@ public class RecipeService {
                 command.saturatedFat(),
                 command.carbohydrates(),
                 new HashSet<>(),
-                ingredients,
-                tags
+                command.ingredients().stream().map(i ->
+                        ingredientRepository.findIngredientByName(i.getName()).stream().findFirst().orElseGet(() -> {
+                            ingredientRepository.saveAndFlush(i);
+                            return i;
+                        })
+                ).collect(Collectors.toSet()),
+                command.tags().stream().map(t ->
+                        tagRepository.findTagByName(t.getName()).stream().findFirst().orElseGet(() -> {
+                            tagRepository.saveAndFlush(t);
+                            return t;
+                        })
+                ).collect(Collectors.toSet())
         );
         recipeRepository.saveAndFlush(recipe);
         return recipeDtoMapper.apply(recipe);
