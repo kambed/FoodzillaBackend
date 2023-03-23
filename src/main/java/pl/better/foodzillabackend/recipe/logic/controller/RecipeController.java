@@ -20,6 +20,9 @@ public class RecipeController {
         return recipeService.getRecipeById(id);
     }
 
-
+    @MutationMapping
+    public RecipeDto createRecipe(@Argument CreateRecipeCommand recipe) {
+        return recipeService.createNewRecipeAndSaveInDb(recipe);
+    }
 
 }

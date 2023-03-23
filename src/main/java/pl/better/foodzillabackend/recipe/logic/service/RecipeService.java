@@ -31,5 +31,34 @@ public class RecipeService {
                 ));
     }
 
-
+    public RecipeDto createNewRecipeAndSaveInDb(CreateRecipeCommand command) {
+        Set<Ingredient> ingredients = new HashSet<>();
+        command.ingredients().forEach(i -> {
+            //TODO: use ingredient repo to find existing ingredient or create new if not present
+        });
+        Set<Tag> tags = new HashSet<>();
+        command.tags().forEach(i -> {
+            //TODO: use tags repo to find existing tag or create new if not present
+        });
+        Recipe recipe = new Recipe(
+                command.name(),
+                command.description(),
+                command.timeOfPreparation(),
+                command.steps().size(),
+                command.steps(),
+                ingredients.size(),
+                command.calories(),
+                command.fat(),
+                command.sugar(),
+                command.sodium(),
+                command.protein(),
+                command.saturatedFat(),
+                command.carbohydrates(),
+                new HashSet<>(),
+                ingredients,
+                tags
+        );
+        recipeRepository.saveAndFlush(recipe);
+        return recipeDtoMapper.apply(recipe);
+    }
 }
