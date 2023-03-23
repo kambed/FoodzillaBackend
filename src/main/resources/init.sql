@@ -17,12 +17,16 @@ create table recipe
     carbohydrates         float null
 );
 
+ALTER TABLE recipe AUTO_INCREMENT=537717;
+
 create table ingredient
 (
     id   int auto_increment
         primary key,
     name varchar(250) null
 );
+
+ALTER TABLE ingredient AUTO_INCREMENT=14907;
 
 create table recipe_ingredient
 (
@@ -36,12 +40,16 @@ create table recipe_ingredient
         foreign key (recipe_id) references recipe (id)
 );
 
+ALTER TABLE recipe_ingredient AUTO_INCREMENT=2102984;
+
 create table tag
 (
     id   int auto_increment
         primary key,
     name varchar(250) null
 );
+
+ALTER TABLE tag AUTO_INCREMENT=553;
 
 create table recipe_tag
 (
@@ -55,11 +63,15 @@ create table recipe_tag
         foreign key (tag_id) references tag (id)
 );
 
+ALTER TABLE recipe_tag AUTO_INCREMENT=4141689;
+
 create table user
 (
     id int auto_increment
         primary key
 );
+
+ALTER TABLE user AUTO_INCREMENT=432123;
 
 create table review
 (
@@ -74,3 +86,5 @@ create table review
     constraint review_user_null_fk
         foreign key (user_id) references user (id)
 );
+
+ALTER TABLE review AUTO_INCREMENT=581254;
