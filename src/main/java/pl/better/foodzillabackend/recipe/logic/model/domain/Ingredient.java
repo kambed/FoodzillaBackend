@@ -22,7 +22,7 @@ public class Ingredient {
     private Long id;
     private String name;
 
-    @ManyToMany(mappedBy = "ingredients")
+    @ManyToMany(mappedBy = "ingredients", cascade = CascadeType.REMOVE)
     private Set<Recipe> recipes = new HashSet<>();
 
     public Ingredient(String name) {

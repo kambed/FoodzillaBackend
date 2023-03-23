@@ -23,7 +23,7 @@ public class Tag {
     private Long id;
     private String name;
 
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(mappedBy = "tags", cascade = CascadeType.REMOVE)
     private Set<Recipe> recipes = new HashSet<>();
 
     public Tag(String name) {

@@ -1,5 +1,6 @@
 package pl.better.foodzillabackend.recipe.logic.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -21,7 +22,7 @@ public class RecipeController {
     }
 
     @MutationMapping
-    public RecipeDto createRecipe(@Argument CreateRecipeCommand recipe) {
+    public RecipeDto createRecipe(@Argument @Valid CreateRecipeCommand recipe) {
         return recipeService.createNewRecipeAndSaveInDb(recipe);
     }
 

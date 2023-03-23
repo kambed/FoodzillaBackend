@@ -33,7 +33,7 @@ public class Recipe {
     private int saturatedFat;
     private int carbohydrates;
 
-    @OneToMany(mappedBy = "recipe")
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();
 
     @ManyToMany

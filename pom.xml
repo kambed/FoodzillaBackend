@@ -85,6 +85,12 @@
             <artifactId>hibernate-types-60</artifactId>
             <version>${hibernate-types.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.graphql-java-kickstart</groupId>
+            <artifactId>graphql-spring-boot-starter-test</artifactId>
+            <version>15.0.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

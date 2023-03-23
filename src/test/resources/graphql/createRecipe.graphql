@@ -1,0 +1,58 @@
+mutation {
+    createRecipe(
+        recipe: {
+            name: "Salty water"
+            description: "Really salty"
+            timeOfPreparation: 30
+            steps: [
+                "Get water",
+                "Insert salt into water"
+            ]
+            calories: 100
+            fat: 10
+            sugar: 10
+            sodium: 10
+            protein: 10
+            saturatedFat: 10
+            carbohydrates: 10
+            ingredients: [
+                {
+                    name: "water"
+                }
+                {
+                    name: "salt"
+                }
+            ]
+            tags: [
+                {
+                    name: "he he"
+                }
+            ]
+        }
+    ) {
+        id
+        name
+        description
+        timeOfPreparation
+        numberOfSteps
+        steps
+        numberOfIngredients
+        calories
+        fat
+        sugar
+        sodium
+        protein
+        saturatedFat
+        carbohydrates
+        reviews {
+            review
+            rating
+        }
+        ingredients {
+            name
+        }
+        tags {
+            name
+        }
+    }
+}
