@@ -24,6 +24,7 @@
         <lombok.version>1.18.24</lombok.version>
         <mysql.connector.version>8.0.32</mysql.connector.version>
         <spring-boot-starter-graphql.version>3.0.4</spring-boot-starter-graphql.version>
+        <hibernate-types.version>2.19.0</hibernate-types.version>
     </properties>
 
     <dependencies>
@@ -78,6 +79,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-graphql</artifactId>
             <version>${spring-boot-starter-graphql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vladmihalcea</groupId>
+            <artifactId>hibernate-types-60</artifactId>
+            <version>${hibernate-types.version}</version>
         </dependency>
     </dependencies>
 
