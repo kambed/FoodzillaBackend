@@ -1,5 +1,6 @@
 package pl.better.foodzillabackend.recipe.logic.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -8,8 +9,6 @@ import org.springframework.stereotype.Controller;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.service.RecipeService;
-
-import javax.validation.Valid;
 
 @Controller
 @RequiredArgsConstructor

@@ -1,13 +1,12 @@
 package pl.better.foodzillabackend.recipe.logic.model.command;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Tag;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
 
