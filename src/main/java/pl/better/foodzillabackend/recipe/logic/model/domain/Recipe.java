@@ -1,10 +1,10 @@
 package pl.better.foodzillabackend.recipe.logic.model.domain;
 
-import jakarta.persistence.*;
 import lombok.*;
 import pl.better.foodzillabackend.utils.StringToListConverter;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
 
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

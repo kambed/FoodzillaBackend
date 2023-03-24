@@ -1,12 +1,12 @@
 package pl.better.foodzillabackend.user.logic.model.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.HashSet;
 import java.util.Set;
 
