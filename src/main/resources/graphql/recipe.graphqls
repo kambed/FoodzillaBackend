@@ -1,0 +1,67 @@
+input RecipeInput {
+    name: String!
+    description: String
+    timeOfPreparation: Int
+    steps: [String]
+    calories: Float
+    fat: Int
+    sugar: Int
+    sodium: Int
+    protein: Int
+    saturatedFat: Int
+    carbohydrates: Int
+    ingredients: [IngredientInput]
+    tags: [TagInput]
+}
+
+input IngredientInput {
+    name: String!
+}
+
+input TagInput {
+    name: String!
+}
+
+type Recipe {
+    id: ID
+    name: String!
+    description: String
+    timeOfPreparation: Int
+    numberOfSteps: Int
+    steps: [String]
+    numberOfIngredients: Int
+    calories: Float
+    fat: Int
+    sugar: Int
+    sodium: Int
+    protein: Int
+    saturatedFat: Int
+    carbohydrates: Int
+    reviews: [Review]
+    ingredients: [Ingredient]
+    tags: [Tag]
+}
+
+type Ingredient {
+    id: ID
+    name: String!
+}
+
+type Tag {
+    id: ID
+    name: String!
+}
+
+type Review {
+    id: ID
+    review: String
+    rating: Int!
+}
+
+type Query {
+    recipe(id: ID!): Recipe
+}
+
+type Mutation {
+    createRecipe(recipe: RecipeInput): Recipe
+}
