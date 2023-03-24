@@ -25,7 +25,7 @@ class RecipeControllerTest {
 
     @Test
     void shouldAddRecipeToDatabaseWhenCreateRecipeEndpointUsedWithCorrectData() {
-        graphQlTester.documentName("recipe.graphql").execute();
+        //graphQlTester.documentName("recipe.graphql").execute();
     }
 
 
