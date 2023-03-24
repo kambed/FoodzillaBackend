@@ -1,6 +1,0 @@
-query get_person($id: Int!){
-    person(id : $id){
-        id
-        name
-    }
-}

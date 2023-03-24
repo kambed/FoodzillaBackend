@@ -1,0 +1,28 @@
+query get_recipe($id: ID!) {
+    recipe(id: $id) {
+        id
+        name
+        description
+        timeOfPreparation
+        numberOfSteps
+        steps
+        numberOfIngredients
+        calories
+        fat
+        sugar
+        sodium
+        protein
+        saturatedFat
+        carbohydrates
+        reviews {
+            review
+            rating
+        }
+        ingredients {
+            name
+        }
+        tags {
+            name
+        }
+    }
+}
