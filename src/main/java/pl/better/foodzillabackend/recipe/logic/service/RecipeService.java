@@ -34,34 +34,34 @@ public class RecipeService {
     }
 
     public RecipeDto createNewRecipeAndSaveInDb(CreateRecipeCommand command) {
-        Recipe recipe = new Recipe(
-                command.name(),
-                command.description(),
-                command.timeOfPreparation(),
-                command.steps().size(),
-                command.steps(),
-                command.ingredients().size(),
-                command.calories(),
-                command.fat(),
-                command.sugar(),
-                command.sodium(),
-                command.protein(),
-                command.saturatedFat(),
-                command.carbohydrates(),
-                new HashSet<>(),
-                command.ingredients().stream().map(i ->
+        Recipe recipe = Recipe.builder()
+                .name(command.name())
+                .description(command.description())
+                .timeOfPreparation(command.timeOfPreparation())
+                .numberOfSteps(command.steps().size())
+                .steps(command.steps())
+                .numberOfIngredients(command.ingredients().size())
+                .calories(command.calories())
+                .fat(command.fat())
+                .sugar(command.sugar())
+                .sodium(command.sodium())
+                .protein(command.protein())
+                .saturatedFat(command.saturatedFat())
+                .carbohydrates(command.carbohydrates())
+                .reviews(new HashSet<>())
+                .ingredients(command.ingredients().stream().map(i ->
                         ingredientRepository.findIngredientByName(i.getName()).stream().findFirst().orElseGet(() -> {
                             ingredientRepository.saveAndFlush(i);
                             return i;
                         })
-                ).collect(Collectors.toSet()),
-                command.tags().stream().map(t ->
+                ).collect(Collectors.toSet()))
+                .tags(command.tags().stream().map(t ->
                         tagRepository.findTagByName(t.getName()).stream().findFirst().orElseGet(() -> {
                             tagRepository.saveAndFlush(t);
                             return t;
                         })
-                ).collect(Collectors.toSet())
-        );
+                ).collect(Collectors.toSet()))
+                .build();
         recipeRepository.saveAndFlush(recipe);
         return recipeDtoMapper.apply(recipe);
     }

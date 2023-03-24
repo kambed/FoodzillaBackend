@@ -84,23 +84,33 @@ class RecipeControllerTest {
     void shouldDisplayRecipeDetailsByGivenId() {
         Ingredient i = new Ingredient("Water");
         Tag t = new Tag("Yummy");
-        Recipe r = new Recipe(
-                "Name", "Description", 2, 2, List.of("Step1", "Step2"),
-                1, 3, 4, 5, 6, 7, 8, 9,
-                new HashSet<>(),
-                Set.of(
+        Recipe r = Recipe.builder()
+                .name("Name")
+                .description("Description")
+                .timeOfPreparation(2)
+                .numberOfSteps(2)
+                .steps(List.of("Step1", "Step2"))
+                .numberOfIngredients(1)
+                .calories(3)
+                .fat(4)
+                .sugar(5)
+                .sodium(6)
+                .protein(7)
+                .saturatedFat(8)
+                .carbohydrates(9)
+                .reviews(new HashSet<>())
+                .ingredients(Set.of(
                         ingredientRepository.findIngredientByName(i.getName()).stream().findFirst().orElseGet(() -> {
                             ingredientRepository.saveAndFlush(i);
                             return i;
                         })
-                ),
-                Set.of(
+                ))
+                .tags(Set.of(
                         tagRepository.findTagByName(t.getName()).stream().findFirst().orElseGet(() -> {
                             tagRepository.saveAndFlush(t);
                             return t;
                         })
-                )
-        );
+                )).build();
         repository.saveAndFlush(r);
         assertEquals(1, repository.findAll().size());
 
