@@ -1,9 +1,12 @@
 package pl.better.foodzillabackend.user.logic.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.better.foodzillabackend.user.logic.exception.UserNotFoundException;
+import pl.better.foodzillabackend.exceptions.type.UserNotFoundException;
 import pl.better.foodzillabackend.user.logic.mapper.UserDtoMapper;
 import pl.better.foodzillabackend.user.logic.model.command.CreateUserCommand;
 import pl.better.foodzillabackend.user.logic.model.domain.User;
@@ -12,7 +15,7 @@ import pl.better.foodzillabackend.user.logic.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private static final String USER_NOT_FOUND = "User with id: %s not found";
     private final UserRepository userRepo;
@@ -39,5 +42,10 @@ public class UserService {
 
         userRepo.saveAndFlush(user);
         return mapper.apply(user);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return null;
     }
 }

@@ -7,7 +7,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Component;
-import pl.better.foodzillabackend.recipe.logic.exception.RecipeNotFoundException;
+import pl.better.foodzillabackend.exceptions.type.NotFoundException;
 
 @Component
 public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter {
@@ -18,7 +18,7 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
         if (ex instanceof ConstraintViolationException) {
             errorType = ErrorType.BAD_REQUEST;
         }
-        if (ex instanceof RecipeNotFoundException) {
+        if (ex instanceof NotFoundException) {
             errorType = ErrorType.NOT_FOUND;
         }
         return GraphqlErrorBuilder.newError()
