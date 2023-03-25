@@ -60,6 +60,8 @@ type Review {
 
 type Query {
     recipe(id: ID!): Recipe
+    tags: [Tag]
+    ingredients: [Ingredient]
 }
 
 type Mutation {
