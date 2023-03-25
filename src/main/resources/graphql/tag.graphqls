@@ -1,0 +1,12 @@
+extend type Query {
+    tags: [Tag]
+}
+
+input TagInput {
+    name: String!
+}
+
+type Tag {
+    id: ID
+    name: String!
+}

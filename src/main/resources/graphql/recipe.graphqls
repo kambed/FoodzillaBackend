@@ -1,3 +1,11 @@
+type Query {
+    recipe(id: ID!): Recipe
+}
+
+type Mutation {
+    createRecipe(recipe: RecipeInput): Recipe
+}
+
 input RecipeInput {
     name: String!
     description: String
@@ -12,14 +20,6 @@ input RecipeInput {
     carbohydrates: Int
     ingredients: [IngredientInput]
     tags: [TagInput]
-}
-
-input IngredientInput {
-    name: String!
-}
-
-input TagInput {
-    name: String!
 }
 
 type Recipe {
@@ -40,30 +40,4 @@ type Recipe {
     reviews: [Review]
     ingredients: [Ingredient]
     tags: [Tag]
-}
-
-type Ingredient {
-    id: ID
-    name: String!
-}
-
-type Tag {
-    id: ID
-    name: String!
-}
-
-type Review {
-    id: ID
-    review: String
-    rating: Int!
-}
-
-type Query {
-    recipe(id: ID!): Recipe
-    tags: [Tag]
-    ingredients: [Ingredient]
-}
-
-type Mutation {
-    createRecipe(recipe: RecipeInput): Recipe
 }

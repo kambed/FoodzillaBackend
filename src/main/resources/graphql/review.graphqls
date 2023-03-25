@@ -1,0 +1,5 @@
+type Review {
+    id: ID
+    review: String
+    rating: Int!
+}
