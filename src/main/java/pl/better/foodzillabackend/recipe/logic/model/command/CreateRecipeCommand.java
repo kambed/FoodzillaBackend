@@ -4,8 +4,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import pl.better.foodzillabackend.recipe.logic.model.domain.Ingredient;
-import pl.better.foodzillabackend.recipe.logic.model.domain.Tag;
+import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
+import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 
 import java.util.List;
 import java.util.Set;

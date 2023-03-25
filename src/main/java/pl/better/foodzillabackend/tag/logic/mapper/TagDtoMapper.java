@@ -1,8 +1,8 @@
-package pl.better.foodzillabackend.recipe.logic.mapper;
+package pl.better.foodzillabackend.tag.logic.mapper;
 
 import org.springframework.stereotype.Component;
-import pl.better.foodzillabackend.recipe.logic.model.domain.Tag;
-import pl.better.foodzillabackend.recipe.logic.model.dto.TagDto;
+import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
+import pl.better.foodzillabackend.tag.logic.model.dto.TagDto;
 
 import java.util.function.Function;
 

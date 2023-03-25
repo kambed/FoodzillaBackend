@@ -1,8 +1,8 @@
-package pl.better.foodzillabackend.recipe.logic.mapper;
+package pl.better.foodzillabackend.ingredient.logic.mapper;
 
 import org.springframework.stereotype.Component;
-import pl.better.foodzillabackend.recipe.logic.model.domain.Ingredient;
-import pl.better.foodzillabackend.recipe.logic.model.dto.IngredientDto;
+import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
+import pl.better.foodzillabackend.ingredient.logic.model.dto.IngredientDto;
 
 import java.util.function.Function;
 

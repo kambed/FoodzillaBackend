@@ -7,12 +7,12 @@ import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureG
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import pl.better.foodzillabackend.recipe.logic.model.domain.Ingredient;
+import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
-import pl.better.foodzillabackend.recipe.logic.model.domain.Tag;
-import pl.better.foodzillabackend.recipe.logic.repository.IngredientRepository;
+import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
+import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
-import pl.better.foodzillabackend.recipe.logic.repository.TagRepository;
+import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 
 import java.util.HashSet;
 import java.util.List;

@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.recipe.logic.model.dto;
+package pl.better.foodzillabackend.tag.logic.model.dto;
 
 import lombok.Builder;
 

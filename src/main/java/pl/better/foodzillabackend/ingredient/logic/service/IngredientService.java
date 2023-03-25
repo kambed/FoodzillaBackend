@@ -1,10 +1,10 @@
-package pl.better.foodzillabackend.recipe.logic.service;
+package pl.better.foodzillabackend.ingredient.logic.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.better.foodzillabackend.recipe.logic.mapper.IngredientDtoMapper;
-import pl.better.foodzillabackend.recipe.logic.model.dto.IngredientDto;
-import pl.better.foodzillabackend.recipe.logic.repository.IngredientRepository;
+import pl.better.foodzillabackend.ingredient.logic.mapper.IngredientDtoMapper;
+import pl.better.foodzillabackend.ingredient.logic.model.dto.IngredientDto;
+import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 
 import java.util.Set;
 import java.util.stream.Collectors;
