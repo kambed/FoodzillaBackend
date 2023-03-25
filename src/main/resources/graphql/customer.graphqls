@@ -1,0 +1,20 @@
+extend type Mutation {
+    createCustomer(customer: CustomerInput): Customer
+}
+
+extend type Query {
+    customer(id: ID!): Customer
+}
+
+input CustomerInput {
+    firstname: String!
+    lastname: String!
+    username: String!
+    password: String!
+}
+
+type Customer {
+    firstname: String!
+    lastname: String!
+    username: String!
+}

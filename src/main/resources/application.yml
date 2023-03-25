@@ -15,3 +15,7 @@ spring:
     properties:
       hibernate:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  security:
+    jwt:
+      secret: ${SECRET_API_KEY}
+      expiration: ${EXPIRATION_LENGTH}

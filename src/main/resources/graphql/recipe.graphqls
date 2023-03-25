@@ -58,10 +58,10 @@ type Review {
     rating: Int!
 }
 
-type Query {
+extend type Query {
     recipe(id: ID!): Recipe
 }
 
-type Mutation {
+extend type Mutation {
     createRecipe(recipe: RecipeInput): Recipe
 }
