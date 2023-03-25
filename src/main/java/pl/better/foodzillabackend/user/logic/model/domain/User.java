@@ -1,10 +1,7 @@
 package pl.better.foodzillabackend.user.logic.model.domain;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
 
 import java.util.HashSet;
@@ -13,8 +10,10 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Builder
 @EqualsAndHashCode
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id

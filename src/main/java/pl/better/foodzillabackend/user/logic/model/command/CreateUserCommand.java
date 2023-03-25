@@ -7,13 +7,13 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 @SchemaMapping
 public record CreateUserCommand(
         @NotNull
-        @Size(min = 1, max = 250)
+        @Size(min = 2, max = 100)
         String firstname,
         @NotNull
-        @Size(min = 1, max = 250)
+        @Size(min = 2, max = 100)
         String lastname,
         @NotNull
-        @Size(min = 1, max = 250)
+        @Size(min = 5, max = 100)
         String username,
         @NotNull
         @Size(min = 8, max = 250)
