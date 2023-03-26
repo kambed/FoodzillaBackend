@@ -1,4 +1,4 @@
-query get_recipe($id: ID!) {
+query get_user($id: ID!) {
     customer(id: $id) {
         firstname
         lastname
