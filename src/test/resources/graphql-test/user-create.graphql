@@ -1,10 +1,13 @@
-mutation {
+mutation create($firstname: String!,
+    $lastname: String!
+    $username: String!
+    $password: String!) {
     createCustomer(
         customer: {
-            firstname: "Bob"
-            lastname: "Loblaw"
-            username: "BobLoblaw"
-            password: "b0bl0bl@w"
+            firstname: $firstname
+            lastname: $lastname
+            username: $username
+            password: $password
         }
     ) {
         firstname

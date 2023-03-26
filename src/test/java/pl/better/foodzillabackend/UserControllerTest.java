@@ -32,11 +32,14 @@ public class UserControllerTest {
     void shouldAddUserToDatabaseWithCorrectData() {
         assertEquals(0, repository.findAll().size());
 
-        GraphQlTester.Response res = graphQlTester.documentName("user-create").execute();
+        GraphQlTester.Response res = send("Boob",
+                "obbo",
+                "Boob123",
+                "bOb@4321");
         res.path("createCustomer").entity(User.class).satisfies(user -> {
-            assertEquals("Bob", user.getFirstname());
-            assertEquals("Loblaw", user.getLastname());
-            assertEquals("BobLoblaw", user.getUsername());
+            assertEquals("Boob", user.getFirstname());
+            assertEquals("obbo", user.getLastname());
+            assertEquals("Boob123", user.getUsername());
         });
 
         assertEquals(1, repository.findAll().size());
@@ -44,17 +47,12 @@ public class UserControllerTest {
 
     @Test
     void shouldReturnErrorAndAbortAddWhenCreateUserWithIncorrectData() {
-        GraphQlTester.Response res = graphQlTester.documentName("user-create-invalid").execute();
+        GraphQlTester.Response res = send("b",
+                "o",
+                "b",
+                "sdaD936245");
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST))
                 .verify().path("createCustomer").valueIsNull();
-    }
-
-    @Test
-    void shouldReturnErrorWhenUserIdNotFound() {
-        GraphQlTester.Response res = graphQlTester.documentName("user-get").variable("id", -1).execute();
-        res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
-                        Objects.equals(responseError.getMessage(), "User with id: -1 not found"))
-                .verify().path("customer").valueIsNull();
     }
 
     @Test
@@ -63,12 +61,15 @@ public class UserControllerTest {
                 .firstname("Bob")
                 .lastname("Loblaw")
                 .username("BobLoblaw")
-                .password("b0bl0bl@w")
+                .password("b0bL0bl@w")
                 .build();
         repository.saveAndFlush(user);
         assertEquals(1, repository.findAll().size());
 
-        GraphQlTester.Response res = graphQlTester.documentName("user-create").execute();
+        GraphQlTester.Response res = send("Obi-Wan",
+                "Kenobi",
+                "BobLoblaw",
+                "IlovESt@rwars321");
 
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.FORBIDDEN) &&
                         Objects.equals(responseError.getMessage(), "User with username: BobLoblaw already exists"))
@@ -78,23 +79,15 @@ public class UserControllerTest {
     }
 
 
-    @Test
-    void shouldDisplayUserDetailsByGivenId() {
-        User user = User.builder()
-                .firstname("Booob")
-                .lastname("ooobooo")
-                .username("obobobo")
-                .password("password123")
-                .build();
-        repository.saveAndFlush(user);
-        assertEquals(1, repository.findAll().size());
-
-        GraphQlTester.Response res = graphQlTester.documentName("user-get").variable("id", user.getId()).execute();
-        res.errors().verify();
-        res.path("customer").entity(User.class).satisfies(recipe -> {
-            assertEquals("Booob", user.getFirstname());
-            assertEquals("ooobooo", user.getLastname());
-            assertEquals("obobobo", user.getUsername());
-        });
+    private GraphQlTester.Response send(String firstname,
+                                        String lastname,
+                                        String username,
+                                        String password) {
+        return graphQlTester.documentName("user-create")
+                .variable("firstname", firstname)
+                .variable("lastname", lastname)
+                .variable("username", username)
+                .variable("password", password)
+                .execute();
     }
 }

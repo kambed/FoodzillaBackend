@@ -1,7 +1,0 @@
-query get_user($id: ID!) {
-    customer(id: $id) {
-        firstname
-        lastname
-        username
-    }
-}

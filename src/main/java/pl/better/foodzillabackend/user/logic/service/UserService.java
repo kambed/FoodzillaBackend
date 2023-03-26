@@ -20,16 +20,6 @@ public class UserService {
     private final UserRepository userRepo;
     private final UserDtoMapper mapper;
 
-    public UserDto getUserById(long id) {
-        return userRepo.getUserById(id)
-                .stream()
-                .map(mapper)
-                .findFirst()
-                .orElseThrow(() -> new UserNotFoundException(
-                        USER_NOT_FOUND.formatted(id)
-                ));
-    }
-
     @Transactional
     public UserDto createNewUserAndSaveInDb(CreateUserCommand command) {
         if (!exists(command)) {

@@ -20,9 +20,4 @@ public class UserController {
     public UserDto createCustomer(@Argument @Valid CreateUserCommand customer) {
         return userService.createNewUserAndSaveInDb(customer);
     }
-
-    @QueryMapping
-    public UserDto customer(@Argument long id) {
-        return userService.getUserById(id);
-    }
 }
