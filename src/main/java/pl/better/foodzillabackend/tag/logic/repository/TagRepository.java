@@ -1,9 +1,9 @@
-package pl.better.foodzillabackend.recipe.logic.repository;
+package pl.better.foodzillabackend.tag.logic.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import pl.better.foodzillabackend.recipe.logic.model.domain.Tag;
+import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 
 import java.util.List;
 
