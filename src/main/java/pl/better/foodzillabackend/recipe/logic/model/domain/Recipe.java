@@ -2,6 +2,8 @@ package pl.better.foodzillabackend.recipe.logic.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
+import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.utils.StringToListConverter;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
 
