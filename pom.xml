@@ -20,6 +20,7 @@
         <lombok.version>1.18.24</lombok.version>
         <mysql.connector.version>8.0.32</mysql.connector.version>
         <jwt.version>4.3.0</jwt.version>
+        <spring-security-config.version>5.7.4</spring-security-config.version>
     </properties>
 
     <dependencies>
@@ -83,6 +84,11 @@
             <groupId>org.springframework.graphql</groupId>
             <artifactId>spring-graphql-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>${spring-security-config.version}</version>
         </dependency>
     </dependencies>
 
