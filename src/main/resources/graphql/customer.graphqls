@@ -1,6 +1,5 @@
 extend type Mutation {
     createCustomer(customer: CustomerInput): Customer
-    login(username: String!, password: String): Jwt
 }
 
 extend type Query {
@@ -18,9 +17,4 @@ type Customer {
     firstname: String!
     lastname: String!
     username: String!
-}
-
-type Jwt {
-    token: String!
-    customer: Customer
 }

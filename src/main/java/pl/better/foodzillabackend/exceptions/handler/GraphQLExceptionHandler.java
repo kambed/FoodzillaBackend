@@ -8,6 +8,7 @@ import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.exceptions.type.NotFoundException;
+import pl.better.foodzillabackend.exceptions.type.UserAlreadyExistsException;
 
 @Component
 public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter {
@@ -20,6 +21,9 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
         }
         if (ex instanceof NotFoundException) {
             errorType = ErrorType.NOT_FOUND;
+        }
+        if (ex instanceof UserAlreadyExistsException) {
+            errorType = ErrorType.FORBIDDEN;
         }
         return GraphqlErrorBuilder.newError()
                 .errorType(errorType)

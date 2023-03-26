@@ -57,9 +57,29 @@ public class UserControllerTest {
                 .verify().path("customer").valueIsNull();
     }
 
+    @Test
+    void shouldReturnErrorWhenUserWithGivenUsernameAlreadyExists() {
+        User user = User.builder()
+                .firstname("Bob")
+                .lastname("Loblaw")
+                .username("BobLoblaw")
+                .password("b0bl0bl@w")
+                .build();
+        repository.saveAndFlush(user);
+        assertEquals(1, repository.findAll().size());
+
+        GraphQlTester.Response res = graphQlTester.documentName("user-create").execute();
+
+        res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.FORBIDDEN) &&
+                        Objects.equals(responseError.getMessage(), "User with username: BobLoblaw already exists"))
+                .verify().path("createCustomer").valueIsNull();
+
+        assertEquals(1, repository.findAll().size());
+    }
+
 
     @Test
-    void shouldDisplayRecipeDetailsByGivenId() {
+    void shouldDisplayUserDetailsByGivenId() {
         User user = User.builder()
                 .firstname("Booob")
                 .lastname("ooobooo")

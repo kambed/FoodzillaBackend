@@ -16,6 +16,7 @@ import pl.better.foodzillabackend.user.logic.repository.UserRepository;
 public class UserService {
 
     private static final String USER_NOT_FOUND = "User with id: %s not found";
+    private static final String USER_ALREADY_EXIST = "User with username: %s already exists";
     private final UserRepository userRepo;
     private final UserDtoMapper mapper;
 
@@ -43,7 +44,7 @@ public class UserService {
             userRepo.saveAndFlush(user);
             return mapper.apply(user);
         } else {
-            throw new UserAlreadyExistsException(command.username());
+            throw new UserAlreadyExistsException(USER_ALREADY_EXIST.formatted(command.username()));
         }
     }
 
