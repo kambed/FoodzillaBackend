@@ -6,10 +6,13 @@ import org.springframework.stereotype.Repository;
 import pl.better.foodzillabackend.user.logic.model.domain.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.id = :id")
     List<User> getUserById(long id);
+    Optional<User> findByUsername(String username);
+    boolean existsByUsername(String username);
 }

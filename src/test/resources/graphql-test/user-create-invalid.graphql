@@ -1,0 +1,14 @@
+mutation {
+    createCustomer(
+        customer: {
+            firstname: "1"
+            lastname: "2"
+            username: "3"
+            password: "4@w"
+        }
+    ) {
+        firstname
+        lastname
+        username
+    }
+}

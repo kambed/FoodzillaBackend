@@ -1,11 +1,9 @@
 package pl.better.foodzillabackend.user.logic.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.better.foodzillabackend.exceptions.type.UserAlreadyExistsException;
 import pl.better.foodzillabackend.exceptions.type.UserNotFoundException;
 import pl.better.foodzillabackend.user.logic.mapper.UserDtoMapper;
 import pl.better.foodzillabackend.user.logic.model.command.CreateUserCommand;
@@ -15,12 +13,11 @@ import pl.better.foodzillabackend.user.logic.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
 
     private static final String USER_NOT_FOUND = "User with id: %s not found";
     private final UserRepository userRepo;
     private final UserDtoMapper mapper;
-    private final PasswordEncoder passwordEncoder;
 
     public UserDto getUserById(long id) {
         return userRepo.getUserById(id)
@@ -32,20 +29,25 @@ public class UserService implements UserDetailsService {
                 ));
     }
 
+    @Transactional
     public UserDto createNewUserAndSaveInDb(CreateUserCommand command) {
-        User user = User.builder()
-                .firstname(command.firstname())
-                .lastname(command.lastname())
-                .username(command.username())
-                .password(passwordEncoder.encode(command.password()))
-                .build();
+        if (!exists(command)) {
+            User user = User.builder()
+                    .firstname(command.firstname())
+                    .lastname(command.lastname())
+                    .username(command.username())
+                    //TODO: password encryption, related to security configuration
+                    .password(command.password())
+                    .build();
 
-        userRepo.saveAndFlush(user);
-        return mapper.apply(user);
+            userRepo.saveAndFlush(user);
+            return mapper.apply(user);
+        } else {
+            throw new UserAlreadyExistsException(command.username());
+        }
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+    private boolean exists(CreateUserCommand command) {
+        return userRepo.existsByUsername(command.username());
     }
 }

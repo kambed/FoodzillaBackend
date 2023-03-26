@@ -17,8 +17,8 @@ public class UserController {
     private final UserService userService;
 
     @MutationMapping
-    public UserDto createCustomer(@Argument @Valid CreateUserCommand user) {
-        return userService.createNewUserAndSaveInDb(user);
+    public UserDto createCustomer(@Argument @Valid CreateUserCommand customer) {
+        return userService.createNewUserAndSaveInDb(customer);
     }
 
     @QueryMapping
