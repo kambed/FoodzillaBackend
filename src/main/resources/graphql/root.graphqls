@@ -1,2 +1,2 @@
-type Mutation
 type Query
+type Mutation
