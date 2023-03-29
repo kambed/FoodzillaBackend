@@ -63,6 +63,8 @@
             <groupId>org.apache.mahout</groupId>
             <artifactId>mahout-integration</artifactId>
             <version>0.13.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/mahout-integration-0.13.0.jar</systemPath>
         </dependency>
 
         <dependency>
