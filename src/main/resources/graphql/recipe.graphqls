@@ -1,6 +1,5 @@
 extend type Query {
     recipe(id: ID!): Recipe
-    recipeImage(id: ID!): RecipeImage
 }
 
 extend type Mutation {
@@ -38,12 +37,8 @@ type Recipe {
     protein: Int
     saturatedFat: Int
     carbohydrates: Int
+    image: String
     reviews: [Review]
     ingredients: [Ingredient]
     tags: [Tag]
-}
-
-type RecipeImage {
-    id: ID
-    image: String
 }

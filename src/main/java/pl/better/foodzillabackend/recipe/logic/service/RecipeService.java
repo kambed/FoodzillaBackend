@@ -10,7 +10,6 @@ import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
-import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeImageDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeImageGenerateDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
@@ -73,7 +72,7 @@ public class RecipeService {
         return recipeDtoMapper.apply(recipe);
     }
 
-    public RecipeImageDto getRecipeImageById(long id) {
+    public String getRecipeImageById(long id) {
         Recipe r = recipeRepository.getRecipeDetailsById(id)
                 .stream()
                 .findFirst()
@@ -84,7 +83,7 @@ public class RecipeService {
             generateImageForRecipe(r);
             recipeRepository.saveAndFlush(r);
         }
-        return new RecipeImageDto(r.getId(), r.getImage());
+        return r.getImage();
     }
 
     private void generateImageForRecipe(Recipe r) {
