@@ -36,6 +36,7 @@ public class Recipe {
     private int protein;
     private int saturatedFat;
     private int carbohydrates;
+    private String image;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();
