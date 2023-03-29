@@ -1,4 +1,4 @@
-mutation {
+mutation CreateRecipe {
     createRecipe(
         recipe: {
             name: "Salty water"

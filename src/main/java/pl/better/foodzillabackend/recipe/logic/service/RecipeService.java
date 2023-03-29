@@ -2,8 +2,6 @@ package pl.better.foodzillabackend.recipe.logic.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
@@ -39,7 +37,7 @@ public class RecipeService {
                         RECIPE_NOT_FOUND_MESSAGE.formatted(id)
                 ));
         if (r.getImage() == null) {
-            setImageForAnRecipeWithStableDiffusion(r);
+            r = setImageForAnRecipeWithStableDiffusion(r);
         }
         return recipeDtoMapper.apply(r);
     }
@@ -73,11 +71,12 @@ public class RecipeService {
                         })
                 ).collect(Collectors.toSet()))
                 .build();
+        recipe = setImageForAnRecipeWithStableDiffusion(recipe);
         recipeRepository.saveAndFlush(recipe);
         return recipeDtoMapper.apply(recipe);
     }
 
-    public void setImageForAnRecipeWithStableDiffusion(Recipe r) {
+    public Recipe setImageForAnRecipeWithStableDiffusion(Recipe r) {
         RestTemplate restTemplate = new RestTemplate();
         Map<String, Object> map = new HashMap<>();
         map.put("text", r.getName());
@@ -87,10 +86,10 @@ public class RecipeService {
                     + "/generate", map, RecipeImageGenerateDto.class);
             if (res != null && res.generatedImgs() != null && res.generatedImgs().size() == 1) {
                 r.setImage(res.generatedImgs().get(0));
-                recipeRepository.saveAndFlush(r);
             }
         } catch (Exception ignored) {
             //ignored
         }
+        return r;
     }
 }
