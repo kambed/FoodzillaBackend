@@ -2,14 +2,14 @@ package pl.better.foodzillabackend.recipe.logic.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.better.foodzillabackend.recipe.logic.exception.RecipeNotFoundException;
+import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
-import pl.better.foodzillabackend.recipe.logic.repository.IngredientRepository;
+import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
-import pl.better.foodzillabackend.recipe.logic.repository.TagRepository;
+import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;

@@ -1,7 +1,7 @@
 package pl.better.foodzillabackend.recipe.logic.model.dto;
 
-import pl.better.foodzillabackend.recipe.logic.model.domain.Ingredient;
-import pl.better.foodzillabackend.recipe.logic.model.domain.Tag;
+import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
+import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
 
 import java.util.List;

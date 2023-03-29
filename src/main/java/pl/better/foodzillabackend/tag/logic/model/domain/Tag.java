@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.recipe.logic.model.domain;
+package pl.better.foodzillabackend.tag.logic.model.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 
 import java.util.HashSet;
 import java.util.Set;

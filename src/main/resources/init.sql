@@ -68,7 +68,11 @@ ALTER TABLE recipe_tag AUTO_INCREMENT=4141689;
 create table user
 (
     id int auto_increment
-        primary key
+        primary key,
+    firstname varchar(250) not null,
+    lastname varchar(250) not null,
+    username varchar(250) not null,
+    password varchar(250) not null
 );
 
 ALTER TABLE user AUTO_INCREMENT=432123;

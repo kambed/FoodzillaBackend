@@ -1,0 +1,17 @@
+mutation create($firstname: String!,
+    $lastname: String!
+    $username: String!
+    $password: String!) {
+    createCustomer(
+        customer: {
+            firstname: $firstname
+            lastname: $lastname
+            username: $username
+            password: $password
+        }
+    ) {
+        firstname
+        lastname
+        username
+    }
+}
