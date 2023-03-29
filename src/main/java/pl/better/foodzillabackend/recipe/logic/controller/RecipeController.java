@@ -24,7 +24,7 @@ public class RecipeController {
 
     @SchemaMapping(typeName = "Recipe", field = "image")
     public String recipeImage(RecipeDto recipe) {
-        return recipeService.getRecipeImageById(recipe.id());
+        return recipeService.getRecipeImageById(recipe);
     }
 
     @MutationMapping

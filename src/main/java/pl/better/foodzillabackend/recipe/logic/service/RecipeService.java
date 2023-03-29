@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
+import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
@@ -26,6 +27,7 @@ public class RecipeService {
     private final IngredientRepository ingredientRepository;
     private final TagRepository tagRepository;
     private final RecipeDtoMapper recipeDtoMapper;
+    private final RecipeMapper recipeMapper;
     private final Environment environment;
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id: %s not found";
 
@@ -72,14 +74,9 @@ public class RecipeService {
         return recipeDtoMapper.apply(recipe);
     }
 
-    public String getRecipeImageById(long id) {
-        Recipe r = recipeRepository.getRecipeDetailsById(id)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new RecipeNotFoundException(
-                        RECIPE_NOT_FOUND_MESSAGE.formatted(id)
-                ));
-        if (r.getImage() == null) {
+    public String getRecipeImageById(RecipeDto recipe) {
+        Recipe r = recipeMapper.apply(recipe);
+        if (recipe.image() == null) {
             generateImageForRecipe(r);
             recipeRepository.saveAndFlush(r);
         }
