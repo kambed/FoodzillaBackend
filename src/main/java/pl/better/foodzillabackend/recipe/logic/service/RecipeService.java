@@ -10,6 +10,7 @@ import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
+import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeImageDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeImageGenerateDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
@@ -30,16 +31,13 @@ public class RecipeService {
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id: %s not found";
 
     public RecipeDto getRecipeById(long id) {
-        Recipe r = recipeRepository.getRecipeDetailsById(id)
+        return recipeRepository.getRecipeDetailsById(id)
                 .stream()
                 .findFirst()
+                .map(recipeDtoMapper)
                 .orElseThrow(() -> new RecipeNotFoundException(
                         RECIPE_NOT_FOUND_MESSAGE.formatted(id)
                 ));
-        if (r.getImage() == null) {
-            r = setImageForAnRecipeWithStableDiffusion(r);
-        }
-        return recipeDtoMapper.apply(r);
     }
 
     public RecipeDto createNewRecipeAndSaveInDb(CreateRecipeCommand command) {
@@ -71,12 +69,25 @@ public class RecipeService {
                         })
                 ).collect(Collectors.toSet()))
                 .build();
-        recipe = setImageForAnRecipeWithStableDiffusion(recipe);
         recipeRepository.saveAndFlush(recipe);
         return recipeDtoMapper.apply(recipe);
     }
 
-    public Recipe setImageForAnRecipeWithStableDiffusion(Recipe r) {
+    public RecipeImageDto getRecipeImageById(long id) {
+        Recipe r = recipeRepository.getRecipeDetailsById(id)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RecipeNotFoundException(
+                        RECIPE_NOT_FOUND_MESSAGE.formatted(id)
+                ));
+        if (r.getImage() == null) {
+            generateImageForRecipe(r);
+            recipeRepository.saveAndFlush(r);
+        }
+        return new RecipeImageDto(r.getId(), r.getImage());
+    }
+
+    private void generateImageForRecipe(Recipe r) {
         RestTemplate restTemplate = new RestTemplate();
         Map<String, Object> map = new HashMap<>();
         map.put("text", r.getName());
@@ -90,6 +101,5 @@ public class RecipeService {
         } catch (Exception ignored) {
             //ignored
         }
-        return r;
     }
 }

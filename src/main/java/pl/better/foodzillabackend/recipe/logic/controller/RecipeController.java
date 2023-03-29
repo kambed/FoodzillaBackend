@@ -8,6 +8,7 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
+import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeImageDto;
 import pl.better.foodzillabackend.recipe.logic.service.RecipeService;
 
 @Controller
@@ -19,6 +20,11 @@ public class RecipeController {
     @QueryMapping
     public RecipeDto recipe(@Argument long id) {
         return recipeService.getRecipeById(id);
+    }
+
+    @QueryMapping
+    public RecipeImageDto recipeImage(@Argument long id) {
+        return recipeService.getRecipeImageById(id);
     }
 
     @MutationMapping
