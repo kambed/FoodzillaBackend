@@ -93,3 +93,7 @@ create table review
 );
 
 ALTER TABLE review AUTO_INCREMENT=581254;
+
+CREATE VIEW preferences AS
+SELECT user_id, recipe_id, rating
+FROM user JOIN review r on user.id = r.user_id;
