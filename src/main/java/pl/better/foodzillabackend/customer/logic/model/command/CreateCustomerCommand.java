@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.user.logic.model.command;
+package pl.better.foodzillabackend.customer.logic.model.command;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 
 @SchemaMapping
-public record CreateUserCommand(
+public record CreateCustomerCommand(
         @NotNull
         @Size(min = 2, max = 100)
         String firstname,

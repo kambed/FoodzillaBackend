@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.test.context.ActiveProfiles;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.tag.logic.model.dto.TagDto;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @AutoConfigureGraphQlTester
+@ActiveProfiles("test")
 class TagControllerTest {
 
     @Autowired

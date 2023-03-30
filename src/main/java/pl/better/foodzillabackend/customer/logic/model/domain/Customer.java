@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.user.logic.model.domain;
+package pl.better.foodzillabackend.customer.logic.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +14,7 @@ import java.util.Set;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +24,6 @@ public class User {
     private String username;
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();
 }
