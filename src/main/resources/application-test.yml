@@ -1,0 +1,14 @@
+spring:
+  graphql:
+    graphiql:
+      enabled: true
+  datasource:
+    username: sa
+    password: password
+    url: jdbc:h2:file:~/rest-fodzilla
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  h2:
+    console:
+      enabled: true

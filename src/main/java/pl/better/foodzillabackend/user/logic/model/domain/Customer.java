@@ -14,7 +14,7 @@ import java.util.Set;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

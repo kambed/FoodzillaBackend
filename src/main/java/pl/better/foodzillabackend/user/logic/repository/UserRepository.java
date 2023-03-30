@@ -3,16 +3,20 @@ package pl.better.foodzillabackend.user.logic.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import pl.better.foodzillabackend.user.logic.model.domain.User;
+import pl.better.foodzillabackend.user.logic.model.domain.Customer;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<Customer, Long> {
 
-    @Query("SELECT u FROM User u WHERE u.id = :id")
-    List<User> getUserById(long id);
-    Optional<User> findByUsername(String username);
+    @Query("SELECT u FROM Customer u WHERE u.id = :id")
+    List<Customer> getUserById(long id);
+
+    Optional<Customer> findByUsername(String username);
+
+    Optional<Customer> findById(Long username);
+
     boolean existsByUsername(String username);
 }

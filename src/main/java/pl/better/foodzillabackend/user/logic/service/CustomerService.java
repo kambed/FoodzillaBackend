@@ -6,14 +6,15 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.better.foodzillabackend.exceptions.type.UserAlreadyExistsException;
 import pl.better.foodzillabackend.exceptions.type.UserNotFoundException;
 import pl.better.foodzillabackend.user.logic.mapper.UserDtoMapper;
-import pl.better.foodzillabackend.user.logic.model.command.CreateUserCommand;
-import pl.better.foodzillabackend.user.logic.model.domain.User;
-import pl.better.foodzillabackend.user.logic.model.dto.UserDto;
+import pl.better.foodzillabackend.user.logic.model.command.CreateCustomerCommand;
+import pl.better.foodzillabackend.user.logic.model.command.UpdateCustomerCommand;
+import pl.better.foodzillabackend.user.logic.model.domain.Customer;
+import pl.better.foodzillabackend.user.logic.model.dto.CustomerDto;
 import pl.better.foodzillabackend.user.logic.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class CustomerService {
 
     private static final String USER_NOT_FOUND = "User with id: %s not found";
     private static final String USER_ALREADY_EXIST = "User with username: %s already exists";
@@ -21,9 +22,9 @@ public class UserService {
     private final UserDtoMapper mapper;
 
     @Transactional
-    public UserDto createNewUserAndSaveInDb(CreateUserCommand command) {
+    public CustomerDto createNewUserAndSaveInDb(CreateCustomerCommand command) {
         if (!exists(command)) {
-            User user = User.builder()
+            Customer user = Customer.builder()
                     .firstname(command.firstname())
                     .lastname(command.lastname())
                     .username(command.username())
@@ -38,7 +39,24 @@ public class UserService {
         }
     }
 
-    private boolean exists(CreateUserCommand command) {
+    private boolean exists(CreateCustomerCommand command) {
         return userRepo.existsByUsername(command.username());
+    }
+
+    @Transactional
+    public CustomerDto editCustomer(UpdateCustomerCommand command) {
+        Customer user = userRepo.findById(command.customerId()).orElseThrow(() -> new UserNotFoundException(
+                USER_NOT_FOUND.formatted(command.customerId())
+        ));
+        if (!userRepo.existsByUsername(command.username())) {
+            user.setFirstname(command.firstname());
+            user.setLastname(command.lastname());
+            user.setUsername(command.username());
+            user.setPassword(command.password());
+            userRepo.saveAndFlush(user);
+            return mapper.apply(user);
+        } else {
+            throw new UserAlreadyExistsException(USER_ALREADY_EXIST.formatted(command.username()));
+        }
     }
 }

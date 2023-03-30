@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
-import pl.better.foodzillabackend.user.logic.model.domain.User;
+import pl.better.foodzillabackend.user.logic.model.domain.Customer;
 
 @Getter
 @Setter
@@ -27,7 +27,7 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private Customer user;
 
     @ManyToOne
     @JoinColumn(name = "recipe_id")
