@@ -1,5 +1,6 @@
 package pl.better.foodzillabackend.recipe.logic.model.dto;
 
+import lombok.Builder;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
@@ -7,6 +8,7 @@ import pl.better.foodzillabackend.review.logic.model.domain.Review;
 import java.util.List;
 import java.util.Set;
 
+@Builder
 public record RecipeDto(
         Long id,
         String name,

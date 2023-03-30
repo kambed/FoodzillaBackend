@@ -16,9 +16,8 @@ public class RecommendationDtoMapper implements Function<RecommendedItem, Recomm
 
     @Override
     public RecommendationDto apply(RecommendedItem recommendedItem) {
-        return new RecommendationDto(
-                recipeService.getRecipeById(recommendedItem.getItemID()),
-                recommendedItem.getValue()
-        );
+        return RecommendationDto.builder()
+                .recipe(recipeService.getRecipeById(recommendedItem.getItemID()))
+                .preference(recommendedItem.getValue()).build();
     }
 }

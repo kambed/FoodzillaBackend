@@ -22,6 +22,7 @@ import java.util.List;
 public class RecommendationService {
     private final UserBasedRecommender userBasedRecommender;
     private final RecommendationDtoMapper recommendationDtoMapper;
+    private static final double THRESHOLD = 0.1;
 
     public RecommendationService(RecommendationDtoMapper recommendationDtoMapper, Environment environment) {
         MysqlDataSource dataSource = new MysqlDataSource();
@@ -32,7 +33,7 @@ public class RecommendationService {
         JDBCDataModel model = new MySQLJDBCDataModel(dataSource,
                 "preferences", "user_id", "recipe_id", "rating", null);
         CityBlockSimilarity similarity = new CityBlockSimilarity(model);
-        UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.1, similarity, model);
+        UserNeighborhood neighborhood = new ThresholdUserNeighborhood(THRESHOLD, similarity, model);
         userBasedRecommender = new GenericUserBasedRecommender(model, neighborhood, similarity);
         this.recommendationDtoMapper = recommendationDtoMapper;
     }
