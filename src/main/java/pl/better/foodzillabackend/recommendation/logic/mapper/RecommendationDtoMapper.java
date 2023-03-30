@@ -13,6 +13,7 @@ import java.util.function.Function;
 public class RecommendationDtoMapper implements Function<RecommendedItem, RecommendationDto> {
 
     private final RecipeService recipeService;
+
     @Override
     public RecommendationDto apply(RecommendedItem recommendedItem) {
         return new RecommendationDto(
