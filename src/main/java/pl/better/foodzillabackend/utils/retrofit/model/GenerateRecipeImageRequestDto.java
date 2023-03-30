@@ -1,7 +1,10 @@
 package pl.better.foodzillabackend.utils.retrofit.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record GenerateRecipeImageRequestDto(
         String text,
-        int num_images
+        @JsonProperty("num_images")
+        int numImages
 ) {
 }
