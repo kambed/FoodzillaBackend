@@ -95,5 +95,5 @@ create table review
 ALTER TABLE review AUTO_INCREMENT=581254;
 
 CREATE VIEW preferences AS
-SELECT customer_id, recipe_id, rating
+SELECT customer.id AS customer_id, r.recipe_id, r.rating
 FROM customer JOIN review r on customer.id = r.customer_id;
