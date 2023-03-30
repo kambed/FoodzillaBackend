@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
@@ -19,6 +20,11 @@ public class RecipeController {
     @QueryMapping
     public RecipeDto recipe(@Argument long id) {
         return recipeService.getRecipeById(id);
+    }
+
+    @SchemaMapping(typeName = "Recipe", field = "image")
+    public String recipeImage(RecipeDto recipe) {
+        return recipeService.getRecipeImageById(recipe);
     }
 
     @MutationMapping

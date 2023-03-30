@@ -14,7 +14,8 @@ create table recipe
     sodium                float null,
     protein               float null,
     saturated_fat         float null,
-    carbohydrates         float null
+    carbohydrates         float null,
+    image                 blob null
 );
 
 ALTER TABLE recipe AUTO_INCREMENT=537717;

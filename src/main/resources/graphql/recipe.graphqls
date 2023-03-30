@@ -37,6 +37,7 @@ type Recipe {
     protein: Int
     saturatedFat: Int
     carbohydrates: Int
+    image: String
     reviews: [Review]
     ingredients: [Ingredient]
     tags: [Tag]
