@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.user.logic.model.command;
+package pl.better.foodzillabackend.customer.logic.model.command;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

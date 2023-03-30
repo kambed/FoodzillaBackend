@@ -10,13 +10,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
-import pl.better.foodzillabackend.user.logic.model.domain.Customer;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"user","recipe"})
+@EqualsAndHashCode(exclude = {"customer","recipe"})
 @Entity
 public class Review {
 
@@ -26,8 +26,8 @@ public class Review {
     private int rating;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Customer user;
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "recipe_id")

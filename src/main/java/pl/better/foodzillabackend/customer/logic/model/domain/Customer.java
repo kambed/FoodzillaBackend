@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.user.logic.model.domain;
+package pl.better.foodzillabackend.customer.logic.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,6 +24,6 @@ public class Customer {
     private String username;
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();
 }

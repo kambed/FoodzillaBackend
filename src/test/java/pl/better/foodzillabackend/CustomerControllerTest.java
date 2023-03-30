@@ -8,8 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.ActiveProfiles;
-import pl.better.foodzillabackend.user.logic.model.domain.Customer;
-import pl.better.foodzillabackend.user.logic.repository.UserRepository;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
+import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 
 import java.util.Objects;
 
@@ -23,7 +23,7 @@ public class CustomerControllerTest {
     @Autowired
     private GraphQlTester graphQlTester;
     @Autowired
-    private UserRepository repository;
+    private CustomerRepository repository;
 
     @BeforeEach
     public void resetDb() {
@@ -74,7 +74,7 @@ public class CustomerControllerTest {
                 "IlovESt@rwars321");
 
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.FORBIDDEN) &&
-                        Objects.equals(responseError.getMessage(), "User with username: BobLoblaw already exists"))
+                        Objects.equals(responseError.getMessage(), "Customer with username: BobLoblaw already exists"))
                 .verify().path("createCustomer").valueIsNull();
 
         assertEquals(1, repository.findAll().size());
@@ -169,7 +169,7 @@ public class CustomerControllerTest {
                 "IlovESt@rwars321");
 
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.FORBIDDEN) &&
-                        Objects.equals(responseError.getMessage(), "User with username: BobLoblaw already exists"))
+                        Objects.equals(responseError.getMessage(), "Customer with username: BobLoblaw already exists"))
                 .verify().path("editCustomer").valueIsNull();
 
         assertEquals(1, repository.findAll().size());
@@ -193,7 +193,7 @@ public class CustomerControllerTest {
                 "IlovESt@rwars321");
 
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
-                        Objects.equals(responseError.getMessage(), "User with id: "+ nonExistentId + " not found"))
+                        Objects.equals(responseError.getMessage(), "Customer with id: "+ nonExistentId + " not found"))
                 .verify().path("editCustomer").valueIsNull();
 
         assertEquals(1, repository.findAll().size());

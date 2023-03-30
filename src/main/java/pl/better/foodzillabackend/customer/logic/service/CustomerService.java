@@ -1,24 +1,25 @@
-package pl.better.foodzillabackend.user.logic.service;
+package pl.better.foodzillabackend.customer.logic.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.better.foodzillabackend.exceptions.type.UserAlreadyExistsException;
-import pl.better.foodzillabackend.user.logic.mapper.UserDtoMapper;
-import pl.better.foodzillabackend.user.logic.model.command.CreateCustomerCommand;
-import pl.better.foodzillabackend.user.logic.model.command.UpdateCustomerCommand;
-import pl.better.foodzillabackend.user.logic.model.domain.Customer;
-import pl.better.foodzillabackend.user.logic.model.dto.CustomerDto;
-import pl.better.foodzillabackend.user.logic.repository.UserRepository;
+import pl.better.foodzillabackend.customer.logic.mapper.CustomerDtoMapper;
+import pl.better.foodzillabackend.exceptions.type.CustomerAlreadyExistsException;
+import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
+import pl.better.foodzillabackend.customer.logic.model.command.CreateCustomerCommand;
+import pl.better.foodzillabackend.customer.logic.model.command.UpdateCustomerCommand;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
+import pl.better.foodzillabackend.customer.logic.model.dto.CustomerDto;
+import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
 
-    private static final String USER_NOT_FOUND = "User with id: %s not found";
-    private static final String USER_ALREADY_EXIST = "User with username: %s already exists";
-    private final UserRepository userRepo;
-    private final UserDtoMapper mapper;
+    private static final String CUSTOMER_NOT_FOUND = "Customer with id: %s not found";
+    private static final String CUSTOMER_ALREADY_EXIST = "Customer with username: %s already exists";
+    private final CustomerRepository userRepo;
+    private final CustomerDtoMapper mapper;
 
     @Transactional
     public CustomerDto createNewUserAndSaveInDb(CreateCustomerCommand command) {
@@ -34,7 +35,7 @@ public class CustomerService {
             userRepo.saveAndFlush(user);
             return mapper.apply(user);
         } else {
-            throw new UserAlreadyExistsException(USER_ALREADY_EXIST.formatted(command.username()));
+            throw new CustomerAlreadyExistsException(CUSTOMER_ALREADY_EXIST.formatted(command.username()));
         }
     }
 
@@ -44,8 +45,8 @@ public class CustomerService {
 
     @Transactional
     public CustomerDto editCustomer(UpdateCustomerCommand command) {
-        Customer user = userRepo.findById(command.customerId()).orElseThrow(() -> new UserNotFoundException(
-                USER_NOT_FOUND.formatted(command.customerId())
+        Customer user = userRepo.findById(command.customerId()).orElseThrow(() -> new CustomerNotFoundException(
+                CUSTOMER_NOT_FOUND.formatted(command.customerId())
         ));
         if (!userRepo.existsByUsername(command.username())) {
             user.setFirstname(command.firstname());
@@ -56,7 +57,7 @@ public class CustomerService {
             userRepo.saveAndFlush(user);
             return mapper.apply(user);
         } else {
-            throw new UserAlreadyExistsException(USER_ALREADY_EXIST.formatted(command.username()));
+            throw new CustomerAlreadyExistsException(CUSTOMER_ALREADY_EXIST.formatted(command.username()));
         }
     }
 }
