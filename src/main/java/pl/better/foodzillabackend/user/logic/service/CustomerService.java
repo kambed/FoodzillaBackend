@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.better.foodzillabackend.exceptions.type.UserAlreadyExistsException;
-import pl.better.foodzillabackend.exceptions.type.UserNotFoundException;
 import pl.better.foodzillabackend.user.logic.mapper.UserDtoMapper;
 import pl.better.foodzillabackend.user.logic.model.command.CreateCustomerCommand;
 import pl.better.foodzillabackend.user.logic.model.command.UpdateCustomerCommand;

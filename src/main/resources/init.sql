@@ -14,7 +14,8 @@ create table recipe
     sodium                float null,
     protein               float null,
     saturated_fat         float null,
-    carbohydrates         float null
+    carbohydrates         float null,
+    image                 blob null
 );
 
 ALTER TABLE recipe AUTO_INCREMENT=537717;
@@ -92,3 +93,7 @@ create table review
 );
 
 ALTER TABLE review AUTO_INCREMENT=581254;
+
+CREATE VIEW preferences AS
+SELECT user_id, recipe_id, rating
+FROM user JOIN review r on user.id = r.user_id;

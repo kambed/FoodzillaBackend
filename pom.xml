@@ -19,6 +19,8 @@
         <java.version>17</java.version>
         <lombok.version>1.18.24</lombok.version>
         <mysql.connector.version>8.0.32</mysql.connector.version>
+        <retrofit.version>2.9.0</retrofit.version>
+        <mahout.version>0.13.0</mahout.version>
     </properties>
 
     <dependencies>
@@ -54,6 +56,29 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>retrofit</artifactId>
+            <version>${retrofit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-jackson</artifactId>
+            <version>${retrofit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.mahout</groupId>
+            <artifactId>mahout-mr</artifactId>
+            <version>${mahout.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.mahout</groupId>
+            <artifactId>mahout-integration</artifactId>
+            <version>${mahout.version}</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/mahout-integration-0.13.0.jar</systemPath>
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

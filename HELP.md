@@ -1,6 +1,33 @@
 # FOODZILLA
 
-To start application there are two options:
+## (OPTIONAL) If you want the API to generate AI aided recipes pictures follow:
+Before starting backend you need to specify STABLE_DIFFUSION_API_URL in .env file.
+The simplest way of getting such URL is to use Google Colab:
+
+> https://colab.research.google.com/github/saharmor/dalle-playground/blob/main/backend/dalle_playground_backend.ipynb
+
+There you start the code and copy Cloudflare URL (should look like your url is: https://xxxxxx.trycloudflare.com)
+
+Another option is to run it locally, you have to install Python 3.9 and run it with commands (in stable-diffusion directory):
+> pip install -r ./requirements.txt
+> 
+> pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio===0.10.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
+> 
+> python app.py
+
+Alternatively, for JetBrains PyCharm users they can use green button in app.py file.
+
+Another option is to start docker container with Dockerfile (file is in stable-diffusion folder) 
+
+> docker build -t stableDiffusion
+> 
+> docker run -d stableDiffusion
+
+Alternatively, for JetBrains PyCharm users they can use green triangle button on the left in Dockerfile.
+
+WARNING: THIS OPERATION REQUIRES MORE THAN 20GB FREE SPACE ON DISK!
+
+## To start application there are two options:
 
 ## 1.) Database docker + Local Spring backend
 
@@ -30,9 +57,9 @@ No further action is required, Dockerfile is only used to build spring applicati
 
 Alternatively, for JetBrains Intellij users they can use green button on the left in opened docker-compose file.
 
-## To check api endpoints you can use Swagger documentation
+## To check api endpoints you can use GraphiQL documentation
 
-[Local Swagger-UI](http://localhost:8080/swagger-ui/index.html#/)
+[GraphiQL UI](http://localhost:8080/graphiql?path=/graphql)
 
 ### Reference Documentation
 
