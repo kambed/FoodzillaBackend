@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @AutoConfigureGraphQlTester
-public class UserControllerTest {
+class UserControllerTest {
 
     @Autowired
     private GraphQlTester graphQlTester;
