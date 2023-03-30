@@ -66,7 +66,7 @@ create table recipe_tag
 
 ALTER TABLE recipe_tag AUTO_INCREMENT=4141689;
 
-create table user
+create table customer
 (
     id int auto_increment
         primary key,
@@ -76,24 +76,24 @@ create table user
     password varchar(250) not null
 );
 
-ALTER TABLE user AUTO_INCREMENT=432123;
+ALTER TABLE customer AUTO_INCREMENT=432123;
 
 create table review
 (
     id        int auto_increment
         primary key,
-    user_id   int not null,
+    customer_id   int not null,
     recipe_id int not null,
     review    blob null,
     rating    int null,
     constraint review_recipe_null_fk
         foreign key (recipe_id) references recipe (id),
-    constraint review_user_null_fk
-        foreign key (user_id) references user (id)
+    constraint review_customer_null_fk
+        foreign key (customer_id) references customer (id)
 );
 
 ALTER TABLE review AUTO_INCREMENT=581254;
 
 CREATE VIEW preferences AS
-SELECT user_id, recipe_id, rating
-FROM user JOIN review r on user.id = r.user_id;
+SELECT customer.id AS customer_id, r.recipe_id, r.rating
+FROM customer JOIN review r on customer.id = r.customer_id;
