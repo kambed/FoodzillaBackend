@@ -52,6 +52,7 @@ public class CustomerService {
             user.setFirstname(command.firstname());
             user.setLastname(command.lastname());
             user.setUsername(command.username());
+            //TODO: password encryption, related to security configuration
             user.setPassword(command.password());
             userRepo.saveAndFlush(user);
             return mapper.apply(user);
