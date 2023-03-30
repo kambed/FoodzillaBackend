@@ -3,7 +3,6 @@ package pl.better.foodzillabackend.recipe.logic.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
@@ -11,13 +10,14 @@ import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
-import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeImageGenerateDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
+import pl.better.foodzillabackend.utils.retrofit.ApiBuilder;
+import pl.better.foodzillabackend.utils.retrofit.model.GenerateRecipeImageRequestDto;
+import pl.better.foodzillabackend.utils.retrofit.model.GenerateRecipeImageResponseDto;
+import retrofit2.Response;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,15 +84,13 @@ public class RecipeService {
     }
 
     private void generateImageForRecipe(Recipe r) {
-        RestTemplate restTemplate = new RestTemplate();
-        Map<String, Object> map = new HashMap<>();
-        map.put("text", r.getName());
-        map.put("num_images", 1);
         try {
-            RecipeImageGenerateDto res = restTemplate.postForObject(environment.getProperty("STABLE_DIFFUSION_API_URL")
-                    + "/generate", map, RecipeImageGenerateDto.class);
-            if (res != null && res.generatedImgs() != null && res.generatedImgs().size() == 1) {
-                r.setImage(res.generatedImgs().get(0));
+            Response<GenerateRecipeImageResponseDto> res =
+                    ApiBuilder.build(environment.getProperty("STABLE_DIFFUSION_API_URL"))
+                            .generateImage(new GenerateRecipeImageRequestDto(r.getName(), 1))
+                            .execute();
+            if (res.isSuccessful() && res.body() != null) {
+                r.setImage(res.body().generatedImgs().get(0));
             }
         } catch (Exception ignored) {
             //ignored
