@@ -10,25 +10,25 @@ import java.util.function.Function;
 public class RecipeDtoMapper implements Function<Recipe, RecipeDto> {
     @Override
     public RecipeDto apply(Recipe recipe) {
-        return new RecipeDto(
-                recipe.getId(),
-                recipe.getName(),
-                recipe.getDescription(),
-                recipe.getTimeOfPreparation(),
-                recipe.getNumberOfSteps(),
-                recipe.getSteps(),
-                recipe.getNumberOfIngredients(),
-                recipe.getCalories(),
-                recipe.getFat(),
-                recipe.getSugar(),
-                recipe.getSodium(),
-                recipe.getProtein(),
-                recipe.getSaturatedFat(),
-                recipe.getCarbohydrates(),
-                recipe.getImage(),
-                recipe.getReviews(),
-                recipe.getIngredients(),
-                recipe.getTags()
-        );
+        return RecipeDto.builder()
+                .id(recipe.getId())
+                .name(recipe.getName())
+                .description(recipe.getDescription())
+                .timeOfPreparation(recipe.getTimeOfPreparation())
+                .numberOfSteps(recipe.getNumberOfSteps())
+                .steps(recipe.getSteps())
+                .numberOfIngredients(recipe.getNumberOfIngredients())
+                .calories(recipe.getCalories())
+                .fat(recipe.getFat())
+                .sugar(recipe.getSugar())
+                .sodium(recipe.getSodium())
+                .protein(recipe.getProtein())
+                .saturatedFat(recipe.getSaturatedFat())
+                .carbohydrates(recipe.getCarbohydrates())
+                .image(recipe.getImage())
+                .reviews(recipe.getReviews())
+                .ingredients(recipe.getIngredients())
+                .tags(recipe.getTags())
+                .build();
     }
 }
