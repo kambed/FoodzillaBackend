@@ -6,9 +6,8 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
-import pl.better.foodzillabackend.auth.service.accesstype.LoggedUser;
+import pl.better.foodzillabackend.auth.service.accesstype.LoggedInUser;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.service.RecipeService;
@@ -30,7 +29,7 @@ public class RecipeController {
     }
 
     @MutationMapping
-    @LoggedUser
+    @LoggedInUser
     public RecipeDto createRecipe(@Argument @Valid CreateRecipeCommand recipe) {
         return recipeService.createNewRecipeAndSaveInDb(recipe);
     }

@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Secured("IS_AUTHENTICATED_FULLY")
-public @interface LoggedUser {
+public @interface LoggedInUser {
 }
