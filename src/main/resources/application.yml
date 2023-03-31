@@ -19,3 +19,5 @@ spring:
     jwt:
       secret: ${SECRET_API_KEY}
       expiration: ${EXPIRATION_LENGTH}
+      header-name: ${HEADER_NAME}
+      prefix: ${PREFIX_NAME}

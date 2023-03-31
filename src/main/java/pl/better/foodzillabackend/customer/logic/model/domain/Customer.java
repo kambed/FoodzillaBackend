@@ -21,6 +21,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class Customer implements UserDetails {
 
+    private static final String UNSUPPORTED_OPERATION = "This method is not supported";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,21 +40,21 @@ public class Customer implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
     }
 }

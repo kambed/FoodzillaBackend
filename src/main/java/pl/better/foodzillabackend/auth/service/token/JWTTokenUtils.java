@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.auth.service;
+package pl.better.foodzillabackend.auth.service.token;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -8,11 +8,14 @@ import pl.better.foodzillabackend.auth.model.domain.Role;
 
 @Component
 public class JWTTokenUtils extends TokenUtils {
+
     public TokenPayload decodeToken(String authorizationHeader) {
-        DecodedJWT decodedToken = JWT.require(Algorithm.HMAC512(getSecret().getBytes()))
+        DecodedJWT decodedToken = JWT
+                .require(Algorithm.HMAC512(getSecret().getBytes()))
                 .build()
                 .verify(authorizationHeader.replace(getTokenPrefix(), ""));
 
-        return new TokenPayload(decodedToken.getSubject(), decodedToken.getClaim("role").as(Role.class));
+        return new TokenPayload(decodedToken.getSubject(), decodedToken.getClaim("role")
+                .as(Role.class));
     }
 }

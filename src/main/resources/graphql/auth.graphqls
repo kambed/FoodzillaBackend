@@ -1,3 +1,8 @@
 extend type Mutation {
-    login(username: String!, password: String!): String!
+    login(username: String!, password: String!): Token
+}
+
+type Token {
+    token: String!
+    date: String!
 }
