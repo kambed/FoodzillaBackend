@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.auth.jwt;
+package pl.better.foodzillabackend.auth.service;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,8 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
-import pl.better.foodzillabackend.auth.token.TokenPayload;
-import pl.better.foodzillabackend.auth.token.TokenUtils;
 
 import java.io.IOException;
 import java.util.Collections;

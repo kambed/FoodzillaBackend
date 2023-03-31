@@ -1,3 +1,0 @@
-extend type Mutation {
-    getToken(username: String!, password: String!): String!
-}

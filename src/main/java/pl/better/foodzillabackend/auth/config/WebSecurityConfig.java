@@ -11,8 +11,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import pl.better.foodzillabackend.auth.jwt.JWTAuthorizationFilter;
-import pl.better.foodzillabackend.auth.token.TokenUtils;
+import pl.better.foodzillabackend.auth.service.JWTAuthorizationFilter;
+import pl.better.foodzillabackend.auth.service.TokenUtils;
 import pl.better.foodzillabackend.customer.logic.service.CustomerService;
 
 
@@ -36,7 +36,6 @@ public class WebSecurityConfig {
                         .permitAll()
                         .anyRequest().denyAll())
                 .addFilter(new JWTAuthorizationFilter(authenticationManagerBean(httpSecurity), tokenUtils))
-                // Disables sessions
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         return httpSecurity.build();

@@ -1,4 +1,6 @@
-package pl.better.foodzillabackend.auth.token;
+package pl.better.foodzillabackend.auth.service;
+
+import pl.better.foodzillabackend.auth.model.domain.Role;
 
 public class TokenPayload {
     private final String username;

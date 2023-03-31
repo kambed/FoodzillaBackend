@@ -8,27 +8,25 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import pl.better.foodzillabackend.auth.token.Role;
-import pl.better.foodzillabackend.auth.token.TokenGenerator;
+import pl.better.foodzillabackend.auth.model.domain.Role;
+import pl.better.foodzillabackend.auth.service.TokenService;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
-import pl.better.foodzillabackend.customer.logic.service.CustomerService;
 
 import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
-public class TokenController {
+public class AuthController {
 
     @Autowired
     private CustomerRepository applicationUserRepository;
-
     @Autowired
-    private TokenGenerator tokenGenerator;
+    private TokenService tokenService;
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @MutationMapping
-    public String getToken(@Argument String username, @Argument String password) {
+    public String login(@Argument String username, @Argument String password) {
         Optional<Customer> applicationUser = applicationUserRepository.findByUsername(username);
 
         if (applicationUser.isEmpty()) {
@@ -39,7 +37,7 @@ public class TokenController {
             throw new GraphQLException("Invalid credentials");
         }
 
-        return tokenGenerator.build(user.getUsername(), Role.NORMAL);
+        return tokenService.build(user.getUsername(), Role.NORMAL);
     }
 
 

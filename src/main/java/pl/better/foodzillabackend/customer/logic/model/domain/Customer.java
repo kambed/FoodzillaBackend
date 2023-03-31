@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import pl.better.foodzillabackend.auth.token.Role;
+import pl.better.foodzillabackend.auth.model.domain.Role;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
 
 import java.util.Collection;

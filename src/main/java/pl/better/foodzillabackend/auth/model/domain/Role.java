@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.auth.token;
+package pl.better.foodzillabackend.auth.model.domain;
 
 import org.springframework.security.core.GrantedAuthority;
 
