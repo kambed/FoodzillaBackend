@@ -1,0 +1,50 @@
+extend type Mutation {
+    search(
+        phrase: String!
+        currentPage: Int = 1
+        pageSize: Int = 5
+        sort: RecipeSort = RATING
+        filter: [RecipeFilter]
+    ): SearchResult!
+}
+
+type SearchResult {
+    currentPage: Int!
+    numberOfPages: Int!
+    recipes: [Recipe!]!
+}
+
+enum RecipeSort {
+    RATING
+    TITLE
+}
+
+input RecipeFilter {
+    timeOfPreparation: [FilterNumberType]
+    tags: [FilterStringType]
+    ingredients: [FilterStringType]
+    numberOfSteps: [FilterNumberType]
+    numberOfIngredients: [FilterNumberType]
+    calories: [FilterNumberType]
+    totalFat: [FilterNumberType]
+    sugar: [FilterNumberType]
+    sodium: [FilterNumberType]
+    protein: [FilterNumberType]
+    saturatedFat: [FilterNumberType]
+    carbohydrates: [FilterNumberType]
+    reviews: [FilterNumberType]
+}
+
+input FilterStringType {
+    equals: String
+    from: String
+    to: String
+    has: [String]
+}
+
+input FilterNumberType {
+    equals: Int
+    from: Int
+    to: Int
+    has: [Int]
+}
