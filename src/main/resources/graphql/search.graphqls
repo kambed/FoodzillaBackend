@@ -1,17 +1,20 @@
-extend type Mutation {
-    search(
-        phrase: String!
-        currentPage: Int = 1
-        pageSize: Int = 5
-        sort: RecipeSort = RATING
-        filter: [RecipeFilter]
-    ): SearchResult!
+extend type Query {
+    search(input: SearchInput): SearchResult!
+}
+
+input SearchInput {
+    phrase: String
+    currentPage: Int = 1
+    pageSize: Int = 5
+    sort: RecipeSort = RATING
+    sortDirection: SortDirection = ASC
+    filter: RecipeFilter
 }
 
 type SearchResult {
     currentPage: Int!
     numberOfPages: Int!
-    recipes: [Recipe!]!
+    recipes: [Recipe]!
 }
 
 enum RecipeSort {
@@ -19,30 +22,33 @@ enum RecipeSort {
     TITLE
 }
 
+enum SortDirection {
+    ASC
+    DESC
+}
+
 input RecipeFilter {
-    timeOfPreparation: [FilterNumberType]
+    timeOfPreparation: [FilterIntType]
     tags: [FilterStringType]
     ingredients: [FilterStringType]
-    numberOfSteps: [FilterNumberType]
-    numberOfIngredients: [FilterNumberType]
-    calories: [FilterNumberType]
-    totalFat: [FilterNumberType]
-    sugar: [FilterNumberType]
-    sodium: [FilterNumberType]
-    protein: [FilterNumberType]
-    saturatedFat: [FilterNumberType]
-    carbohydrates: [FilterNumberType]
-    reviews: [FilterNumberType]
+    numberOfSteps: [FilterIntType]
+    numberOfIngredients: [FilterIntType]
+    calories: [FilterIntType]
+    totalFat: [FilterIntType]
+    sugar: [FilterIntType]
+    sodium: [FilterIntType]
+    protein: [FilterIntType]
+    saturatedFat: [FilterIntType]
+    carbohydrates: [FilterIntType]
+    reviews: [FilterIntType]
 }
 
 input FilterStringType {
     equals: String
-    from: String
-    to: String
     has: [String]
 }
 
-input FilterNumberType {
+input FilterIntType {
     equals: Int
     from: Int
     to: Int
