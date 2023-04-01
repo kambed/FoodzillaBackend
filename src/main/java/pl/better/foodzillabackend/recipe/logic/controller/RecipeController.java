@@ -28,8 +28,8 @@ public class RecipeController {
         return recipeService.getRecipeImageById(recipe);
     }
 
-    @MutationMapping
     @LoggedInUser
+    @MutationMapping
     public RecipeDto createRecipe(@Argument @Valid CreateRecipeCommand recipe) {
         return recipeService.createNewRecipeAndSaveInDb(recipe);
     }

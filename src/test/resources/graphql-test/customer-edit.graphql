@@ -1,11 +1,10 @@
-mutation edit($customerId: ID!,
+mutation edit(
     $firstname: String!,
     $lastname: String!
     $username: String!
     $password: String!) {
     editCustomer(
         customer: {
-            customerId: $customerId
             firstname: $firstname
             lastname: $lastname
             username: $username

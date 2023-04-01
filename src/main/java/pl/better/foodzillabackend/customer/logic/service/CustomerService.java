@@ -9,13 +9,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.better.foodzillabackend.customer.logic.mapper.CustomerDtoMapper;
-import pl.better.foodzillabackend.exceptions.type.CustomerAlreadyExistsException;
-import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.customer.logic.model.command.CreateCustomerCommand;
 import pl.better.foodzillabackend.customer.logic.model.command.UpdateCustomerCommand;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.customer.logic.model.dto.CustomerDto;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
+import pl.better.foodzillabackend.exceptions.type.CustomerAlreadyExistsException;
+import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +45,9 @@ public class CustomerService implements UserDetailsService {
     }
 
     @Transactional
-    public CustomerDto editCustomer(UpdateCustomerCommand command) {
-        Customer user = repository.findById(command.customerId()).orElseThrow(() -> new CustomerNotFoundException(
-                CUSTOMER_NOT_FOUND.formatted(command.customerId())
+    public CustomerDto editCustomer(String principal, UpdateCustomerCommand command) {
+        Customer user = repository.findByUsername(principal).orElseThrow(() -> new CustomerNotFoundException(
+                CUSTOMER_NOT_FOUND.formatted(principal)
         ));
         if (!repository.existsByUsername(command.username())) {
             user.setFirstname(command.firstname());

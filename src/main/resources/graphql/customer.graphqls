@@ -11,8 +11,6 @@ input CustomerInput {
 }
 
 input CustomerEditInput {
-    #TODO : Replace with id from current session
-    customerId: ID!
     firstname: String!
     lastname: String!
     username: String!

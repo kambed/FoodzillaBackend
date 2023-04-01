@@ -9,14 +9,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
-import pl.better.foodzillabackend.exceptions.type.InvalidTokenException;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
 @Component
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
+
     private final TokenUtils tokenUtils;
 
     public JWTAuthorizationFilter(AuthenticationManager authManager, TokenUtils tokenUtils) {
@@ -45,12 +44,10 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         if (token == null) {
             return null;
         }
-
         TokenPayload tokenPayload = tokenUtils.decodeToken(token);
         if (tokenPayload.username() == null) {
             return null;
         }
-
         return new UsernamePasswordAuthenticationToken(tokenPayload.username(),
                 null,
                 Collections.singletonList(tokenPayload.role()));
