@@ -23,9 +23,9 @@ public class CustomerService implements UserDetailsService {
 
     private static final String CUSTOMER_NOT_FOUND = "Customer with id: %s not found";
     private static final String CUSTOMER_ALREADY_EXIST = "Customer with username: %s already exists";
-    private final CustomerRepository userRepo;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final CustomerRepository repository;
     private final CustomerDtoMapper mapper;
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Transactional
     public CustomerDto createNewUserAndSaveInDb(CreateCustomerCommand command) {
@@ -37,29 +37,24 @@ public class CustomerService implements UserDetailsService {
                     .password(passwordEncoder.encode(command.password()))
                     .build();
 
-            userRepo.saveAndFlush(user);
+            repository.saveAndFlush(user);
             return mapper.apply(user);
         } else {
             throw new CustomerAlreadyExistsException(CUSTOMER_ALREADY_EXIST.formatted(command.username()));
         }
     }
 
-    private boolean exists(CreateCustomerCommand command) {
-        return userRepo.existsByUsername(command.username());
-    }
-
     @Transactional
     public CustomerDto editCustomer(UpdateCustomerCommand command) {
-        Customer user = userRepo.findById(command.customerId()).orElseThrow(() -> new CustomerNotFoundException(
+        Customer user = repository.findById(command.customerId()).orElseThrow(() -> new CustomerNotFoundException(
                 CUSTOMER_NOT_FOUND.formatted(command.customerId())
         ));
-        if (!userRepo.existsByUsername(command.username())) {
+        if (!repository.existsByUsername(command.username())) {
             user.setFirstname(command.firstname());
             user.setLastname(command.lastname());
             user.setUsername(command.username());
-            //TODO: password encryption, related to security configuration
-            user.setPassword(command.password());
-            userRepo.saveAndFlush(user);
+            user.setPassword(passwordEncoder.encode(command.password()));
+            repository.saveAndFlush(user);
             return mapper.apply(user);
         } else {
             throw new CustomerAlreadyExistsException(CUSTOMER_ALREADY_EXIST.formatted(command.username()));
@@ -68,6 +63,12 @@ public class CustomerService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepo.findByUsername(username).get();
+        return repository.findByUsername(username).orElseThrow(() -> {
+            throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND, username));
+        });
+    }
+
+    private boolean exists(CreateCustomerCommand command) {
+        return repository.existsByUsername(command.username());
     }
 }

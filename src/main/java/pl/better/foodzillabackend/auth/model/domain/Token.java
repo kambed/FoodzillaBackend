@@ -1,6 +1,7 @@
 package pl.better.foodzillabackend.auth.model.domain;
 
 import lombok.*;
+import pl.better.foodzillabackend.customer.logic.model.dto.CustomerDto;
 
 @Getter
 @Setter
@@ -9,5 +10,5 @@ import lombok.*;
 @Builder
 public class Token {
     String token;
-    String date;
+    CustomerDto customer;
 }

@@ -1,7 +1,6 @@
 package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
@@ -35,7 +34,6 @@ class TagControllerTest {
     }
 
     @Test
-    @Disabled
     void shouldReturnAllIngredients() {
         GraphQlTester.Response response = graphQlTester.documentName("tags").execute();
         response.errors().verify();

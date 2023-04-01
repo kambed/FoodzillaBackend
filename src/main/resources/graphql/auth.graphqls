@@ -4,5 +4,5 @@ extend type Mutation {
 
 type Token {
     token: String!
-    date: String!
+    customer: Customer!
 }

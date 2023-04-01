@@ -42,14 +42,17 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(tokenUtils.getHeaderString());
-        if (token != null) {
-            TokenPayload tokenPayload = tokenUtils.decodeToken(token);
-
-            if (tokenPayload.username() != null) {
-                return new UsernamePasswordAuthenticationToken(tokenPayload.username(), null, Collections.singletonList(tokenPayload.role()));
-            }
-
+        if (token == null) {
+            return null;
         }
-        return null;
+
+        TokenPayload tokenPayload = tokenUtils.decodeToken(token);
+        if (tokenPayload.username() == null) {
+            return null;
+        }
+
+        return new UsernamePasswordAuthenticationToken(tokenPayload.username(),
+                null,
+                Collections.singletonList(tokenPayload.role()));
     }
 }
