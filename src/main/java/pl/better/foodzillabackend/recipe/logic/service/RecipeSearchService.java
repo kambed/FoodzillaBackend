@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
@@ -20,53 +19,56 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-@RequiredArgsConstructor
 public class RecipeSearchService {
-    private final EntityManagerFactory entityManagerFactory;
+    private final EntityManager entityManager;
     private final RecipeDtoMapper mapper;
+    private final CriteriaBuilder criteriaBuilder;
+    private final CriteriaQuery<Recipe> criteriaQuery;
+    private final Root<Recipe> root;
 
-    public SearchResultDto search(SearchPojo input) {
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-
-            CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-            CriteriaQuery<Recipe> criteriaQuery = criteriaBuilder.createQuery(Recipe.class);
-            Root<Recipe> root = criteriaQuery.from(Recipe.class);
-
-            if (input == null) {
-                throw new FilterInputException("Input is null");
-            }
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getPhrasePredicates(input, criteriaBuilder, root));
-            predicates.addAll(getFiltersPredicates(input, criteriaBuilder, root));
-            if (!predicates.isEmpty()) {
-                criteriaQuery.where(predicates.toArray(new Predicate[0]));
-            }
-
-            List<Order> orders = getOrders(input, criteriaBuilder, root);
-            if (!orders.isEmpty()) {
-                criteriaQuery.orderBy(orders);
-            }
-            long totalResults = entityManager.createQuery(criteriaQuery).getResultList().size();
-
-            TypedQuery<Recipe> typedQuery = entityManager.createQuery(criteriaQuery);
-            typedQuery.setFirstResult((input.currentPage() - 1) * input.pageSize());
-            typedQuery.setMaxResults(input.pageSize());
-
-            List<Recipe> results = typedQuery.getResultList();
-
-            Set<RecipeDto> recipes = results.stream()
-                    .map(mapper)
-                    .collect(LinkedHashSet::new, Set::add, Set::addAll);
-
-            return SearchResultDto.builder()
-                    .currentPage(input.currentPage())
-                    .numberOfPages((int) Math.ceil((double) totalResults / input.pageSize()))
-                    .recipes(recipes)
-                    .build();
-        }
+    public RecipeSearchService(EntityManagerFactory entityManagerFactory, RecipeDtoMapper mapper) {
+        this.mapper = mapper;
+        entityManager = entityManagerFactory.createEntityManager();
+        criteriaBuilder = entityManager.getCriteriaBuilder();
+        criteriaQuery = criteriaBuilder.createQuery(Recipe.class);
+        root = criteriaQuery.from(Recipe.class);
     }
 
-    private List<Predicate> getPhrasePredicates(SearchPojo input, CriteriaBuilder criteriaBuilder, Root<Recipe> root) {
+    public SearchResultDto search(SearchPojo input) {
+        if (input == null) {
+            throw new FilterInputException("Input is null");
+        }
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.addAll(getPhrasePredicates(input));
+        predicates.addAll(getFiltersPredicates(input));
+        if (!predicates.isEmpty()) {
+            criteriaQuery.where(predicates.toArray(new Predicate[0]));
+        }
+
+        List<Order> orders = getOrders(input);
+        if (!orders.isEmpty()) {
+            criteriaQuery.orderBy(orders);
+        }
+        long totalResults = entityManager.createQuery(criteriaQuery).getResultList().size();
+
+        TypedQuery<Recipe> typedQuery = entityManager.createQuery(criteriaQuery);
+        typedQuery.setFirstResult((input.currentPage() - 1) * input.pageSize());
+        typedQuery.setMaxResults(input.pageSize());
+
+        List<Recipe> results = typedQuery.getResultList();
+
+        Set<RecipeDto> recipes = results.stream()
+                .map(mapper)
+                .collect(LinkedHashSet::new, Set::add, Set::addAll);
+
+        return SearchResultDto.builder()
+                .currentPage(input.currentPage())
+                .numberOfPages((int) Math.ceil((double) totalResults / input.pageSize()))
+                .recipes(recipes)
+                .build();
+    }
+
+    private List<Predicate> getPhrasePredicates(SearchPojo input) {
         if (input.phrase() == null) {
             return List.of();
         }
@@ -76,7 +78,7 @@ public class RecipeSearchService {
         ));
     }
 
-    private List<Predicate> getFiltersPredicates(SearchPojo input, CriteriaBuilder criteriaBuilder, Root<Recipe> root) {
+    private List<Predicate> getFiltersPredicates(SearchPojo input) {
         if (input.filters() == null) {
             return List.of();
         }
@@ -107,7 +109,7 @@ public class RecipeSearchService {
         return predicates;
     }
 
-    private List<Order> getOrders(SearchPojo input, CriteriaBuilder criteriaBuilder, Root<Recipe> root) {
+    private List<Order> getOrders(SearchPojo input) {
         if (input.sort() == null) {
             return List.of();
         }
