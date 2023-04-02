@@ -9,11 +9,14 @@ import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
+import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
+import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +24,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class RecipeSearchService {
     private final EntityManagerFactory entityManagerFactory;
+    private final RecipeDtoMapper mapper;
 
     public SearchResultDto search(SearchPojo input) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
@@ -30,18 +34,23 @@ public class RecipeSearchService {
             Root<Recipe> root = criteriaQuery.from(Recipe.class);
 
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getPhrasePredicates(input, criteriaBuilder, root));
-            predicates.addAll(getFiltersPredicates(input, criteriaBuilder, root));
+            if (input != null) {
+                predicates.addAll(getPhrasePredicates(input, criteriaBuilder, root));
+                predicates.addAll(getFiltersPredicates(input, criteriaBuilder, root));
 
-            criteriaQuery.where(predicates.toArray(new Predicate[0]));
+                criteriaQuery.where(predicates.toArray(new Predicate[0]));
+            }
             criteriaQuery.select(root);
 
             List<Recipe> results = entityManager.createQuery(criteriaQuery).getResultList();
+            Set<RecipeDto> recipes = results.stream()
+                    .map(mapper)
+                    .collect(HashSet::new, Set::add, Set::addAll);
 
             return SearchResultDto.builder()
-                    .currentPage(input.currentPage())
+                    .currentPage(input != null ? input.currentPage() : 1)
                     .numberOfPages(1)
-                    .recipes(Set.of())
+                    .recipes(recipes)
                     .build();
         }
     }
