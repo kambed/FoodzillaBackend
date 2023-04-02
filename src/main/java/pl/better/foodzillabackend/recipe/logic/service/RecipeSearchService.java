@@ -2,15 +2,15 @@ package pl.better.foodzillabackend.recipe.logic.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -25,6 +25,40 @@ public class RecipeSearchService {
             CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
             CriteriaQuery<Recipe> criteriaQuery = criteriaBuilder.createQuery(Recipe.class);
             Root<Recipe> root = criteriaQuery.from(Recipe.class);
+
+            List<Predicate> predicates = new ArrayList<>();
+            if (input.phrase() != null) {
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(root.get("name"), "%" + input.phrase() + "%"),
+                        criteriaBuilder.like(root.get("description"), "%" + input.phrase() + "%")
+                ));
+            }
+            if (input.filters() != null) {
+                input.filters().forEach(filter -> {
+                    boolean isInt = root.get(filter.attribute()).getModel().getBindableJavaType().getName().equals("int");
+                    if (isInt) {
+                        root.get(filter.attribute()).as(Integer.class);
+                    }
+                    if (!isInt && (filter.from() != null || filter.to() != null)) {
+                        throw new FilterInputException(
+                                "Cannot filter by range on non-number attribute " + filter.attribute() + "."
+                        );
+                    }
+                    if (filter.equals() != null) {
+                        predicates.add(criteriaBuilder.equal(root.get(filter.attribute()), filter.equals()));
+                    }
+                    if (filter.from() != null) {
+                        predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(filter.attribute()), filter.from()));
+                    }
+                    if (filter.to() != null) {
+                        predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(filter.attribute()), filter.to()));
+                    }
+                    if (filter.in() != null) {
+                        predicates.add(root.get(filter.attribute()).in(filter.in()));
+                    }
+                });
+            }
+            criteriaQuery.where(predicates.toArray(new Predicate[0]));
             criteriaQuery.select(root);
 
             List<Recipe> results = entityManager.createQuery(criteriaQuery).getResultList();

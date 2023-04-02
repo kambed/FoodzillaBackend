@@ -8,7 +8,7 @@ input SearchInput {
     pageSize: Int = 5
     sort: RecipeSort = RATING
     sortDirection: SortDirection = ASC
-    filter: RecipeFilter
+    filters: [FilterType]
 }
 
 type SearchResult {
@@ -27,30 +27,10 @@ enum SortDirection {
     DESC
 }
 
-input RecipeFilter {
-    timeOfPreparation: [FilterIntType]
-    tags: [FilterStringType]
-    ingredients: [FilterStringType]
-    numberOfSteps: [FilterIntType]
-    numberOfIngredients: [FilterIntType]
-    calories: [FilterIntType]
-    totalFat: [FilterIntType]
-    sugar: [FilterIntType]
-    sodium: [FilterIntType]
-    protein: [FilterIntType]
-    saturatedFat: [FilterIntType]
-    carbohydrates: [FilterIntType]
-    reviews: [FilterIntType]
-}
-
-input FilterStringType {
+input FilterType {
+    attribute: String!
     equals: String
-    has: [String]
-}
-
-input FilterIntType {
-    equals: Int
     from: Int
     to: Int
-    has: [Int]
+    in: [String]
 }
