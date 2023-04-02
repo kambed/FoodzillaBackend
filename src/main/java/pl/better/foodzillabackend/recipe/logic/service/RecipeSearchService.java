@@ -2,6 +2,7 @@ package pl.better.foodzillabackend.recipe.logic.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,29 +32,35 @@ public class RecipeSearchService {
             CriteriaQuery<Recipe> criteriaQuery = criteriaBuilder.createQuery(Recipe.class);
             Root<Recipe> root = criteriaQuery.from(Recipe.class);
 
-            if (input != null) {
-                List<Predicate> predicates = new ArrayList<>();
-                predicates.addAll(getPhrasePredicates(input, criteriaBuilder, root));
-                predicates.addAll(getFiltersPredicates(input, criteriaBuilder, root));
-                if (!predicates.isEmpty()) {
-                    criteriaQuery.where(predicates.toArray(new Predicate[0]));
-                }
-
-                List<Order> orders = getOrders(input, criteriaBuilder, root);
-                if (!orders.isEmpty()) {
-                    criteriaQuery.orderBy(orders);
-                }
+            if (input == null) {
+                throw new FilterInputException("Input is null");
             }
-            criteriaQuery.select(root);
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.addAll(getPhrasePredicates(input, criteriaBuilder, root));
+            predicates.addAll(getFiltersPredicates(input, criteriaBuilder, root));
+            if (!predicates.isEmpty()) {
+                criteriaQuery.where(predicates.toArray(new Predicate[0]));
+            }
 
-            List<Recipe> results = entityManager.createQuery(criteriaQuery).getResultList();
+            List<Order> orders = getOrders(input, criteriaBuilder, root);
+            if (!orders.isEmpty()) {
+                criteriaQuery.orderBy(orders);
+            }
+            long totalResults = entityManager.createQuery(criteriaQuery).getResultList().size();
+
+            TypedQuery<Recipe> typedQuery = entityManager.createQuery(criteriaQuery);
+            typedQuery.setFirstResult((input.currentPage() - 1) * input.pageSize());
+            typedQuery.setMaxResults(input.pageSize());
+
+            List<Recipe> results = typedQuery.getResultList();
+
             Set<RecipeDto> recipes = results.stream()
                     .map(mapper)
                     .collect(LinkedHashSet::new, Set::add, Set::addAll);
 
             return SearchResultDto.builder()
-                    .currentPage(input != null ? input.currentPage() : 1)
-                    .numberOfPages(1)
+                    .currentPage(input.currentPage())
+                    .numberOfPages((int) Math.ceil((double) totalResults / input.pageSize()))
                     .recipes(recipes)
                     .build();
         }
