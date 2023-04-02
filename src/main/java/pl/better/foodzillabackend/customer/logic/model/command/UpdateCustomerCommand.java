@@ -7,8 +7,7 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 
 @SchemaMapping
 public record UpdateCustomerCommand(
-        @NotNull
-        Long customerId,
+
         @NotNull
         @Size(min = 2, max = 100)
         String firstname,

@@ -11,7 +11,9 @@ import java.util.Set;
 @Controller
 @RequiredArgsConstructor
 public class TagController {
+
     private final TagService tagService;
+
     @QueryMapping
     public Set<TagDto> tags() {
         return tagService.getAllTags();
