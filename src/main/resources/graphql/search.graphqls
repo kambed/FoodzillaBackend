@@ -1,13 +1,12 @@
 extend type Query {
-    search(input: SearchInput): SearchResult!
+    search(input: SearchInput = {}): SearchResult!
 }
 
 input SearchInput {
     phrase: String
     currentPage: Int = 1
     pageSize: Int = 5
-    sort: RecipeSort = RATING
-    sortDirection: SortDirection = ASC
+    sort: [RecipeSort] = [{attribute: "name"}]
     filters: [FilterType]
 }
 
@@ -17,9 +16,9 @@ type SearchResult {
     recipes: [Recipe]!
 }
 
-enum RecipeSort {
-    RATING
-    TITLE
+input RecipeSort {
+    attribute: String!
+    direction: SortDirection! = ASC
 }
 
 enum SortDirection {

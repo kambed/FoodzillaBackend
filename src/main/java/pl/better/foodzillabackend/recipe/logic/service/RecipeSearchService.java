@@ -2,10 +2,7 @@ package pl.better.foodzillabackend.recipe.logic.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
@@ -14,9 +11,10 @@ import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,19 +31,25 @@ public class RecipeSearchService {
             CriteriaQuery<Recipe> criteriaQuery = criteriaBuilder.createQuery(Recipe.class);
             Root<Recipe> root = criteriaQuery.from(Recipe.class);
 
-            List<Predicate> predicates = new ArrayList<>();
             if (input != null) {
+                List<Predicate> predicates = new ArrayList<>();
                 predicates.addAll(getPhrasePredicates(input, criteriaBuilder, root));
                 predicates.addAll(getFiltersPredicates(input, criteriaBuilder, root));
+                if (!predicates.isEmpty()) {
+                    criteriaQuery.where(predicates.toArray(new Predicate[0]));
+                }
 
-                criteriaQuery.where(predicates.toArray(new Predicate[0]));
+                List<Order> orders = getOrders(input, criteriaBuilder, root);
+                if (!orders.isEmpty()) {
+                    criteriaQuery.orderBy(orders);
+                }
             }
             criteriaQuery.select(root);
 
             List<Recipe> results = entityManager.createQuery(criteriaQuery).getResultList();
             Set<RecipeDto> recipes = results.stream()
                     .map(mapper)
-                    .collect(HashSet::new, Set::add, Set::addAll);
+                    .collect(LinkedHashSet::new, Set::add, Set::addAll);
 
             return SearchResultDto.builder()
                     .currentPage(input != null ? input.currentPage() : 1)
@@ -66,7 +70,7 @@ public class RecipeSearchService {
     }
 
     private List<Predicate> getFiltersPredicates(SearchPojo input, CriteriaBuilder criteriaBuilder, Root<Recipe> root) {
-        if (input.filters() != null) {
+        if (input.filters() == null) {
             return List.of();
         }
         List<Predicate> predicates = new ArrayList<>();
@@ -94,5 +98,20 @@ public class RecipeSearchService {
             }
         });
         return predicates;
+    }
+
+    private List<Order> getOrders(SearchPojo input, CriteriaBuilder criteriaBuilder, Root<Recipe> root) {
+        if (input.sort() == null) {
+            return List.of();
+        }
+        List<Order> orders = new ArrayList<>();
+        input.sort().forEach(sort -> {
+            if (sort.direction().equals(SortDirectionPojo.ASC)) {
+                orders.add(criteriaBuilder.asc(root.get(sort.attribute())));
+            } else {
+                orders.add(criteriaBuilder.desc(root.get(sort.attribute())));
+            }
+        });
+        return orders;
     }
 }
