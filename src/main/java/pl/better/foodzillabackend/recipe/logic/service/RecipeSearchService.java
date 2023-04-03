@@ -68,10 +68,7 @@ public class RecipeSearchService {
                 .limit(pageable.getPageSize())
                 .toList();
 
-        CriteriaQuery<Recipe> recipeCriteriaQuery = criteriaBuilder.createQuery(Recipe.class);
-        Root<Recipe> recipeRoot = recipeCriteriaQuery.from(Recipe.class);
-        recipeCriteriaQuery.where(recipeRoot.get("id").in(recipeIds));
-        List<Recipe> recipes = entityManager.createQuery(recipeCriteriaQuery).getResultList();
+        List<Recipe> recipes = recipeRepository.getRecipesIds(recipeIds);
 
         List<RecipeDto> recipeDtos = recipes.stream()
                 .map(mapper)
