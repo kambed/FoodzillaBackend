@@ -62,6 +62,7 @@ public class CustomerService implements UserDetailsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repository.findByUsername(username).orElseThrow(() -> {
             throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND, username));
