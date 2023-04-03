@@ -6,12 +6,14 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Service;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
+import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
+import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -25,6 +27,8 @@ public class RecipeSearchService {
     private final CriteriaBuilder criteriaBuilder;
     private final CriteriaQuery<Recipe> criteriaQuery;
     private final Root<Recipe> root;
+    private final Join<Recipe, Ingredient> ingredientsJoin;
+    private final Join<Recipe, Tag> tagsJoin;
 
     public RecipeSearchService(EntityManagerFactory entityManagerFactory, RecipeDtoMapper mapper) {
         this.mapper = mapper;
@@ -32,6 +36,8 @@ public class RecipeSearchService {
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Recipe.class);
         root = criteriaQuery.from(Recipe.class);
+        ingredientsJoin = root.join("ingredients", JoinType.LEFT);
+        tagsJoin = root.join("tags", JoinType.LEFT);
     }
 
     public SearchResultDto search(SearchPojo input) {
@@ -84,9 +90,11 @@ public class RecipeSearchService {
         }
         List<Predicate> predicates = new ArrayList<>();
         input.filters().forEach(filter -> {
-            boolean isInt = root.get(filter.attribute()).getModel().getBindableJavaType().getName().equals("int");
+            Path<Object> path = resolvePath(filter.attribute());
+            String type = path.getModel().getBindableJavaType().getName();
+            boolean isInt = type.equals("int");
             if (isInt) {
-                root.get(filter.attribute()).as(Integer.class);
+                path.as(Integer.class);
             }
             if (!isInt && (filter.from() != null || filter.to() != null)) {
                 throw new FilterInputException(
@@ -94,7 +102,7 @@ public class RecipeSearchService {
                 );
             }
             if (filter.equals() != null) {
-                predicates.add(criteriaBuilder.equal(root.get(filter.attribute()), filter.equals()));
+                predicates.add(criteriaBuilder.equal(path, filter.equals()));
             }
             if (filter.from() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(filter.attribute()), filter.from()));
@@ -103,10 +111,20 @@ public class RecipeSearchService {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(filter.attribute()), filter.to()));
             }
             if (filter.in() != null) {
-                predicates.add(root.get(filter.attribute()).in(filter.in()));
+                predicates.add(path.in(filter.in()));
             }
         });
         return predicates;
+    }
+
+    private Path<Object> resolvePath(String attribute) {
+        if (attribute.equals("ingredients")) {
+            return ingredientsJoin.get("name");
+        }
+        if (attribute.equals("tags")) {
+            return tagsJoin.get("name");
+        }
+        return root.get(attribute);
     }
 
     private List<Order> getOrders(SearchPojo input) {
