@@ -1,6 +1,5 @@
 package pl.better.foodzillabackend;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +31,7 @@ class AuthControllerTest {
 
     @BeforeEach
     public void setUp() {
+        repository.deleteAll();
         Customer customer = Customer.builder()
                 .firstname("Boob")
                 .lastname("obbo")
@@ -39,13 +39,6 @@ class AuthControllerTest {
                 .username("Boob123")
                 .build();
         repository.saveAndFlush(customer);
-
-        assertEquals(1, repository.findAll().size());
-    }
-
-    @AfterEach
-    public void resetDb() {
-        repository.deleteAll();
     }
 
     @Test
