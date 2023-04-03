@@ -53,7 +53,9 @@ public class RecipeSearchService {
         List<Predicate> predicates = new ArrayList<>();
         predicates.addAll(getPhrasePredicates(input));
         predicates.addAll(getFiltersPredicates(input));
-        criteriaQuery.where(predicates.toArray(new Predicate[0]));
+        if (!predicates.isEmpty()) {
+            criteriaQuery.where(predicates.toArray(new Predicate[0]));
+        }
 
         List<Order> orders = getOrders(input);
         if (!orders.isEmpty()) {
@@ -68,10 +70,7 @@ public class RecipeSearchService {
                 .limit(pageable.getPageSize())
                 .toList();
 
-        CriteriaQuery<Recipe> recipeCriteriaQuery = criteriaBuilder.createQuery(Recipe.class);
-        Root<Recipe> recipeRoot = recipeCriteriaQuery.from(Recipe.class);
-        recipeCriteriaQuery.where(recipeRoot.get("id").in(recipeIds));
-        List<Recipe> recipes = entityManager.createQuery(recipeCriteriaQuery).getResultList();
+        List<Recipe> recipes = recipeRepository.getRecipesIds(recipeIds);
 
         List<RecipeDto> recipeDtos = recipes.stream()
                 .map(mapper)
