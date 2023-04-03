@@ -2,12 +2,12 @@ package pl.better.foodzillabackend.recipe.logic.model.dto;
 
 import lombok.Builder;
 
-import java.util.Set;
+import java.util.List;
 
 @Builder
 public record SearchResultDto(
         Integer currentPage,
         Integer numberOfPages,
-        Set<RecipeDto> recipes
+        List<RecipeDto> recipes
 ) {
 }

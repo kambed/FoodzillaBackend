@@ -2,8 +2,11 @@ package pl.better.foodzillabackend.recipe.logic.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
@@ -13,64 +16,72 @@ import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
+import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class RecipeSearchService {
     private final EntityManager entityManager;
     private final RecipeDtoMapper mapper;
     private final CriteriaBuilder criteriaBuilder;
-    private final CriteriaQuery<Recipe> criteriaQuery;
+    private final CriteriaQuery<Long> criteriaQuery;
     private final Root<Recipe> root;
     private final Join<Recipe, Ingredient> ingredientsJoin;
     private final Join<Recipe, Tag> tagsJoin;
+    private final RecipeRepository recipeRepository;
 
-    public RecipeSearchService(EntityManagerFactory entityManagerFactory, RecipeDtoMapper mapper) {
+    public RecipeSearchService(EntityManagerFactory entityManagerFactory, RecipeDtoMapper mapper,
+                               RecipeRepository recipeRepository) {
         this.mapper = mapper;
         entityManager = entityManagerFactory.createEntityManager();
         criteriaBuilder = entityManager.getCriteriaBuilder();
-        criteriaQuery = criteriaBuilder.createQuery(Recipe.class);
+        criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
         ingredientsJoin = root.join("ingredients", JoinType.LEFT);
         tagsJoin = root.join("tags", JoinType.LEFT);
+        this.recipeRepository = recipeRepository;
     }
 
     public SearchResultDto search(SearchPojo input) {
         if (input == null) {
             throw new FilterInputException("Input is null");
         }
+        Pageable pageable = PageRequest.of(input.currentPage() - 1, input.pageSize());
         List<Predicate> predicates = new ArrayList<>();
         predicates.addAll(getPhrasePredicates(input));
         predicates.addAll(getFiltersPredicates(input));
-        if (!predicates.isEmpty()) {
-            criteriaQuery.where(predicates.toArray(new Predicate[0]));
-        }
+        criteriaQuery.where(predicates.toArray(new Predicate[0]));
 
         List<Order> orders = getOrders(input);
         if (!orders.isEmpty()) {
             criteriaQuery.orderBy(orders);
         }
-        long totalResults = entityManager.createQuery(criteriaQuery).getResultList().size();
+        criteriaQuery.select(root.get("id"));
+        criteriaQuery.distinct(true);
+        List<Long> results = entityManager.createQuery(criteriaQuery).getResultList();
 
-        TypedQuery<Recipe> typedQuery = entityManager.createQuery(criteriaQuery);
-        typedQuery.setFirstResult((input.currentPage() - 1) * input.pageSize());
-        typedQuery.setMaxResults(input.pageSize());
+        List<Long> recipeIds = results.stream()
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .toList();
 
-        List<Recipe> results = typedQuery.getResultList();
+        CriteriaQuery<Recipe> recipeCriteriaQuery = criteriaBuilder.createQuery(Recipe.class);
+        Root<Recipe> recipeRoot = recipeCriteriaQuery.from(Recipe.class);
+        recipeCriteriaQuery.where(recipeRoot.get("id").in(recipeIds));
+        List<Recipe> recipes = entityManager.createQuery(recipeCriteriaQuery).getResultList();
 
-        Set<RecipeDto> recipes = results.stream()
+        List<RecipeDto> recipeDtos = recipes.stream()
                 .map(mapper)
-                .collect(LinkedHashSet::new, Set::add, Set::addAll);
+                .toList();
+        Page<RecipeDto> page = new PageImpl<>(recipeDtos, pageable, results.size());
 
         return SearchResultDto.builder()
-                .currentPage(input.currentPage())
-                .numberOfPages((int) Math.ceil((double) totalResults / input.pageSize()))
-                .recipes(recipes)
+                .currentPage(page.getNumber() + 1)
+                .numberOfPages(page.getTotalPages())
+                .recipes(page.getContent())
                 .build();
     }
 
