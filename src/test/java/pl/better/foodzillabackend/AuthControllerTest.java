@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureG
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import pl.better.foodzillabackend.auth.model.domain.Token;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
@@ -26,25 +27,24 @@ class AuthControllerTest {
     private GraphQlTester graphQlTester;
     @Autowired
     private CustomerRepository repository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
-    public void resetDb() {
-        GraphQlTester.Response res = sendCreate("Boob",
-                "obbo",
-                "Boob123",
-                "bOb@4321");
-
-        res.path("createCustomer").entity(Customer.class).satisfies(user -> {
-            assertEquals("Boob", user.getFirstname());
-            assertEquals("obbo", user.getLastname());
-            assertEquals("Boob123", user.getUsername());
-        });
+    public void setUp() {
+        Customer customer = Customer.builder()
+                .firstname("Boob")
+                .lastname("obbo")
+                .password(passwordEncoder.encode("bOb@4321"))
+                .username("Boob123")
+                .build();
+        repository.saveAndFlush(customer);
 
         assertEquals(1, repository.findAll().size());
     }
 
     @AfterEach
-    public void resetDB() {
+    public void resetDb() {
         repository.deleteAll();
     }
 
@@ -71,18 +71,6 @@ class AuthControllerTest {
                 .verify().path("login").valueIsNull();
     }
 
-    private GraphQlTester.Response sendCreate(String firstname,
-                                              String lastname,
-                                              String username,
-                                              String password) {
-        return graphQlTester.documentName("customer-create")
-                .variable("firstname", firstname)
-                .variable("lastname", lastname)
-                .variable("username", username)
-                .variable("password", password)
-                .execute();
-    }
-
     private GraphQlTester.Response sendLogin(String username,
                                               String password) {
         return graphQlTester.documentName("customer-login")
@@ -90,5 +78,4 @@ class AuthControllerTest {
                 .variable("password", password)
                 .execute();
     }
-
 }
