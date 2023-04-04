@@ -134,7 +134,55 @@ class RecipeSearchControllerTest {
     @DirtiesContext
     void shouldReturnRecipesFilteredByCalories() {
         GraphQlTester.Response response = graphQlTester.documentName("recipe-search")
-                .variable("filters", Set.of(Map.of("attribute", "calories", "to", 150)))
+                .variable(
+                        "filters",
+                        Set.of(
+                                Map.of(
+                                        "attribute", "calories",
+                                        "from", 50,
+                                        "to", 150
+                                )
+                        )
+                )
+                .execute();
+        response.errors().satisfy(errors -> assertEquals(0, errors.size()));
+        response.path("search.recipes").entityList(Recipe.class).satisfies(recipes -> {
+            assertEquals(1, recipes.size());
+            assertEquals("Recipe 1", Objects.requireNonNull(recipes.get(0)).getName());
+        });
+    }
+
+    @Test
+    @DirtiesContext
+    void shouldReturnErrorForFilterNonNumberAttributeByFromTo() {
+        GraphQlTester.Response response = graphQlTester.documentName("recipe-search")
+                .variable(
+                        "filters",
+                        Set.of(
+                                Map.of(
+                                        "attribute", "name",
+                                        "from", 150,
+                                        "to", 200
+                                )
+                        )
+                )
+                .execute();
+        response.errors().satisfy(errors -> assertEquals(1, errors.size()));
+    }
+
+    @Test
+    @DirtiesContext
+    void shouldReturnRecipesWithEqualDescription() {
+        GraphQlTester.Response response = graphQlTester.documentName("recipe-search")
+                .variable(
+                        "filters",
+                        Set.of(
+                                Map.of(
+                                        "attribute", "description",
+                                        "equals", "Description 1"
+                                )
+                        )
+                )
                 .execute();
         response.errors().satisfy(errors -> assertEquals(0, errors.size()));
         response.path("search.recipes").entityList(Recipe.class).satisfies(recipes -> {

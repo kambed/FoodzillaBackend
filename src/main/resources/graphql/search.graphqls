@@ -1,5 +1,5 @@
 extend type Query {
-    search(input: SearchInput = {}): SearchResult!
+    search(input: SearchInput! = {}): SearchResult!
 }
 
 input SearchInput {

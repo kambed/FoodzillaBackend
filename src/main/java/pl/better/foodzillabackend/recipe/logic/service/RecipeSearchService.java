@@ -46,9 +46,6 @@ public class RecipeSearchService {
     }
 
     public SearchResultDto search(SearchPojo input) {
-        if (input == null) {
-            throw new FilterInputException("Input is null");
-        }
         Pageable pageable = PageRequest.of(input.currentPage() - 1, input.pageSize());
         List<Predicate> predicates = new ArrayList<>();
         predicates.addAll(getPhrasePredicates(input));
