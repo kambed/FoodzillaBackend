@@ -1,0 +1,15 @@
+query search($pageSize: Int = 2, $currentPage: Int = 1, $phrase: String, $filters: [FilterType]) {
+    search(input: {
+        phrase: $phrase
+        pageSize: $pageSize
+        currentPage: $currentPage
+        filters: $filters
+        sort: null
+    }) {
+        currentPage
+        numberOfPages
+        recipes {
+            name
+        }
+    }
+}
