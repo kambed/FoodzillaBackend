@@ -13,25 +13,25 @@ import java.util.Set;
 @SchemaMapping
 public record CreateRecipeCommand(
         @NotNull
-        @Size(min = 1, max = 250)
+        @Size(min = 1, max = 250,  message = "Recipe name must be between 1 and 250 characters.")
         String name,
         String description,
-        @Min(0)
+        @Min(value = 0, message = "Time of preparation cannot be less than 0.")
         int timeOfPreparation,
         List<String> steps,
-        @Min(0)
+        @Min(value = 0, message = "Calorific value cannot be less than 0.")
         int calories,
-        @Min(0)
+        @Min(value = 0, message = "Amount of fat cannot be less than 0.")
         int fat,
-        @Min(0)
+        @Min(value = 0, message = "Amount of sugar cannot be less than 0.")
         int sugar,
-        @Min(0)
+        @Min(value = 0, message = "Amount of sodium cannot be less than 0.")
         int sodium,
-        @Min(0)
+        @Min(value = 0, message = "Amount of protein cannot be less than 0.")
         int protein,
-        @Min(0)
+        @Min(value = 0, message = "Amount of saturatedFat cannot be less than 0.")
         int saturatedFat,
-        @Min(0)
+        @Min(value = 0, message = "Amount of carbohydrates cannot be less than 0.")
         int carbohydrates,
         Set<Ingredient> ingredients,
         Set<Tag> tags

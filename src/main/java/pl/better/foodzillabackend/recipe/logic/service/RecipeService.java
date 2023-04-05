@@ -29,7 +29,7 @@ public class RecipeService {
     private final RecipeDtoMapper recipeDtoMapper;
     private final RecipeMapper recipeMapper;
     private final Environment environment;
-    private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id: %s not found";
+    private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
 
     public RecipeDto getRecipeById(long id) {
         return recipeRepository.getRecipeDetailsById(id)
