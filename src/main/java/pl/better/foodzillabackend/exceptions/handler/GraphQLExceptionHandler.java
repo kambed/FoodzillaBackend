@@ -26,9 +26,16 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
         if (ex instanceof ForbiddenException) {
             errorType = ErrorType.FORBIDDEN;
         }
+
+        String[] split = ex.getMessage().split(": ");
+        String errorMessage = split[0];
+        if (split.length == 2) {
+            errorMessage = split[1];
+        }
+
         return GraphqlErrorBuilder.newError()
                 .errorType(errorType)
-                .message(ex.getMessage())
+                .message(errorMessage)
                 .path(env.getExecutionStepInfo().getPath())
                 .location(env.getField().getSourceLocation())
                 .build();
