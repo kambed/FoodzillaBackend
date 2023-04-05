@@ -3,6 +3,6 @@ extend type Query {
 }
 
 extend type Mutation {
-    addRecipeToFavourites(recipe: RecipeInput): [Recipe]
-    removeRecipeFromFavourites(recipe: RecipeInput): [Recipe]
+    addRecipeToFavourites(recipeId: ID!): [Recipe]
+    removeRecipeFromFavourites(recipeId: ID!): [Recipe]
 }

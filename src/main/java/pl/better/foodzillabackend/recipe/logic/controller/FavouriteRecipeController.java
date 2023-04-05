@@ -1,6 +1,7 @@
 package pl.better.foodzillabackend.recipe.logic.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,22 +23,22 @@ public class FavouriteRecipeController {
     public Set<RecipeDto> favouriteRecipes() {
         String principal = (String)
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return null;
+        return service.favouriteRecipes(principal);
     }
 
     @LoggedInUser
     @MutationMapping
-    public Set<RecipeDto> addRecipeToFavourites() {
+    public Set<RecipeDto> addRecipeToFavourites(@Argument int recipeId) {
         String principal = (String)
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return null;
+        return service.addRecipeToFavourites(principal, recipeId);
     }
 
     @LoggedInUser
     @MutationMapping
-    public Set<RecipeDto> removeRecipeFromFavourites() {
+    public Set<RecipeDto> removeRecipeFromFavourites(@Argument int recipeId) {
         String principal = (String)
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return null;
+        return service.removeRecipeFromFavourites(principal, recipeId);
     }
 }

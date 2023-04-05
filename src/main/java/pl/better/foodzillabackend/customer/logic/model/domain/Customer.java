@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"reviews","favouriteRecipes"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer implements UserDetails {
