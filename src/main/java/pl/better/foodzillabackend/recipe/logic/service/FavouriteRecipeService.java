@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class FavouriteRecipeService {
 
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
-    private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id: %s not found";
+    private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
     private final RecipeRepository recipeRepository;
     private final CustomerRepository customerRepository;
     private final RecipeDtoMapper recipeDtoMapper;
