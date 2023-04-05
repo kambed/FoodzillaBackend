@@ -1,0 +1,8 @@
+extend type Query {
+    favouriteRecipes: [Recipe]
+}
+
+extend type Mutation {
+    addRecipeToFavourites(recipe: RecipeInput): [Recipe]
+    removeRecipeFromFavourites(recipe: RecipeInput): [Recipe]
+}
