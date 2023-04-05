@@ -24,6 +24,7 @@ import java.util.List;
 
 @Service
 public class RecipeSearchService {
+
     private final EntityManager entityManager;
     private final RecipeDtoMapper mapper;
     private final CriteriaBuilder criteriaBuilder;

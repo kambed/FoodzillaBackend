@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class IngredientService {
+
     private final IngredientRepository ingredientRepository;
     private final IngredientDtoMapper ingredientDtoMapper;
 

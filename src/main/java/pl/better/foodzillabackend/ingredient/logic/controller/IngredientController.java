@@ -11,7 +11,9 @@ import java.util.Set;
 @Controller
 @RequiredArgsConstructor
 public class IngredientController {
+
     private final IngredientService ingredientService;
+
     @QueryMapping
     public Set<IngredientDto> ingredients() {
         return ingredientService.getAllIngredients();

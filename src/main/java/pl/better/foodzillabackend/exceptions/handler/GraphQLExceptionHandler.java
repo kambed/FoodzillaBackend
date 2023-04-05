@@ -8,8 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Component;
-import pl.better.foodzillabackend.exceptions.type.CustomerAlreadyExistsException;
-import pl.better.foodzillabackend.exceptions.type.FilterInputException;
+import pl.better.foodzillabackend.exceptions.type.BadRequestException;
 import pl.better.foodzillabackend.exceptions.type.ForbiddenException;
 import pl.better.foodzillabackend.exceptions.type.NotFoundException;
 
@@ -18,7 +17,7 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
     @Override
     protected GraphQLError resolveToSingleError(@NotNull Throwable ex, @NotNull DataFetchingEnvironment env) {
         ErrorType errorType = ErrorType.INTERNAL_ERROR;
-        if (ex instanceof ConstraintViolationException || ex instanceof CustomerAlreadyExistsException) {
+        if (ex instanceof ConstraintViolationException || ex instanceof BadRequestException) {
             errorType = ErrorType.BAD_REQUEST;
         }
         if (ex instanceof NotFoundException) {
@@ -26,9 +25,6 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
         }
         if (ex instanceof ForbiddenException) {
             errorType = ErrorType.FORBIDDEN;
-        }
-        if (ex instanceof FilterInputException) {
-            errorType = ErrorType.BAD_REQUEST;
         }
         return GraphqlErrorBuilder.newError()
                 .errorType(errorType)

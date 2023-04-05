@@ -11,7 +11,9 @@ import pl.better.foodzillabackend.recipe.logic.service.RecipeSearchService;
 @Controller
 @RequiredArgsConstructor
 public class RecipeSearchController {
+
     private final RecipeSearchService recipeSearchService;
+
     @QueryMapping
     public SearchResultDto search(@Argument SearchPojo input) {
         return recipeSearchService.search(input);
