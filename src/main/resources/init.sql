@@ -94,6 +94,20 @@ create table review
 
 ALTER TABLE review AUTO_INCREMENT=581254;
 
+create table customer_recipe
+(
+    id        int auto_increment
+        primary key,
+    customer_id int not null,
+    recipe_id    int not null,
+    constraint customer_recipe_Customer_null_fk
+        foreign key (customer_id) references customer (id),
+    constraint customer_recipe_Recipe_null_fk
+        foreign key (recipe_id) references recipe (id)
+);
+
+ALTER TABLE customer_recipe AUTO_INCREMENT=1;
+
 CREATE VIEW preferences AS
 SELECT customer.id AS customer_id, r.recipe_id, r.rating
 FROM customer JOIN review r on customer.id = r.customer_id;

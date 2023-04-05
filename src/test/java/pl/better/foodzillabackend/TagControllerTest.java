@@ -2,31 +2,18 @@ package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import org.springframework.test.context.ActiveProfiles;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.tag.logic.model.dto.TagDto;
-import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 
 import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@AutoConfigureGraphQlTester
-@ActiveProfiles("test")
-class TagControllerTest {
-
-    @Autowired
-    private GraphQlTester graphQlTester;
-    @Autowired
-    private TagRepository tagRepository;
+class TagControllerTest extends TestBase {
 
     @BeforeEach
-    public void resetDb() {
-        tagRepository.deleteAll();
+    public void setUp() {
+        super.resetDb();
         Tag tag1 = new Tag("Breakfast");
         Tag tag2 = new Tag("Lunch");
         tagRepository.save(tag1);
