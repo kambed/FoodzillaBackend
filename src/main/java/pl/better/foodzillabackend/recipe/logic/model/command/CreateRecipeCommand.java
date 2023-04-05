@@ -31,7 +31,7 @@ public record CreateRecipeCommand(
         int protein,
         @Min(value = 0, message = "Amount of saturatedFat cannot be less than 0.")
         int saturatedFat,
-        @Min(0)
+        @Min(value = 0, message = "Amount of carbohydrates cannot be less than 0.")
         int carbohydrates,
         Set<Ingredient> ingredients,
         Set<Tag> tags
