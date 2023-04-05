@@ -2,43 +2,27 @@ package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 import pl.better.foodzillabackend.auth.model.domain.Token;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
-import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@AutoConfigureGraphQlTester
-@ActiveProfiles("test")
-class AuthControllerTest {
-
-    @Autowired
-    private GraphQlTester graphQlTester;
-    @Autowired
-    private CustomerRepository repository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+class AuthControllerTest extends TestBase {
 
     @BeforeEach
     public void setUp() {
-        repository.deleteAll();
+        super.resetDb();
         Customer customer = Customer.builder()
                 .firstname("Boob")
                 .lastname("obbo")
                 .password(passwordEncoder.encode("bOb@4321"))
                 .username("Boob123")
                 .build();
-        repository.saveAndFlush(customer);
+        customerRepository.saveAndFlush(customer);
     }
 
     @Test

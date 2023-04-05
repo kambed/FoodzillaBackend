@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import pl.better.foodzillabackend.auth.service.accesstype.LoggedInUser;
@@ -21,24 +22,24 @@ public class FavouriteRecipeController {
     @LoggedInUser
     @QueryMapping
     public Set<RecipeDto> favouriteRecipes() {
-        String principal = (String)
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
         return service.favouriteRecipes(principal);
     }
 
     @LoggedInUser
     @MutationMapping
     public Set<RecipeDto> addRecipeToFavourites(@Argument int recipeId) {
-        String principal = (String)
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
         return service.addRecipeToFavourites(principal, recipeId);
     }
 
     @LoggedInUser
     @MutationMapping
     public Set<RecipeDto> removeRecipeFromFavourites(@Argument int recipeId) {
-        String principal = (String)
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
         return service.removeRecipeFromFavourites(principal, recipeId);
     }
 }

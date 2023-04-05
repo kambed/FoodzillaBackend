@@ -1,0 +1,30 @@
+mutation removeRecipeFromFavourites($recipeId: ID!) {
+    removeRecipeFromFavourites(
+        recipeId: $recipeId
+    ) {
+        id
+        name
+        description
+        timeOfPreparation
+        numberOfSteps
+        steps
+        numberOfIngredients
+        calories
+        fat
+        sugar
+        sodium
+        protein
+        saturatedFat
+        carbohydrates
+        reviews {
+            review
+            rating
+        }
+        ingredients {
+            name
+        }
+        tags {
+            name
+        }
+    }
+}
