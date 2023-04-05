@@ -60,7 +60,7 @@ class AuthControllerTest {
         GraphQlTester.Response res = sendLogin("Rick",
                 "s@ncHez321");
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
-                        Objects.equals(responseError.getMessage(), "Customer with id: Rick not found"))
+                        Objects.equals(responseError.getMessage(), "Customer with username Rick not found"))
                 .verify().path("login").valueIsNull();
     }
 

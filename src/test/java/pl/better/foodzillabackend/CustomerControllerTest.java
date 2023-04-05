@@ -75,7 +75,7 @@ public class CustomerControllerTest {
                 "IlovESt@rwars321");
 
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST) &&
-                        Objects.equals(responseError.getMessage(), "Customer with username: BobLoblaw already exists"))
+                        Objects.equals(responseError.getMessage(), "Customer with username BobLoblaw already exists"))
                 .verify().path("createCustomer").valueIsNull();
 
         assertEquals(1, repository.findAll().size());
@@ -172,7 +172,7 @@ public class CustomerControllerTest {
                 "IlovESt@rwars321");
 
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST) &&
-                        Objects.equals(responseError.getMessage(), "Customer with username: BobLoblaw already exists"))
+                        Objects.equals(responseError.getMessage(), "Customer with username BobLoblaw already exists"))
                 .verify().path("editCustomer").valueIsNull();
 
         assertEquals(1, repository.findAll().size());
@@ -197,7 +197,7 @@ public class CustomerControllerTest {
                 "IlovESt@rwars321");
 
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
-                        Objects.equals(responseError.getMessage(), "Customer with id: "+ nonExistentId + " not found"))
+                        Objects.equals(responseError.getMessage(), "Customer with id "+ nonExistentId + " not found"))
                 .verify().path("editCustomer").valueIsNull();
 
         assertEquals(1, repository.findAll().size());

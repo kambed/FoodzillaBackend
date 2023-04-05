@@ -148,7 +148,7 @@ class RecipeControllerTest {
     void shouldReturnErrorWhenRecipeIdNotFound() {
         GraphQlTester.Response res = graphQlTester.documentName("recipe-get").variable("id", -1).execute();
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
-                        Objects.equals(responseError.getMessage(), "Recipe with id: -1 not found"))
+                        Objects.equals(responseError.getMessage(), "Recipe with id -1 not found"))
                 .verify().path("recipe").valueIsNull();
     }
 }
