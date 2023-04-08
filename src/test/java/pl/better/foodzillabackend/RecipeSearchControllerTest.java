@@ -2,16 +2,10 @@ package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
-import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
-import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 
 import java.util.Map;
 import java.util.Objects;
@@ -19,21 +13,11 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@AutoConfigureGraphQlTester
-@ActiveProfiles("test")
-class RecipeSearchControllerTest {
-
-    @Autowired
-    private GraphQlTester graphQlTester;
-    @Autowired
-    private RecipeRepository recipeRepository;
-    @Autowired
-    private IngredientRepository ingredientRepository;
+class RecipeSearchControllerTest extends TestBase {
 
     @BeforeEach
     public void resetDb() {
-        recipeRepository.deleteAll();
+        super.resetDb();
         Ingredient ingredient1 = Ingredient.builder()
                 .name("Ingredient 1")
                 .build();
