@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.better.foodzillabackend.auth.model.domain.Role;
+import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
 
 import java.util.Collection;
@@ -16,7 +17,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"reviews","favouriteRecipes"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer implements UserDetails {
@@ -32,6 +33,13 @@ public class Customer implements UserDetails {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.REMOVE)
+    @JoinTable(
+            name = "customer_recipe",
+            joinColumns = @JoinColumn(name = "customer_id"),
+            inverseJoinColumns = @JoinColumn(name = "recipe_id"))
+    private Set<Recipe> favouriteRecipes = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

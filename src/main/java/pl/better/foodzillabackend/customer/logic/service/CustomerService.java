@@ -21,8 +21,8 @@ import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 @RequiredArgsConstructor
 public class CustomerService implements UserDetailsService {
 
-    private static final String CUSTOMER_NOT_FOUND = "Customer with id: %s not found";
-    private static final String CUSTOMER_ALREADY_EXIST = "Customer with username: %s already exists";
+    private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
+    private static final String CUSTOMER_ALREADY_EXIST = "Customer with username %s already exists";
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final CustomerRepository repository;
     private final CustomerDtoMapper mapper;
@@ -62,6 +62,7 @@ public class CustomerService implements UserDetailsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repository.findByUsername(username).orElseThrow(() -> {
             throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND, username));

@@ -26,8 +26,8 @@ public class CustomerController {
     @LoggedInUser
     @MutationMapping
     public CustomerDto editCustomer(@Argument @Valid UpdateCustomerCommand customer) {
-        String principal = (String)
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
         return customerService.editCustomer(principal, customer);
     }
 }
