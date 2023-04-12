@@ -1,0 +1,35 @@
+extend type Query {
+    search(input: SearchInput! = {}): SearchResult!
+}
+
+input SearchInput {
+    phrase: String
+    currentPage: Int = 1
+    pageSize: Int = 5
+    sort: [RecipeSort] = [{attribute: "name"}]
+    filters: [FilterType]
+}
+
+type SearchResult {
+    currentPage: Int!
+    numberOfPages: Int!
+    recipes: [Recipe]!
+}
+
+input RecipeSort {
+    attribute: String!
+    direction: SortDirection! = ASC
+}
+
+enum SortDirection {
+    ASC
+    DESC
+}
+
+input FilterType {
+    attribute: String!
+    equals: String
+    from: Int
+    to: Int
+    in: [String]
+}

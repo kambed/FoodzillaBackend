@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TagService {
+
     private final TagRepository tagRepository;
     private final TagDtoMapper tagDtoMapper;
 

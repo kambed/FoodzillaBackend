@@ -2,10 +2,7 @@ package pl.better.foodzillabackend.ingredient.logic.model.domain;
 
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 
 import java.util.HashSet;
@@ -14,6 +11,8 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @EqualsAndHashCode(exclude = "recipes")
 @Entity
 public class Ingredient {
