@@ -17,7 +17,6 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @QueryMapping
-    @LoggedInUser
     public List<RecommendationDto> recommendations(@Argument long id, @Argument int numOfRecommendations) { //TODO: Replace ID with id from Bearer
         return recommendationService.recommend(id, numOfRecommendations);
     }

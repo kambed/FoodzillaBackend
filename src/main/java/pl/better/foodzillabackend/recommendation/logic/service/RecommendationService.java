@@ -30,7 +30,7 @@ public class RecommendationService {
         dataSource.setPassword(environment.getProperty("MYSQL_PASSWORD"));
         dataSource.setDatabaseName(environment.getProperty("MYSQL_DATABASE"));
         JDBCDataModel model = new MySQLJDBCDataModel(dataSource,
-                "preferences", "customer_id", "recipe_id", "rating", null);
+                "preference", "customer_id", "recipe_id", "rating", null);
         CityBlockSimilarity similarity = new CityBlockSimilarity(model);
         UserNeighborhood neighborhood = new ThresholdUserNeighborhood(THRESHOLD, similarity, model);
         userBasedRecommender = new GenericUserBasedRecommender(model, neighborhood, similarity);
