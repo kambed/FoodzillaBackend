@@ -19,32 +19,7 @@ import java.util.List;
 @Service
 public class RecommendationService {
 
-    private final UserBasedRecommender userBasedRecommender;
-    private final RecommendationDtoMapper recommendationDtoMapper;
-    private static final double THRESHOLD = 0.1;
-
-    public RecommendationService(RecommendationDtoMapper recommendationDtoMapper, Environment environment) {
-        MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL(environment.getProperty("MYSQL_URL"));
-        dataSource.setUser(environment.getProperty("MYSQL_USER"));
-        dataSource.setPassword(environment.getProperty("MYSQL_PASSWORD"));
-        dataSource.setDatabaseName(environment.getProperty("MYSQL_DATABASE"));
-        JDBCDataModel model = new MySQLJDBCDataModel(dataSource,
-                "preference", "customer_id", "recipe_id", "rating", null);
-        CityBlockSimilarity similarity = new CityBlockSimilarity(model);
-        UserNeighborhood neighborhood = new ThresholdUserNeighborhood(THRESHOLD, similarity, model);
-        userBasedRecommender = new GenericUserBasedRecommender(model, neighborhood, similarity);
-        this.recommendationDtoMapper = recommendationDtoMapper;
-    }
-
     public List<RecommendationDto> recommend(long id, int numOfRecommendations) {
-        try {
-            return userBasedRecommender.recommend(id, numOfRecommendations)
-                    .stream()
-                    .map(recommendationDtoMapper)
-                    .toList();
-        } catch (Exception ex) {
-            return Collections.emptyList();
-        }
+        //TODO: CONNECT TO PYTHON MODULE
     }
 }
