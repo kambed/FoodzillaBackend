@@ -1,4 +1,7 @@
+import os
 from abc import ABC
+
+import numpy as np
 import pandas as pd
 import tensorflow as tf
 import tensorflow_recommenders as tfrs
@@ -54,32 +57,37 @@ class FoodzillaModel(tfrs.models.Model, ABC):
         return self.task(labels=features["rating"], predictions=rating_predictions)
 
 
-def train_model(data):
+def train_model(data, epochs):
     preferences_data = pd.DataFrame(data, columns=['customer_id', 'recipe_id', 'rating'])
     preferences_data['customer_id'] = preferences_data['customer_id'].apply(str)
     preferences_data['recipe_id'] = preferences_data['recipe_id'].apply(str)
     ratings = tf.data.Dataset.from_tensor_slices({"userId": tf.cast(preferences_data['customer_id'].values, tf.string),
                                                   "productId": tf.cast(preferences_data['recipe_id'].values, tf.string),
-                                                  "rating": tf.cast(preferences_data['rating'].values, tf.int64, )})
-
-    total_ratings = len(preferences_data.index)
-    shuffled = ratings.shuffle(100_000, seed=42, reshuffle_each_iteration=False)
-    train = shuffled.take(int(total_ratings * 0.8))
-    test = shuffled.skip(int(total_ratings * 0.8)).take(int(total_ratings * 0.2))
-
+                                                  "rating": tf.cast(preferences_data['rating'].values, tf.int64)})
     model = FoodzillaModel(preferences_data)
-    model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
-    cached_train = train.shuffle(100_000).batch(8192).cache()
-    cached_test = test.batch(4096).cache()
-    model.fit(cached_train, epochs=10)
+    model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.5))
 
-    user_rand = preferences_data['customer_id'][123]
-    test_rating = {}
-    for m in test.take(5):
-        test_rating[m["productId"].numpy()] = model.ranking_model(tf.convert_to_tensor([user_rand]),
-                                                                  tf.convert_to_tensor([m["productId"]]))
-    print("Top 5 recommended products for User {}: ".format(user_rand))
-    for m in sorted(test_rating, key=test_rating.get, reverse=True):
-        print(m.decode())
+    if os.path.exists("saved_model/"):
+        model.load_weights("saved_model/")
 
-    # print(model.evaluate(cached_test, return_dict=True))
+    cached_train = ratings.shuffle(100_000).batch(8192).cache()
+    model.fit(cached_train, epochs=epochs)
+
+    model.save_weights("saved_model/")
+
+    return model.evaluate(ratings.batch(4096).cache(), return_dict=True)
+
+
+def predict_with_model(user_id, num_of_recommendations, data):
+    preferences_data = pd.DataFrame(data, columns=['customer_id', 'recipe_id', 'rating'])
+    preferences_data['customer_id'] = preferences_data['customer_id'].apply(str)
+    preferences_data['recipe_id'] = preferences_data['recipe_id'].apply(str)
+    model = FoodzillaModel(preferences_data)
+
+    if os.path.exists("saved_model/"):
+        model.load_weights("saved_model/").expect_partial()
+
+    result_ratings = {}
+    for r in np.random.choice(preferences_data['recipe_id'].unique(), size=5000, replace=False):
+        result_ratings[r] = model.ranking_model(tf.convert_to_tensor([user_id]), tf.convert_to_tensor([r]))
+    return sorted(result_ratings, key=result_ratings.get, reverse=True)[:num_of_recommendations]
