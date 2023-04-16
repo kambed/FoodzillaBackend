@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 
 @app.route('/train/<epochs>')
-def hello_world(epochs):  # put application's code here
+def train(epochs):
     mysql.update_data()
     return train_model(mysql.get_data(), int(epochs))
 
