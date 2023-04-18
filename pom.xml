@@ -71,18 +71,6 @@
             <artifactId>converter-jackson</artifactId>
             <version>${retrofit.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.mahout</groupId>
-            <artifactId>mahout-mr</artifactId>
-            <version>${mahout.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.mahout</groupId>
-            <artifactId>mahout-integration</artifactId>
-            <version>${mahout.version}</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/mahout-integration-0.13.0.jar</systemPath>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
