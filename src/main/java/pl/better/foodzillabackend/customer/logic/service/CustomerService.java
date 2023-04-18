@@ -49,7 +49,7 @@ public class CustomerService implements UserDetailsService {
         Customer user = repository.findByUsername(principal).orElseThrow(() -> new CustomerNotFoundException(
                 CUSTOMER_NOT_FOUND.formatted(principal)
         ));
-        if (!repository.existsByUsername(command.username())) {
+        if (!repository.existsByUsername(command.username()) || principal.equals(command.username())) {
             user.setFirstname(command.firstname());
             user.setLastname(command.lastname());
             user.setUsername(command.username());
