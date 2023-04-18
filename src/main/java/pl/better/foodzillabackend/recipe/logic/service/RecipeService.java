@@ -3,6 +3,10 @@ package pl.better.foodzillabackend.recipe.logic.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
+import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
+import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RecipeService {
 
+    private final CustomerRepository customerRepository;
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
     private final TagRepository tagRepository;
@@ -31,17 +36,26 @@ public class RecipeService {
     private final RecipeMapper recipeMapper;
     private final Environment environment;
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
+    private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
 
-    public RecipeDto getRecipeById(long id) {
-        return recipeRepository.getRecipeDetailsById(id)
-                .stream()
-                .findFirst()
-                .map(recipeDtoMapper)
-                .orElseThrow(() -> new RecipeNotFoundException(
-                        RECIPE_NOT_FOUND_MESSAGE.formatted(id)
-                ));
+    @Transactional
+    public RecipeDto getRecipeById(String principal, long id) {
+        Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
+                RECIPE_NOT_FOUND_MESSAGE.formatted(id)
+        ));
+
+        if (!principal.equals("anonymousUser")) {
+            Customer customer = customerRepository.findByUsername(principal).orElseThrow(
+                    () -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND.formatted(principal)
+                    ));
+            customer.getRecentlyViewedRecipes().add(recipe);
+            customerRepository.saveAndFlush(customer);
+        }
+
+        return recipeDtoMapper.apply(recipe);
     }
 
+    @Transactional
     public RecipeDto createNewRecipeAndSaveInDb(CreateRecipeCommand command) {
         Recipe recipe = Recipe.builder()
                 .name(command.name())
