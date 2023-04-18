@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.utils.retrofit;
+package pl.better.foodzillabackend.utils.retrofit.image.api;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

@@ -8,6 +8,7 @@ query search($pageSize: Int = 2, $currentPage: Int = 1, $phrase: String, $filter
     }) {
         currentPage
         numberOfPages
+        opinion
         recipes {
             name
         }
