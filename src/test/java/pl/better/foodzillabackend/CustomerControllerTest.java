@@ -1,10 +1,11 @@
 package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.security.test.context.support.WithMockUser;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 
 import java.util.Objects;
@@ -81,44 +82,16 @@ public class CustomerControllerTest extends TestBase {
                 .execute();
     }
 
-    private GraphQlTester.Response sendEdit(Long id,
-                                            String firstname,
+    private GraphQlTester.Response sendEdit(String firstname,
                                             String lastname,
                                             String username,
                                             String password) {
         return graphQlTester.documentName("customer-edit")
-                .variable("customerId", id)
                 .variable("firstname", firstname)
                 .variable("lastname", lastname)
                 .variable("username", username)
                 .variable("password", password)
                 .execute();
-    }
-
-    @Test
-    @Disabled
-    void shouldEditUserInDatabaseWithCorrectData() {
-        assertEquals(0, customerRepository.findAll().size());
-        Customer user = Customer.builder()
-                .firstname("Bob")
-                .lastname("Loblaw")
-                .username("BobLoblaw")
-                .password("b0bL0bl@w")
-                .build();
-        customerRepository.saveAndFlush(user);
-        assertEquals(1, customerRepository.findAll().size());
-        GraphQlTester.Response res = sendEdit(user.getId(),
-                "Tomek",
-                "Hajto",
-                "RozjechalemBabeNaPasach",
-                "bOb@4321");
-        res.path("editCustomer").entity(Customer.class).satisfies(userResponse -> {
-            assertEquals("Tomek", userResponse.getFirstname());
-            assertEquals("Hajto", userResponse.getLastname());
-            assertEquals("RozjechalemBabeNaPasach", userResponse.getUsername());
-        });
-
-        assertEquals(1, customerRepository.findAll().size());
     }
 
     @Test
@@ -131,8 +104,7 @@ public class CustomerControllerTest extends TestBase {
                 .password("b0bL0bl@w")
                 .build();
         customerRepository.saveAndFlush(user);
-        GraphQlTester.Response res = sendEdit(user.getId(),
-                "b",
+        GraphQlTester.Response res = sendEdit("b",
                 "o",
                 "b",
                 "sdaD936245");
@@ -140,55 +112,79 @@ public class CustomerControllerTest extends TestBase {
                 .verify().path("editCustomer").valueIsNull();
     }
 
-    @Test
-    @Disabled
-    void shouldReturnErrorWhenUserDuringEditHasUsernameWhichExist() {
-        Customer user = Customer.builder()
-                .firstname("Bob")
-                .lastname("Loblaw")
-                .username("BobLoblaw")
-                .password("b0bL0bl@w")
-                .build();
-        customerRepository.saveAndFlush(user);
-        assertEquals(1, customerRepository.findAll().size());
+    @Nested
+    class LoggedInCustomerControllerTest {
+        @BeforeEach
+        public void setUp() {
 
-        GraphQlTester.Response res = sendEdit(user.getId(),
-                "Obi-Wan",
-                "Kenobi",
-                "BobLoblaw",
-                "IlovESt@rwars321");
+            Customer user = Customer.builder()
+                    .firstname("Bob")
+                    .lastname("Loblaw")
+                    .username("BobLoblaw")
+                    .password("b0bL0bl@w")
+                    .build();
+            customerRepository.saveAndFlush(user);
+        }
 
-        res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST) &&
-                        Objects.equals(responseError.getMessage(), "Customer with username BobLoblaw already exists"))
-                .verify().path("editCustomer").valueIsNull();
+        @Test
+        @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
+        void shouldEditUserInDatabaseWithCorrectData() {
+            assertEquals(1, customerRepository.findAll().size());
 
-        assertEquals(1, customerRepository.findAll().size());
+            GraphQlTester.Response res = sendEdit(
+                    "Tomek",
+                    "Hajto",
+                    "RozjechalemBabeNaPasach",
+                    "bOb@4321");
+            res.path("editCustomer").entity(Customer.class).satisfies(userResponse -> {
+                assertEquals("Tomek", userResponse.getFirstname());
+                assertEquals("Hajto", userResponse.getLastname());
+                assertEquals("RozjechalemBabeNaPasach", userResponse.getUsername());
+            });
+
+            assertEquals(1, customerRepository.findAll().size());
+        }
+
+        @Test
+        @WithMockUser(username = "Stefania", password = "b0bL0bl@w")
+        void shouldReturnErrorWhileEditWhenUsernameInUpdateUserCommandIsNotFound() {
+            assertEquals(1, customerRepository.findAll().size());
+
+            GraphQlTester.Response res = sendEdit("Obi-Wan",
+                    "Kenobi",
+                    "BobLoblaw",
+                    "IlovESt@rwars321");
+
+            res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
+                            Objects.equals(responseError.getMessage(), "Customer with username Stefania not found"))
+                    .verify().path("editCustomer").valueIsNull();
+
+            assertEquals(1, customerRepository.findAll().size());
+        }
+
+        @Test
+        @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
+        void shouldReturnErrorWhenUserDuringEditHasUsernameWhichExist() {
+            assertEquals(1, customerRepository.findAll().size());
+            Customer user = Customer.builder()
+                    .firstname("Bob")
+                    .lastname("Loblaw")
+                    .username("Marian")
+                    .password("b0bL0bl@w")
+                    .build();
+            customerRepository.saveAndFlush(user);
+            assertEquals(2, customerRepository.findAll().size());
+
+            GraphQlTester.Response res = sendEdit("Obi-Wan",
+                    "Kenobi",
+                    "Marian",
+                    "IlovESt@rwars321");
+
+            res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST) &&
+                            Objects.equals(responseError.getMessage(), "Customer with username Marian already exists"))
+                    .verify().path("editCustomer").valueIsNull();
+
+            assertEquals(2, customerRepository.findAll().size());
+        }
     }
-
-    @Test
-    @Disabled
-    void shouldReturnErrorWhileEditWhenUserIdInUpdateUserCommandIdNotFound() {
-        Customer user = Customer.builder()
-                .firstname("Bob")
-                .lastname("Loblaw")
-                .username("BobLoblaw")
-                .password("b0bL0bl@w")
-                .build();
-        customerRepository.saveAndFlush(user);
-        assertEquals(1, customerRepository.findAll().size());
-        Long nonExistentId = 112L;
-        GraphQlTester.Response res = sendEdit(nonExistentId,
-                "Obi-Wan",
-                "Kenobi",
-                "BobLoblaw",
-                "IlovESt@rwars321");
-
-        res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
-                        Objects.equals(responseError.getMessage(), "Customer with id "+ nonExistentId + " not found"))
-                .verify().path("editCustomer").valueIsNull();
-
-        assertEquals(1, customerRepository.findAll().size());
-    }
-
-
 }
