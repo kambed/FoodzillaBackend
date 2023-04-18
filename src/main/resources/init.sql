@@ -108,6 +108,6 @@ create table customer_recipe
 
 ALTER TABLE customer_recipe AUTO_INCREMENT=1;
 
-CREATE VIEW preferences AS
+CREATE VIEW preference AS
 SELECT customer.id AS customer_id, r.recipe_id, r.rating
 FROM customer JOIN review r on customer.id = r.customer_id;
