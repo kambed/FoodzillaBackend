@@ -88,6 +88,9 @@ def predict_with_model(user_id, num_of_recommendations, data):
         model.load_weights("saved_model/").expect_partial()
 
     result_ratings = {}
-    for r in np.random.choice(preferences_data['recipe_id'].unique(), size=5000, replace=False):
+    preferences_data_sample = preferences_data['recipe_id'].unique()
+    if preferences_data.size > 5000:
+        preferences_data_sample = np.random.choice(preferences_data['recipe_id'].unique(), size=5000, replace=False)
+    for r in preferences_data_sample:
         result_ratings[r] = model.ranking_model(tf.convert_to_tensor([user_id]), tf.convert_to_tensor([r]))
     return sorted(result_ratings, key=result_ratings.get, reverse=True)[:num_of_recommendations]
