@@ -31,8 +31,6 @@ public class RecipeController {
     @LoggedInUser
     @MutationMapping
     public RecipeDto createRecipe(@Argument @Valid CreateRecipeCommand recipe) {
-        RecipeDto recipeDto = recipeService.createNewRecipeAndSaveInDb(recipe);
-        recipeService.train();
-        return recipeDto;
+        return recipeService.createNewRecipeAndSaveInDb(recipe);
     }
 }

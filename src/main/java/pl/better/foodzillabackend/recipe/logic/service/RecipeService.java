@@ -100,13 +100,4 @@ public class RecipeService {
             //ignored
         }
     }
-
-    @Async("recommendationTaskExecutor")
-    public void train() {
-        try {
-            PythonApiClient.create(environment.getProperty("BASE_PYTHON_URL")).trainModel(10).execute();
-        } catch (Exception e) {
-            throw new PythonErrorException("Error during using python module");
-        }
-    }
 }
