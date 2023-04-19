@@ -1,7 +1,9 @@
 package pl.better.foodzillabackend.customer.logic.model.domain;
 
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.better.foodzillabackend.auth.model.domain.Role;
@@ -11,6 +13,7 @@ import pl.better.foodzillabackend.review.logic.model.domain.Review;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -30,6 +33,10 @@ public class Customer implements UserDetails {
     private String lastname;
     private String username;
     private String password;
+
+
+    @Type(JsonStringType.class)
+    private List<Long> recommendations;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();

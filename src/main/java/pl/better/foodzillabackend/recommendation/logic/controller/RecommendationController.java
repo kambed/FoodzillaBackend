@@ -3,9 +3,10 @@ package pl.better.foodzillabackend.recommendation.logic.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import pl.better.foodzillabackend.auth.service.accesstype.LoggedInUser;
-import pl.better.foodzillabackend.recommendation.logic.model.dto.RecommendationDto;
+import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recommendation.logic.service.RecommendationService;
 
 import java.util.List;
@@ -18,7 +19,17 @@ public class RecommendationController {
 
     @QueryMapping
     @LoggedInUser
-    public List<RecommendationDto> recommendations(@Argument long id, @Argument int numOfRecommendations) { //TODO: Replace ID with id from Bearer
-        return recommendationService.recommend(id, numOfRecommendations);
+    public List<RecipeDto> recommendations(@Argument int numOfRecommendations) {
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        return recommendationService.recommend(principal, numOfRecommendations);
+    }
+
+    @QueryMapping
+    @LoggedInUser
+    public List<RecipeDto> recommendationsReadFromCustomer() {
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        return recommendationService.recommendationsFromCustomer(principal);
     }
 }

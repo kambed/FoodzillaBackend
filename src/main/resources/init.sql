@@ -73,7 +73,8 @@ create table customer
     firstname varchar(250) not null,
     lastname varchar(250) not null,
     username varchar(250) not null,
-    password varchar(250) not null
+    password varchar(250) not null,
+    recommendations varchar(250) null
 );
 
 ALTER TABLE customer AUTO_INCREMENT=432123;

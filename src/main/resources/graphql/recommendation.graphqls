@@ -1,8 +1,8 @@
 extend type Query {
-    recommendations(id: ID!, numOfRecommendations: Int!): [Recommendation]!
+    recommendations(numOfRecommendations: Int!): [Recipe]!
 }
 
-type Recommendation {
-    recipe: Recipe!
-    preference: Float!
+extend type Query {
+    recommendationsReadFromCustomer: [Recipe]
 }
+

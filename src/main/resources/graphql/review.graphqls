@@ -1,3 +1,13 @@
+extend type Mutation {
+    createReview(command: ReviewInput): Review
+}
+
+input ReviewInput {
+    recipeId: Int!
+    review: String
+    rating: Int!
+}
+
 type Review {
     id: ID
     review: String
