@@ -1,10 +1,11 @@
 package pl.better.foodzillabackend.recipe.logic.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import pl.better.foodzillabackend.exceptions.type.PythonErrorException;
+import org.springframework.transaction.annotation.Transactional;
+import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
@@ -15,7 +16,6 @@ import pl.better.foodzillabackend.ingredient.logic.repository.IngredientReposito
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 import pl.better.foodzillabackend.utils.retrofit.ApiBuilder;
-import pl.better.foodzillabackend.utils.retrofit.PythonApiClient;
 import pl.better.foodzillabackend.utils.retrofit.model.GenerateRecipeImageRequestDto;
 import pl.better.foodzillabackend.utils.retrofit.model.GenerateRecipeImageResponseDto;
 import retrofit2.Response;
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RecipeService {
 
+    private final CustomerRepository customerRepository;
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
     private final TagRepository tagRepository;
@@ -35,16 +36,16 @@ public class RecipeService {
     private final Environment environment;
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
 
+    @Transactional
     public RecipeDto getRecipeById(long id) {
-        return recipeRepository.getRecipeDetailsById(id)
-                .stream()
-                .findFirst()
-                .map(recipeDtoMapper)
-                .orElseThrow(() -> new RecipeNotFoundException(
-                        RECIPE_NOT_FOUND_MESSAGE.formatted(id)
-                ));
+        Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
+                RECIPE_NOT_FOUND_MESSAGE.formatted(id)
+        ));
+        publishCustomEvent(recipe);
+        return recipeDtoMapper.apply(recipe);
     }
 
+    @Transactional
     public RecipeDto createNewRecipeAndSaveInDb(CreateRecipeCommand command) {
         Recipe recipe = Recipe.builder()
                 .name(command.name())
@@ -99,5 +100,12 @@ public class RecipeService {
         } catch (Exception ignored) {
             //ignored
         }
+    }
+
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    public void publishCustomEvent(Recipe recipe) {
+        RecentlyViewedRecipesEvent recentlyViewedRecipesEvent = new RecentlyViewedRecipesEvent(this, recipe);
+        applicationEventPublisher.publishEvent(recentlyViewedRecipesEvent);
     }
 }

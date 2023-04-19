@@ -1,5 +1,7 @@
 package pl.better.foodzillabackend;
 
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -7,6 +9,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -173,5 +176,44 @@ class RecipeSearchControllerTest extends TestBase {
             assertEquals(1, recipes.size());
             assertEquals("Recipe 1", Objects.requireNonNull(recipes.get(0)).getName());
         });
+    }
+
+    @Test
+    @DirtiesContext
+    void shouldReturnMockedApiOpinion() throws IOException {
+        try (MockWebServer mockWebServer = new MockWebServer()) {
+            mockWebServer.start();
+            MockResponse mockResponse = new MockResponse()
+                    .setResponseCode(200)
+                    .setBody("""
+                            {
+                               "id": "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
+                               "object": "text_completion",
+                               "created": 1589478378,
+                               "model": "ada",
+                               "choices": [
+                                 {
+                                   "text": "Mocked opinion",
+                                   "index": 0,
+                                   "logprobs": null,
+                                   "finish_reason": "length"
+                                 }
+                               ],
+                               "usage": {
+                                 "prompt_tokens": 5,
+                                 "completion_tokens": 7,
+                                 "total_tokens": 12
+                               }
+                             }""");
+            mockWebServer.enqueue(mockResponse);
+            System.setProperty("COMPLETIONS_API_URL", mockWebServer.url("/").toString());
+
+            GraphQlTester.Response response = graphQlTester.documentName("recipe-search").execute();
+            response.errors().satisfy(errors -> assertEquals(0, errors.size()));
+            response.path("search.opinion").entity(String.class)
+                    .satisfies(opinion -> assertEquals("Mocked opinion", opinion));
+
+            mockWebServer.shutdown();
+        }
     }
 }

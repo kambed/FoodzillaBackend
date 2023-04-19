@@ -18,6 +18,7 @@ import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
+import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +34,14 @@ public class RecipeSearchService {
     private final Join<Recipe, Ingredient> ingredientsJoin;
     private final Join<Recipe, Tag> tagsJoin;
     private final RecipeRepository recipeRepository;
+    private final CompletionsAdapter completionsAdapter;
 
-    public RecipeSearchService(EntityManagerFactory entityManagerFactory, RecipeDtoMapper mapper,
-                               RecipeRepository recipeRepository) {
+    public RecipeSearchService(
+            EntityManagerFactory entityManagerFactory,
+            RecipeDtoMapper mapper,
+            RecipeRepository recipeRepository,
+            CompletionsAdapter completionsAdapter
+    ) {
         this.mapper = mapper;
         entityManager = entityManagerFactory.createEntityManager();
         criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -44,6 +50,7 @@ public class RecipeSearchService {
         ingredientsJoin = root.join("ingredients", JoinType.LEFT);
         tagsJoin = root.join("tags", JoinType.LEFT);
         this.recipeRepository = recipeRepository;
+        this.completionsAdapter = completionsAdapter;
     }
 
     public SearchResultDto search(SearchPojo input) {
@@ -148,5 +155,11 @@ public class RecipeSearchService {
             }
         });
         return orders;
+    }
+
+    public String getOpinion(SearchResultDto searchResult) {
+        return completionsAdapter.generateCompletion(
+                "What do you think about this recipes: " + searchResult.toString()
+        );
     }
 }

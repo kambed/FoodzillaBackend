@@ -20,7 +20,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Builder
-@EqualsAndHashCode(exclude = {"reviews", "favouriteRecipes"})
+@EqualsAndHashCode(exclude = {"reviews","favouriteRecipes","recentlyViewedRecipes"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer implements UserDetails {
@@ -47,6 +47,13 @@ public class Customer implements UserDetails {
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
     private Set<Recipe> favouriteRecipes = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.REMOVE)
+    @JoinTable(
+            name = "recently_viewed_recipes",
+            joinColumns = @JoinColumn(name = "customer_id"),
+            inverseJoinColumns = @JoinColumn(name = "recipe_id"))
+    private Set<Recipe> recentlyViewedRecipes = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
