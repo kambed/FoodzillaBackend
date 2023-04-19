@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.security.test.context.support.WithMockUser;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
@@ -21,10 +23,18 @@ class RecipeControllerTest extends TestBase {
     @BeforeEach
     public void setUp() {
         super.resetDb();
+
+        Customer user = Customer.builder()
+                .firstname("Bob")
+                .lastname("Loblaw")
+                .username("BobLoblaw")
+                .password("b0bL0bl@w")
+                .build();
+        customerRepository.saveAndFlush(user);
     }
 
     @Test
-    @Disabled
+    @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldAddRecipeToDatabaseWhenCreateRecipeEndpointUsedWithCorrectData() {
         assertEquals(0, recipeRepository.findAll().size());
 
@@ -64,6 +74,7 @@ class RecipeControllerTest extends TestBase {
     }
 
     @Test
+    @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldDisplayRecipeDetailsByGivenId() {
         Ingredient i = new Ingredient("Water");
         Tag t = new Tag("Yummy");
@@ -124,6 +135,7 @@ class RecipeControllerTest extends TestBase {
     }
 
     @Test
+    @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldReturnErrorWhenRecipeIdNotFound() {
         GraphQlTester.Response res = graphQlTester.documentName("recipe-get").variable("id", -1).execute();
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&

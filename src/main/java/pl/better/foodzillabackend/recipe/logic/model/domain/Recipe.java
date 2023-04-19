@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = {"reviews", "ingredients", "tags"})
+@EqualsAndHashCode(exclude = {"reviews", "ingredients", "tags","customersWhoViewedRecently"})
 @Entity
 public class Recipe {
     @Id
@@ -55,6 +55,9 @@ public class Recipe {
             joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
+
+    @ManyToMany(mappedBy = "recentlyViewedRecipes", cascade = CascadeType.REMOVE)
+    private Set<Customer> customersWhoViewedRecently = new HashSet<>();
 
     @ManyToMany(mappedBy = "favouriteRecipes", cascade = CascadeType.REMOVE)
     private Set<Customer> customers = new HashSet<>();
