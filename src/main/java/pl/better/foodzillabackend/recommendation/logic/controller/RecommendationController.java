@@ -24,4 +24,12 @@ public class RecommendationController {
                 .getAuthentication().getName();
         return recommendationService.recommend(principal, numOfRecommendations);
     }
+
+    @QueryMapping
+    @LoggedInUser
+    public List<RecipeDto> recommendationsReadFromCustomer() {
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        return recommendationService.recommendationsFromCustomer(principal);
+    }
 }

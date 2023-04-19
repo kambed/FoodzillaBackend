@@ -2,3 +2,7 @@ extend type Query {
     recommendations(numOfRecommendations: Int!): [Recipe]!
 }
 
+extend type Query {
+    recommendationsReadFromCustomer: [Recipe]
+}
+
