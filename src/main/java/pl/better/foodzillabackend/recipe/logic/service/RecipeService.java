@@ -18,9 +18,9 @@ import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
-import pl.better.foodzillabackend.utils.retrofit.ApiBuilder;
-import pl.better.foodzillabackend.utils.retrofit.model.GenerateRecipeImageRequestDto;
-import pl.better.foodzillabackend.utils.retrofit.model.GenerateRecipeImageResponseDto;
+import pl.better.foodzillabackend.utils.retrofit.image.api.ApiBuilder;
+import pl.better.foodzillabackend.utils.retrofit.image.api.model.GenerateRecipeImageRequestDto;
+import pl.better.foodzillabackend.utils.retrofit.image.api.model.GenerateRecipeImageResponseDto;
 import retrofit2.Response;
 
 import java.util.HashSet;
