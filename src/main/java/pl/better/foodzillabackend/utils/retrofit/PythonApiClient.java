@@ -5,20 +5,20 @@ import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-public class PythonApiClient {
-    private static final String BASE_URL = "http://localhost:5000";
 
-    public static PythonApi create() {
+public class PythonApiClient {
+
+    public static PythonApi create(String url) {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(url)
                 .client(new OkHttpClient.Builder()
-                        .addInterceptor(chain -> {
-                            Request requestBuilder = chain.request().newBuilder()
-                                    .addHeader("Accept", "application/json")
-                                    .build();
-                            return chain.proceed(requestBuilder);
-                        })
-                        .build())
+                .addInterceptor(chain -> {
+                    Request requestBuilder = chain.request().newBuilder()
+                            .addHeader("Accept", "application/json")
+                            .build();
+                    return chain.proceed(requestBuilder);
+                })
+                .build())
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
 

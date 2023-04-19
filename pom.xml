@@ -25,6 +25,7 @@
         <java-jwt.version>3.10.2</java-jwt.version>
         <annotations.version>23.0.0</annotations.version>
         <graphql-java-extended-scalars.version>17.0</graphql-java-extended-scalars.version>
+        <hibernate-types.version>2.21.1</hibernate-types.version>
     </properties>
 
     <dependencies>
@@ -163,6 +164,11 @@
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>${java-jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vladmihalcea</groupId>
+            <artifactId>hibernate-types-60</artifactId>
+            <version>${hibernate-types.version}</version>
         </dependency>
     </dependencies>
 

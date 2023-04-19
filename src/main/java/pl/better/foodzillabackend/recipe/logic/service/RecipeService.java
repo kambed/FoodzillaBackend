@@ -2,7 +2,9 @@ package pl.better.foodzillabackend.recipe.logic.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import pl.better.foodzillabackend.exceptions.type.PythonErrorException;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
@@ -13,6 +15,7 @@ import pl.better.foodzillabackend.ingredient.logic.repository.IngredientReposito
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 import pl.better.foodzillabackend.utils.retrofit.ApiBuilder;
+import pl.better.foodzillabackend.utils.retrofit.PythonApiClient;
 import pl.better.foodzillabackend.utils.retrofit.model.GenerateRecipeImageRequestDto;
 import pl.better.foodzillabackend.utils.retrofit.model.GenerateRecipeImageResponseDto;
 import retrofit2.Response;
@@ -95,6 +98,15 @@ public class RecipeService {
             }
         } catch (Exception ignored) {
             //ignored
+        }
+    }
+
+    @Async("recommendationTaskExecutor")
+    public void train() {
+        try {
+            PythonApiClient.create(environment.getProperty("BASE_PYTHON_URL")).trainModel(10).execute();
+        } catch (Exception e) {
+            throw new PythonErrorException("Error during using python module");
         }
     }
 }
