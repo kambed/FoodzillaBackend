@@ -2,6 +2,7 @@ package pl.better.foodzillabackend.recipe.logic.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -21,9 +22,7 @@ public class RecipeController {
 
     @QueryMapping
     public RecipeDto recipe(@Argument long id) {
-        String principal = SecurityContextHolder.getContext()
-                .getAuthentication().getName();
-        return recipeService.getRecipeById(principal,id);
+        return recipeService.getRecipeById(id);
     }
 
     @SchemaMapping(typeName = "Recipe", field = "image")

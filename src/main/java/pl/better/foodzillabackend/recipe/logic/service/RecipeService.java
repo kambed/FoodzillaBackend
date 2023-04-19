@@ -1,6 +1,7 @@
 package pl.better.foodzillabackend.recipe.logic.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +9,7 @@ import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
+import pl.better.foodzillabackend.recipe.logic.listener.RecentlyViewedRecipesEvent;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
@@ -36,22 +38,13 @@ public class RecipeService {
     private final RecipeMapper recipeMapper;
     private final Environment environment;
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
-    private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
 
     @Transactional
-    public RecipeDto getRecipeById(String principal, long id) {
+    public RecipeDto getRecipeById(long id) {
         Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
                 RECIPE_NOT_FOUND_MESSAGE.formatted(id)
         ));
-
-        if (!principal.equals("anonymousUser")) {
-            Customer customer = customerRepository.findByUsername(principal).orElseThrow(
-                    () -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND.formatted(principal)
-                    ));
-            customer.getRecentlyViewedRecipes().add(recipe);
-            customerRepository.saveAndFlush(customer);
-        }
-
+        publishCustomEvent(recipe);
         return recipeDtoMapper.apply(recipe);
     }
 
@@ -110,5 +103,12 @@ public class RecipeService {
         } catch (Exception ignored) {
             //ignored
         }
+    }
+
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    public void publishCustomEvent(Recipe recipe) {
+        RecentlyViewedRecipesEvent recentlyViewedRecipesEvent = new RecentlyViewedRecipesEvent(this, recipe);
+        applicationEventPublisher.publishEvent(recentlyViewedRecipesEvent);
     }
 }
