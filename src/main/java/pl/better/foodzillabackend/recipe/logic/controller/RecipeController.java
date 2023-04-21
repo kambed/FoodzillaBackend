@@ -2,12 +2,10 @@ package pl.better.foodzillabackend.recipe.logic.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import pl.better.foodzillabackend.auth.service.accesstype.LoggedInUser;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;

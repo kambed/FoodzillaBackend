@@ -1,6 +1,7 @@
 package pl.better.foodzillabackend.customer.logic.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,16 +17,20 @@ import pl.better.foodzillabackend.customer.logic.model.dto.CustomerDto;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerAlreadyExistsException;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
+import pl.better.foodzillabackend.recommendation.logic.service.RecommendationService;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerService implements UserDetailsService {
-
+    private final RecommendationService recommendationService;
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
     private static final String CUSTOMER_ALREADY_EXIST = "Customer with username %s already exists";
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final CustomerRepository repository;
     private final CustomerDtoMapper mapper;
+    private final Environment environment;
 
     @Transactional
     public CustomerDto createNewUserAndSaveInDb(CreateCustomerCommand command) {
@@ -38,6 +43,8 @@ public class CustomerService implements UserDetailsService {
                     .build();
 
             repository.saveAndFlush(user);
+            recommendationService.recommend(command.username(),
+                    Integer.parseInt(Objects.requireNonNull(environment.getProperty("NUM_OF_RECOMMENDATIONS"))));
             return mapper.apply(user);
         } else {
             throw new CustomerAlreadyExistsException(CUSTOMER_ALREADY_EXIST.formatted(command.username()));

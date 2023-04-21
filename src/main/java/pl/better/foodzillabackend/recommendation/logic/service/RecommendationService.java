@@ -16,6 +16,7 @@ import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.utils.retrofit.PythonApiClient;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +28,8 @@ public class RecommendationService {
     private final Environment environment;
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
 
-    @Transactional
-    public List<RecipeDto> recommend(String principal, int numOfRecommendations) {
+    @Async("recommendationTaskExecutor")
+    public void recommend(String principal, int numOfRecommendations) {
         Customer customer = customerRepository
                 .findByUsername(principal)
                 .orElseThrow(() -> new CustomerNotFoundException(
@@ -42,10 +43,6 @@ public class RecommendationService {
                     .body();
             customer.setRecommendations(recommendationIds);
             customerRepository.saveAndFlush(customer);
-            return recipeRepository.getRecipesIds(recommendationIds)
-                    .stream()
-                    .map(recipeDtoMapper)
-                    .toList();
         } catch (Exception e) {
             throw new PythonErrorException("Error during using python module");
         }
@@ -59,10 +56,34 @@ public class RecommendationService {
                         CUSTOMER_NOT_FOUND.formatted(principal)
                 ));
         List<Long> recommendationIds = customer.getRecommendations();
+        if (recommendationIds == null) {
+            try {
+                recommendationIds = PythonApiClient
+                        .create(environment.getProperty("BASE_PYTHON_URL"))
+                        .predict(customer.getId(),
+                                Integer.parseInt(Objects.requireNonNull(environment.getProperty("NUM_OF_RECOMMENDATIONS"))))
+                        .execute()
+                        .body();
+            } catch (Exception e) {
+                throw new PythonErrorException("Error during using python module");
+            }
+        }
         return recipeRepository
                 .getRecipesIds(recommendationIds)
                 .stream()
                 .map(recipeDtoMapper)
                 .toList();
+    }
+
+    @Async("recommendationTaskExecutor")
+    public void train() {
+        try {
+            PythonApiClient.create(environment
+                            .getProperty("BASE_PYTHON_URL"))
+                    .trainModel(Integer.parseInt(Objects.requireNonNull(environment.getProperty("NUM_OF_EPOCHS"))))
+                    .execute();
+        } catch (Exception e) {
+            throw new PythonErrorException("Error during using python module");
+        }
     }
 }
