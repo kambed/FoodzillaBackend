@@ -1,9 +1,9 @@
 package pl.better.foodzillabackend.utils.retrofit.image.api;
 
-import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.utils.retrofit.image.api.model.GenerateRecipeImageRequestDto;
 import pl.better.foodzillabackend.utils.retrofit.image.api.model.GenerateRecipeImageResponseDto;
@@ -12,17 +12,20 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 @Component
-@RequiredArgsConstructor
 public class ImageGeneratorAdapter {
-    private final Environment environment;
-    private final String url = environment.getRequiredProperty("STABLE_DIFFUSION_API_URL");
+    private final String url;
+
+    public ImageGeneratorAdapter(Environment environment) {
+        this.url = environment.getRequiredProperty("STABLE_DIFFUSION_API_URL");
+    }
+
     public String generateImage(String prompt) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .client(new OkHttpClient.Builder()
                         .addInterceptor(chain -> {
                             Request requestBuilder = chain.request().newBuilder()
-                                    .addHeader("Accept", "application/json")
+                                    .addHeader(HttpHeaders.ACCEPT, "application/json")
                                     .build();
                             return chain.proceed(requestBuilder);
                         })

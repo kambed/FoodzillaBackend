@@ -1,9 +1,9 @@
 package pl.better.foodzillabackend.utils.retrofit.recommendations.api;
 
-import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -13,18 +13,22 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@RequiredArgsConstructor
 public class RecommendationAdapter {
-    private final Environment environment;
-    private final String url = environment.getRequiredProperty("RECOMMENDATIONS_API_URL");
-    private final int numOfRecommendations = environment.getRequiredProperty(
-            "NUM_OF_RECOMMENDATIONS",
-            Integer.class
-    );
-    private final int epochs = environment.getRequiredProperty(
-            "NUM_OF_EPOCHS",
-            Integer.class
-    );
+    private final String url;
+    private final int numOfRecommendations;
+    private final int epochs;
+
+    public RecommendationAdapter(Environment environment) {
+        this.url = environment.getRequiredProperty("RECOMMENDATIONS_API_URL");
+        this.numOfRecommendations = environment.getRequiredProperty(
+                "NUM_OF_RECOMMENDATIONS",
+                Integer.class
+        );
+        this.epochs = environment.getRequiredProperty(
+                "NUM_OF_EPOCHS",
+                Integer.class
+        );
+    }
 
 
     public List<Long> getRecommendations(long userId) throws IOException {
@@ -48,7 +52,7 @@ public class RecommendationAdapter {
                         .readTimeout(100, TimeUnit.SECONDS)
                         .addInterceptor(chain -> {
                             Request requestBuilder = chain.request().newBuilder()
-                                    .addHeader("Accept", "application/json")
+                                    .addHeader(HttpHeaders.ACCEPT, "application/json")
                                     .build();
                             return chain.proceed(requestBuilder);
                         })

@@ -1,7 +1,6 @@
 package pl.better.foodzillabackend;
 
 import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -17,6 +16,19 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RecipeSearchControllerTest extends TestBase {
+//    private static final MockWebServer mockWebServer = new MockWebServer();;
+//
+//    @BeforeAll
+//    public static void setup() throws IOException {
+//        mockWebServer.start();
+//        System.setProperty("COMPLETIONS_API_URL", mockWebServer.url("/").toString());
+//    }
+//
+//    @AfterAll
+//    public static void tearDown() throws IOException {
+//        mockWebServer.shutdown();
+//        System.clearProperty("COMPLETIONS_API_URL");
+//    }
 
     @BeforeEach
     public void resetDb() {
@@ -181,39 +193,35 @@ class RecipeSearchControllerTest extends TestBase {
     @Test
     @DirtiesContext
     void shouldReturnMockedApiOpinion() throws IOException {
-        try (MockWebServer mockWebServer = new MockWebServer()) {
-            mockWebServer.start();
-            MockResponse mockResponse = new MockResponse()
-                    .setResponseCode(200)
-                    .setBody("""
-                            {
-                               "id": "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
-                               "object": "text_completion",
-                               "created": 1589478378,
-                               "model": "ada",
-                               "choices": [
-                                 {
-                                   "text": "Mocked opinion",
-                                   "index": 0,
-                                   "logprobs": null,
-                                   "finish_reason": "length"
-                                 }
-                               ],
-                               "usage": {
-                                 "prompt_tokens": 5,
-                                 "completion_tokens": 7,
-                                 "total_tokens": 12
-                               }
-                             }""");
-            mockWebServer.enqueue(mockResponse);
-            System.setProperty("COMPLETIONS_API_URL", mockWebServer.url("/").toString());
+        MockResponse mockResponse = new MockResponse()
+                .setResponseCode(200)
+                .setBody("""
+                        {
+                           "id": "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
+                           "object": "text_completion",
+                           "created": 1589478378,
+                           "model": "ada",
+                           "choices": [
+                             {
+                               "text": "Mocked opinion",
+                               "index": 0,
+                               "logprobs": null,
+                               "finish_reason": "length"
+                             }
+                           ],
+                           "usage": {
+                             "prompt_tokens": 5,
+                             "completion_tokens": 7,
+                             "total_tokens": 12
+                           }
+                         }""");
+        completionsMockWebServer.enqueue(mockResponse);
 
-            GraphQlTester.Response response = graphQlTester.documentName("recipe-search").execute();
-            response.errors().satisfy(errors -> assertEquals(0, errors.size()));
-            response.path("search.opinion").entity(String.class)
-                    .satisfies(opinion -> assertEquals("Mocked opinion", opinion));
+        GraphQlTester.Response response = graphQlTester.documentName("recipe-search").execute();
+        response.errors().satisfy(errors -> assertEquals(0, errors.size()));
+        response.path("search.opinion").entity(String.class)
+                .satisfies(opinion -> assertEquals("Mocked opinion", opinion));
 
-            mockWebServer.shutdown();
-        }
+        completionsMockWebServer.shutdown();
     }
 }
