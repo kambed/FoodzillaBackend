@@ -1,7 +1,6 @@
 package pl.better.foodzillabackend.review.logic.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +17,6 @@ import pl.better.foodzillabackend.review.logic.model.domain.Review;
 import pl.better.foodzillabackend.review.logic.model.dto.ReviewDto;
 import pl.better.foodzillabackend.review.logic.repository.ReviewRepository;
 
-import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -30,7 +27,6 @@ public class ReviewService {
     private final ReviewDtoMapper reviewDtoMapper;
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
-    private final Environment environment;
 
     @Transactional
     public ReviewDto createReview(CreateReviewCommand command) {
@@ -58,8 +54,7 @@ public class ReviewService {
         reviewRepository.saveAndFlush(review);
 
         recommendationService.train();
-        recommendationService.recommend(principal,
-                Integer.parseInt(Objects.requireNonNull(environment.getProperty("NUM_OF_RECOMMENDATIONS"))));
+        recommendationService.recommend(principal);
 
         return reviewDtoMapper.apply(review);
     }

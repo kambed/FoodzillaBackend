@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.utils.retrofit;
+package pl.better.foodzillabackend.utils.retrofit.recommendations.api;
 
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
@@ -8,7 +8,7 @@ import retrofit2.http.Path;
 import java.util.List;
 
 @Component
-public interface PythonApi {
+public interface RecommendationApi {
 
     @GET("/train/{epochs}")
     Call<Object> trainModel(@Path("epochs") int epochs);
