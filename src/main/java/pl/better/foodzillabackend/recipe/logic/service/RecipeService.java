@@ -89,7 +89,7 @@ public class RecipeService {
         return r.getImage();
     }
 
-    private void generateImageForRecipe(Recipe r) {
+    private synchronized void generateImageForRecipe(Recipe r) {
         try {
             Response<GenerateRecipeImageResponseDto> res =
                     ApiBuilder.build(environment.getProperty("STABLE_DIFFUSION_API_URL"))

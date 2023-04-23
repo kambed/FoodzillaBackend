@@ -5,6 +5,8 @@ import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.util.concurrent.TimeUnit;
+
 
 public class PythonApiClient {
 
@@ -12,13 +14,15 @@ public class PythonApiClient {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .client(new OkHttpClient.Builder()
-                .addInterceptor(chain -> {
-                    Request requestBuilder = chain.request().newBuilder()
-                            .addHeader("Accept", "application/json")
-                            .build();
-                    return chain.proceed(requestBuilder);
-                })
-                .build())
+                        .connectTimeout(100, TimeUnit.SECONDS)
+                        .readTimeout(100, TimeUnit.SECONDS)
+                        .addInterceptor(chain -> {
+                            Request requestBuilder = chain.request().newBuilder()
+                                    .addHeader("Accept", "application/json")
+                                    .build();
+                            return chain.proceed(requestBuilder);
+                        })
+                        .build())
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
 

@@ -1,7 +1,6 @@
 package pl.better.foodzillabackend.recommendation.logic.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -19,15 +18,7 @@ public class RecommendationController {
 
     @QueryMapping
     @LoggedInUser
-    public List<RecipeDto> recommendations(@Argument int numOfRecommendations) {
-        String principal = SecurityContextHolder.getContext()
-                .getAuthentication().getName();
-        return recommendationService.recommend(principal, numOfRecommendations);
-    }
-
-    @QueryMapping
-    @LoggedInUser
-    public List<RecipeDto> recommendationsReadFromCustomer() {
+    public List<RecipeDto> recommendations() {
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         return recommendationService.recommendationsFromCustomer(principal);

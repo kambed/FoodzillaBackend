@@ -105,7 +105,7 @@ public class FavouriteRecipeControllerTest extends TestBase {
                 .execute();
 
         res.path("favouriteRecipes").entityList(Recipe.class).satisfies(result ->
-                assertEquals(result.size(), 1));
+                assertEquals(1, result.size()));
     }
 
     @Test
@@ -115,7 +115,7 @@ public class FavouriteRecipeControllerTest extends TestBase {
                 .variable("recipeId",4)
                 .execute();
         res.path("addRecipeToFavourites").entityList(Recipe.class).satisfies(result ->
-                assertEquals(result.size(), 2));
+                assertEquals(2, result.size()));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class FavouriteRecipeControllerTest extends TestBase {
                 .variable("recipeId",5)
                 .execute();
         res.path("removeRecipeFromFavourites").entityList(Recipe.class).satisfies(result ->
-                assertEquals(result.size(), 0));
+                assertEquals(0, result.size()));
     }
 
 }

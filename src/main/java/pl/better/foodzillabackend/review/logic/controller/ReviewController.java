@@ -20,8 +20,6 @@ public class ReviewController {
     @LoggedInUser
     @MutationMapping
     public ReviewDto createReview(@Argument @Valid CreateReviewCommand command) {
-        ReviewDto reviewDto = reviewService.createReview(command);
-        reviewService.train();
-        return reviewDto;
+        return reviewService.createReview(command);
     }
 }
