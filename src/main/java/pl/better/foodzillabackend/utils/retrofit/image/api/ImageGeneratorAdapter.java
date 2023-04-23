@@ -19,7 +19,7 @@ public class ImageGeneratorAdapter {
         this.url = environment.getRequiredProperty("STABLE_DIFFUSION_API_URL");
     }
 
-    public String generateImage(String prompt) {
+    public synchronized String generateImage(String prompt) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .client(new OkHttpClient.Builder()

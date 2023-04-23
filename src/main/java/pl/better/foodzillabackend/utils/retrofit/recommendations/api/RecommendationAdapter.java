@@ -38,7 +38,7 @@ public class RecommendationAdapter {
                 .body();
     }
 
-    public void train() throws IOException {
+    public synchronized void train() throws IOException {
         createApi()
                 .trainModel(epochs)
                 .execute();

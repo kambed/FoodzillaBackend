@@ -83,7 +83,7 @@ public class RecipeService {
         return r.getImage();
     }
 
-    private synchronized void generateImageForRecipe(Recipe recipe) {
+    private void generateImageForRecipe(Recipe recipe) {
         String image = imageGeneratorAdapter.generateImage(recipe.getName());
         if (image != null) {
             recipe.setImage(image);
