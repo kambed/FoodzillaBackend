@@ -1,7 +1,6 @@
 package pl.better.foodzillabackend.auth.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,6 @@ import pl.better.foodzillabackend.customer.logic.service.CustomerService;
 import pl.better.foodzillabackend.exceptions.type.InvalidCredentialsException;
 import pl.better.foodzillabackend.recommendation.logic.service.RecommendationService;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -24,7 +22,6 @@ public class AuthService {
     private final CustomerService customerService;
     private final PasswordEncoder passwordEncoder;
     private final CustomerDtoMapper mapper;
-    private final Environment environment;
 
     public Token generateToken(String username, String password) {
         Optional<UserDetails> customer = Optional.ofNullable(customerService.loadUserByUsername(username));
@@ -32,8 +29,7 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid credentials");
         }
 
-        recommendationService.recommend(username,
-                Integer.parseInt(Objects.requireNonNull(environment.getProperty("NUM_OF_RECOMMENDATIONS"))));
+        recommendationService.recommend(username);
 
         return tokenUtils.generateToken(username, mapper.apply((Customer) customer.get()));
     }

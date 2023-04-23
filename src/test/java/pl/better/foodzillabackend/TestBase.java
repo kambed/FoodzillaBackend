@@ -1,5 +1,7 @@
 package pl.better.foodzillabackend;
 
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +12,8 @@ import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
+
+import java.io.IOException;
 
 @SpringBootTest
 @AutoConfigureGraphQlTester
@@ -28,6 +32,16 @@ public class TestBase {
     protected CustomerRepository customerRepository;
     @Autowired
     protected PasswordEncoder passwordEncoder;
+    protected static MockWebServer completionsMockWebServer;
+
+    @BeforeAll
+    public static void setup() throws IOException {
+        if (completionsMockWebServer == null) {
+            completionsMockWebServer = new MockWebServer();
+            completionsMockWebServer.start();
+            System.setProperty("COMPLETIONS_API_URL", completionsMockWebServer.url("/").toString());
+        }
+    }
 
     protected void resetDb() {
         recipeRepository.deleteAll();
