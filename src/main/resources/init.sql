@@ -73,7 +73,8 @@ create table customer
     firstname varchar(250) not null,
     lastname varchar(250) not null,
     username varchar(250) not null,
-    password varchar(250) not null
+    password varchar(250) not null,
+    recommendations varchar(250) null
 );
 
 ALTER TABLE customer AUTO_INCREMENT=432123;
@@ -94,6 +95,31 @@ create table review
 
 ALTER TABLE review AUTO_INCREMENT=581254;
 
-CREATE VIEW preferences AS
+create table customer_recipe
+(
+    id        int auto_increment
+        primary key,
+    customer_id int not null,
+    recipe_id    int not null,
+    constraint customer_recipe_Customer_null_fk
+        foreign key (customer_id) references customer (id),
+    constraint customer_recipe_Recipe_null_fk
+        foreign key (recipe_id) references recipe (id)
+);
+
+ALTER TABLE customer_recipe AUTO_INCREMENT=1;
+
+CREATE VIEW preference AS
 SELECT customer.id AS customer_id, r.recipe_id, r.rating
 FROM customer JOIN review r on customer.id = r.customer_id;
+
+create table recently_viewed_recipes
+(
+    id   int auto_increment primary key,
+    customer_id int not null,
+    recipe_id int not null,
+    constraint recently_viewed_recipes_Customer_null_fk
+        foreign key (customer_id) references customer (id),
+    constraint recently_viewed_recipes_Recipe_null_fk
+        foreign key (recipe_id) references recipe (id)
+);

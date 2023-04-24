@@ -1,19 +1,15 @@
 package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.test.context.support.WithMockUser;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
-import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
-import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
-import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,30 +18,25 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@AutoConfigureGraphQlTester
-@ActiveProfiles("test")
-class RecipeControllerTest {
-
-    @Autowired
-    private GraphQlTester graphQlTester;
-    @Autowired
-    private RecipeRepository repository;
-    @Autowired
-    private IngredientRepository ingredientRepository;
-    @Autowired
-    private TagRepository tagRepository;
+class RecipeControllerTest extends TestBase {
 
     @BeforeEach
-    public void resetDb() {
-        repository.deleteAll();
-        ingredientRepository.deleteAll();
-        tagRepository.deleteAll();
+    public void setUp() {
+        super.resetDb();
+
+        Customer user = Customer.builder()
+                .firstname("Bob")
+                .lastname("Loblaw")
+                .username("BobLoblaw")
+                .password("b0bL0bl@w")
+                .build();
+        customerRepository.saveAndFlush(user);
     }
 
     @Test
+    @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldAddRecipeToDatabaseWhenCreateRecipeEndpointUsedWithCorrectData() {
-        assertEquals(0, repository.findAll().size());
+        assertEquals(0, recipeRepository.findAll().size());
 
         GraphQlTester.Response res = graphQlTester.documentName("recipe-create").execute();
         res.path("createRecipe").entity(Recipe.class).satisfies(recipe -> {
@@ -72,7 +63,7 @@ class RecipeControllerTest {
             assertEquals("he he", recipe.getTags().stream().toList().get(0).getName().toLowerCase());
         });
 
-        assertEquals(1, repository.findAll().size());
+        assertEquals(1, recipeRepository.findAll().size());
     }
 
     @Test
@@ -83,6 +74,7 @@ class RecipeControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldDisplayRecipeDetailsByGivenId() {
         Ingredient i = new Ingredient("Water");
         Tag t = new Tag("Yummy");
@@ -113,8 +105,8 @@ class RecipeControllerTest {
                             return t;
                         })
                 )).build();
-        repository.saveAndFlush(r);
-        assertEquals(1, repository.findAll().size());
+        recipeRepository.saveAndFlush(r);
+        assertEquals(1, recipeRepository.findAll().size());
 
         GraphQlTester.Response res = graphQlTester.documentName("recipe-get").variable("id", r.getId()).execute();
         res.errors().verify();
@@ -143,10 +135,11 @@ class RecipeControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldReturnErrorWhenRecipeIdNotFound() {
         GraphQlTester.Response res = graphQlTester.documentName("recipe-get").variable("id", -1).execute();
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
-                        Objects.equals(responseError.getMessage(), "Recipe with id: -1 not found"))
+                        Objects.equals(responseError.getMessage(), "Recipe with id -1 not found"))
                 .verify().path("recipe").valueIsNull();
     }
 }

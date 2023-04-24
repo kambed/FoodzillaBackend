@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.utils.retrofit.model;
+package pl.better.foodzillabackend.utils.retrofit.image.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -2,31 +2,18 @@ package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import org.springframework.test.context.ActiveProfiles;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.ingredient.logic.model.dto.IngredientDto;
-import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 
 import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@AutoConfigureGraphQlTester
-@ActiveProfiles("test")
-class IngredientControllerTest {
-
-    @Autowired
-    private GraphQlTester graphQlTester;
-    @Autowired
-    private IngredientRepository ingredientRepository;
+class IngredientControllerTest extends TestBase {
 
     @BeforeEach
-    public void resetDb() {
-        ingredientRepository.deleteAll();
+    public void setUp() {
+        super.resetDb();
         Ingredient ingredient1 = new Ingredient("Salt");
         Ingredient ingredient2 = new Ingredient("Water");
         ingredientRepository.save(ingredient1);

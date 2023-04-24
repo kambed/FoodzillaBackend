@@ -1,51 +1,74 @@
 package pl.better.foodzillabackend.recommendation.logic.service;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
-
-import java.util.Collections;
-
-import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
-import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
-import org.apache.mahout.cf.taste.impl.similarity.CityBlockSimilarity;
-import org.apache.mahout.cf.taste.model.JDBCDataModel;
-import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
-import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
-import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel;
-import org.springframework.core.env.Environment;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import pl.better.foodzillabackend.recommendation.logic.mapper.RecommendationDtoMapper;
-import pl.better.foodzillabackend.recommendation.logic.model.dto.RecommendationDto;
+import org.springframework.transaction.annotation.Transactional;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
+import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
+import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
+import pl.better.foodzillabackend.exceptions.type.RecommendationErrorException;
+import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
+import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
+import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.utils.retrofit.recommendations.api.RecommendationAdapter;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RecommendationService {
-    private final UserBasedRecommender userBasedRecommender;
-    private final RecommendationDtoMapper recommendationDtoMapper;
-    private static final double THRESHOLD = 0.1;
 
-    public RecommendationService(RecommendationDtoMapper recommendationDtoMapper, Environment environment) {
-        MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL(environment.getProperty("MYSQL_URL"));
-        dataSource.setUser(environment.getProperty("MYSQL_USER"));
-        dataSource.setPassword(environment.getProperty("MYSQL_PASSWORD"));
-        dataSource.setDatabaseName(environment.getProperty("MYSQL_DATABASE"));
-        JDBCDataModel model = new MySQLJDBCDataModel(dataSource,
-                "preferences", "customer_id", "recipe_id", "rating", null);
-        CityBlockSimilarity similarity = new CityBlockSimilarity(model);
-        UserNeighborhood neighborhood = new ThresholdUserNeighborhood(THRESHOLD, similarity, model);
-        userBasedRecommender = new GenericUserBasedRecommender(model, neighborhood, similarity);
-        this.recommendationDtoMapper = recommendationDtoMapper;
+    private final CustomerRepository customerRepository;
+    private final RecipeRepository recipeRepository;
+    private final RecipeDtoMapper recipeDtoMapper;
+    private final RecommendationAdapter recommendationAdapter;
+    private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
+
+    @Async("recommendationTaskExecutor")
+    public void recommend(String principal) {
+        Customer customer = customerRepository
+                .findByUsername(principal)
+                .orElseThrow(() -> new CustomerNotFoundException(
+                        CUSTOMER_NOT_FOUND.formatted(principal)
+                ));
+        try {
+            List<Long> recommendationIds = recommendationAdapter.getRecommendations(customer.getId());
+            customer.setRecommendations(recommendationIds);
+            customerRepository.saveAndFlush(customer);
+        } catch (Exception e) {
+            throw new RecommendationErrorException("Error during using recommendation module");
+        }
     }
 
-    public List<RecommendationDto> recommend(long id, int numOfRecommendations) {
+    @Transactional(readOnly = true)
+    public List<RecipeDto> recommendationsFromCustomer(String principal) {
+        Customer customer = customerRepository
+                .findByUsername(principal)
+                .orElseThrow(() -> new CustomerNotFoundException(
+                        CUSTOMER_NOT_FOUND.formatted(principal)
+                ));
+        List<Long> recommendationIds = customer.getRecommendations();
+        if (recommendationIds == null) {
+            try {
+                recommendationIds = recommendationAdapter.getRecommendations(customer.getId());
+            } catch (Exception e) {
+                throw new RecommendationErrorException("Error during using recommendations module");
+            }
+        }
+        return recipeRepository
+                .getRecipesIds(recommendationIds)
+                .stream()
+                .map(recipeDtoMapper)
+                .toList();
+    }
+
+    @Async("recommendationTaskExecutor")
+    public void train() {
         try {
-            return userBasedRecommender.recommend(id, numOfRecommendations)
-                    .stream()
-                    .map(recommendationDtoMapper)
-                    .toList();
-        } catch (Exception ex) {
-            return Collections.emptyList();
+            recommendationAdapter.train();
+        } catch (Exception e) {
+            throw new RecommendationErrorException("Error during using python module");
         }
     }
 }

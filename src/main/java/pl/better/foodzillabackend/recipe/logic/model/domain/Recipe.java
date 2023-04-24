@@ -2,6 +2,7 @@ package pl.better.foodzillabackend.recipe.logic.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.utils.StringToListConverter;
@@ -16,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = {"reviews", "ingredients", "tags"})
+@EqualsAndHashCode(exclude = {"reviews", "ingredients", "tags","customersWhoViewedRecently"})
 @Entity
 public class Recipe {
     @Id
@@ -54,4 +55,10 @@ public class Recipe {
             joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
+
+    @ManyToMany(mappedBy = "recentlyViewedRecipes", cascade = CascadeType.REMOVE)
+    private Set<Customer> customersWhoViewedRecently = new HashSet<>();
+
+    @ManyToMany(mappedBy = "favouriteRecipes", cascade = CascadeType.REMOVE)
+    private Set<Customer> customers = new HashSet<>();
 }

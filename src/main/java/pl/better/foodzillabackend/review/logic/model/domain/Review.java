@@ -1,6 +1,8 @@
 package pl.better.foodzillabackend.review.logic.model.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -16,11 +18,12 @@ import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"customer","recipe"})
+@EqualsAndHashCode(exclude = {"customer", "recipe"})
 @Entity
 public class Review {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String review;
     private int rating;
@@ -32,4 +35,13 @@ public class Review {
     @ManyToOne
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
+
+    public Review(String review, int rating, Customer customer, Recipe recipe) {
+        this.review = review;
+        this.rating = rating;
+        this.customer = customer;
+        customer.getReviews().add(this);
+        this.recipe = recipe;
+        recipe.getReviews().add(this);
+    }
 }

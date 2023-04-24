@@ -1,7 +1,7 @@
 package pl.better.foodzillabackend.exceptions.type;
 
-public class NotFoundException extends RuntimeException {
-    public NotFoundException(String message) {
+public abstract class NotFoundException extends RuntimeException {
+    protected NotFoundException(String message) {
         super(message);
     }
 }

@@ -1,21 +1,20 @@
 package pl.better.foodzillabackend.recipe.logic.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
+import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
+import pl.better.foodzillabackend.recipe.logic.listener.RecentlyViewedRecipesEvent;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
-import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
-import pl.better.foodzillabackend.utils.retrofit.ApiBuilder;
-import pl.better.foodzillabackend.utils.retrofit.model.GenerateRecipeImageRequestDto;
-import pl.better.foodzillabackend.utils.retrofit.model.GenerateRecipeImageResponseDto;
-import retrofit2.Response;
+import pl.better.foodzillabackend.utils.retrofit.image.api.ImageGeneratorAdapter;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -28,19 +27,20 @@ public class RecipeService {
     private final TagRepository tagRepository;
     private final RecipeDtoMapper recipeDtoMapper;
     private final RecipeMapper recipeMapper;
-    private final Environment environment;
-    private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id: %s not found";
+    private final ImageGeneratorAdapter imageGeneratorAdapter;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
 
+    @Transactional
     public RecipeDto getRecipeById(long id) {
-        return recipeRepository.getRecipeDetailsById(id)
-                .stream()
-                .findFirst()
-                .map(recipeDtoMapper)
-                .orElseThrow(() -> new RecipeNotFoundException(
-                        RECIPE_NOT_FOUND_MESSAGE.formatted(id)
-                ));
+        Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
+                RECIPE_NOT_FOUND_MESSAGE.formatted(id)
+        ));
+        publishCustomEvent(recipe);
+        return recipeDtoMapper.apply(recipe);
     }
 
+    @Transactional
     public RecipeDto createNewRecipeAndSaveInDb(CreateRecipeCommand command) {
         Recipe recipe = Recipe.builder()
                 .name(command.name())
@@ -83,17 +83,15 @@ public class RecipeService {
         return r.getImage();
     }
 
-    private void generateImageForRecipe(Recipe r) {
-        try {
-            Response<GenerateRecipeImageResponseDto> res =
-                    ApiBuilder.build(environment.getProperty("STABLE_DIFFUSION_API_URL"))
-                            .generateImage(new GenerateRecipeImageRequestDto(r.getName(), 1))
-                            .execute();
-            if (res.isSuccessful() && res.body() != null) {
-                r.setImage(res.body().generatedImgs().get(0));
-            }
-        } catch (Exception ignored) {
-            //ignored
+    private void generateImageForRecipe(Recipe recipe) {
+        String image = imageGeneratorAdapter.generateImage(recipe.getName());
+        if (image != null) {
+            recipe.setImage(image);
         }
+    }
+
+    private void publishCustomEvent(Recipe recipe) {
+        RecentlyViewedRecipesEvent recentlyViewedRecipesEvent = new RecentlyViewedRecipesEvent(this, recipe);
+        applicationEventPublisher.publishEvent(recentlyViewedRecipesEvent);
     }
 }
