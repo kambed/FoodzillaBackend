@@ -31,12 +31,11 @@ public class Customer implements UserDetails {
     private String username;
     private String password;
 
-
     @Type(JsonStringType.class)
     private List<Long> recommendations;
 
     @Type(JsonStringType.class)
-    private List<SearchPojo> searches = new ArrayList<>();
+    private List<SearchPojo> searches;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();

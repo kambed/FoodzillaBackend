@@ -1,0 +1,25 @@
+extend type Query {
+    savedSearch: SearchResult!
+}
+
+type SearchResult {
+    id: Int!
+    phrase: Int!
+    filters: [FilterType]
+    sort: [SortType]
+}
+
+type FilterType  {
+    attribute: String!
+    equals: String
+}
+
+input SortType {
+    attribute: String!
+    direction: SortDirection! = ASC
+}
+
+enum SortDirection {
+    ASC
+    DESC
+}

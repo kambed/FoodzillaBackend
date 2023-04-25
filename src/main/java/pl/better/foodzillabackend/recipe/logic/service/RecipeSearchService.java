@@ -18,6 +18,7 @@ import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.SavedSearchPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
@@ -66,6 +67,9 @@ public class RecipeSearchService {
                 .getAuthentication().getName();
         Customer customer = getCustomer(principal);
 
+        if (customer.getSearches() == null) {
+            customer.setSearches(new ArrayList<>());
+        }
         customer.getSearches().add(input);
 
         Pageable pageable = PageRequest.of(input.currentPage() - 1, input.pageSize());
@@ -101,6 +105,29 @@ public class RecipeSearchService {
                 .numberOfPages(page.getTotalPages())
                 .recipes(page.getContent())
                 .build();
+    }
+
+    //FIXME: exception for searches
+    public List<SearchPojo> getSearches(SavedSearchPojo input) {
+
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        Customer customer = getCustomer(principal);
+
+        if (customer.getSearches() == null) {
+            customer.setSearches(new ArrayList<>());
+        }
+
+        return customer.getSearches();
+
+//        return customer.getSearches();
+
+
+//        return customer.getSearches().stream().findFirst()
+//                .orElseThrow(() -> {
+//                    throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND,
+//                            customer));
+//                });
     }
 
     private List<Predicate> getPhrasePredicates(SearchPojo input) {
