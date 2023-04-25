@@ -93,9 +93,10 @@ public class RecipeSearchService {
         if (input.phrase() == null) {
             return List.of();
         }
+        String searchPhrase = "%" + input.phrase().toLowerCase() + "%";
         return List.of(criteriaBuilder.or(
-                criteriaBuilder.like(root.get("name"), "%" + input.phrase() + "%"),
-                criteriaBuilder.like(root.get("description"), "%" + input.phrase() + "%")
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), searchPhrase),
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), searchPhrase)
         ));
     }
 
