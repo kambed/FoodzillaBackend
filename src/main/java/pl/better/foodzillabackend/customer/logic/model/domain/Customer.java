@@ -8,13 +8,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.better.foodzillabackend.auth.model.domain.Role;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -37,6 +34,9 @@ public class Customer implements UserDetails {
 
     @Type(JsonStringType.class)
     private List<Long> recommendations;
+
+    @Type(JsonStringType.class)
+    private List<SearchPojo> searches = new ArrayList<>();
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();

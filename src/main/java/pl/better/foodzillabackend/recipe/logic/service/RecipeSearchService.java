@@ -7,7 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
+import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
+import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
@@ -21,11 +25,13 @@ import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class RecipeSearchService {
 
+    private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
     private final EntityManager entityManager;
     private final RecipeDtoMapper mapper;
     private final CriteriaBuilder criteriaBuilder;
@@ -35,15 +41,17 @@ public class RecipeSearchService {
     private final Join<Recipe, Tag> tagsJoin;
     private final RecipeRepository recipeRepository;
     private final CompletionsAdapter completionsAdapter;
+    private final CustomerRepository customerRepository;
 
     public RecipeSearchService(
             EntityManagerFactory entityManagerFactory,
             RecipeDtoMapper mapper,
             RecipeRepository recipeRepository,
-            CompletionsAdapter completionsAdapter
-    ) {
+            CompletionsAdapter completionsAdapter,
+            CustomerRepository customerRepository) {
         this.mapper = mapper;
         entityManager = entityManagerFactory.createEntityManager();
+        this.customerRepository = customerRepository;
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
@@ -54,6 +62,12 @@ public class RecipeSearchService {
     }
 
     public SearchResultDto search(SearchPojo input) {
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        Customer customer = getCustomer(principal);
+
+        customer.getSearches().add(input);
+
         Pageable pageable = PageRequest.of(input.currentPage() - 1, input.pageSize());
         List<Predicate> predicates = new ArrayList<>();
         predicates.addAll(getPhrasePredicates(input));
@@ -140,6 +154,14 @@ public class RecipeSearchService {
             return tagsJoin.get("name");
         }
         return root.get(attribute);
+    }
+
+    private Customer getCustomer(String customer) {
+        return customerRepository.findByUsername(customer)
+                .orElseThrow(() -> {
+                    throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND,
+                            customer));
+                });
     }
 
     private List<Order> getOrders(SearchPojo input) {
