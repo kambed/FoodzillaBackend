@@ -1,6 +1,7 @@
 package pl.better.foodzillabackend.review.logic.model.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;

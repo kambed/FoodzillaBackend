@@ -15,7 +15,8 @@ create table recipe
     protein               float null,
     saturated_fat         float null,
     carbohydrates         float null,
-    image                 mediumblob null
+    image                 mediumblob null,
+    rating                float default 0
 );
 
 ALTER TABLE recipe AUTO_INCREMENT=537717;
@@ -68,12 +69,12 @@ ALTER TABLE recipe_tag AUTO_INCREMENT=4141689;
 
 create table customer
 (
-    id int auto_increment
+    id              int auto_increment
         primary key,
-    firstname varchar(250) not null,
-    lastname varchar(250) not null,
-    username varchar(250) not null,
-    password varchar(250) not null,
+    firstname       varchar(250) not null,
+    lastname        varchar(250) not null,
+    username        varchar(250) not null,
+    password        varchar(250) not null,
     recommendations varchar(250) null
 );
 
@@ -81,12 +82,12 @@ ALTER TABLE customer AUTO_INCREMENT=432123;
 
 create table review
 (
-    id        int auto_increment
+    id          int auto_increment
         primary key,
-    customer_id   int not null,
-    recipe_id int not null,
-    review    blob null,
-    rating    int null,
+    customer_id int not null,
+    recipe_id   int not null,
+    review      blob null,
+    rating      int null,
     constraint review_recipe_null_fk
         foreign key (recipe_id) references recipe (id),
     constraint review_customer_null_fk
@@ -97,10 +98,10 @@ ALTER TABLE review AUTO_INCREMENT=581254;
 
 create table customer_recipe
 (
-    id        int auto_increment
+    id          int auto_increment
         primary key,
     customer_id int not null,
-    recipe_id    int not null,
+    recipe_id   int not null,
     constraint customer_recipe_Customer_null_fk
         foreign key (customer_id) references customer (id),
     constraint customer_recipe_Recipe_null_fk
@@ -111,13 +112,14 @@ ALTER TABLE customer_recipe AUTO_INCREMENT=1;
 
 CREATE VIEW preference AS
 SELECT customer.id AS customer_id, r.recipe_id, r.rating
-FROM customer JOIN review r on customer.id = r.customer_id;
+FROM customer
+         JOIN review r on customer.id = r.customer_id;
 
 create table recently_viewed_recipes
 (
-    id   int auto_increment primary key,
+    id          int auto_increment primary key,
     customer_id int not null,
-    recipe_id int not null,
+    recipe_id   int not null,
     constraint recently_viewed_recipes_Customer_null_fk
         foreign key (customer_id) references customer (id),
     constraint recently_viewed_recipes_Recipe_null_fk

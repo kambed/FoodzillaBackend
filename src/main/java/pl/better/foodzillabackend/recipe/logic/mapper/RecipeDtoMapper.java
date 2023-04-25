@@ -25,6 +25,7 @@ public class RecipeDtoMapper implements Function<Recipe, RecipeDto> {
                 .protein(recipe.getProtein())
                 .saturatedFat(recipe.getSaturatedFat())
                 .carbohydrates(recipe.getCarbohydrates())
+                .rating(recipe.getRating())
                 .image(recipe.getImage())
                 .reviews(recipe.getReviews())
                 .ingredients(recipe.getIngredients())
