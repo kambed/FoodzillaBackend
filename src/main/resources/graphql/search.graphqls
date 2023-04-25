@@ -5,7 +5,7 @@ extend type Query {
 input SearchInput {
     phrase: String
     currentPage: Int = 1
-    pageSize: Int = 5
+    pageSize: Int = 6
     sort: [RecipeSort] = [{attribute: "name"}]
     filters: [FilterType]
 }
