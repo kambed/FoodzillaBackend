@@ -41,4 +41,5 @@ type Recipe {
     reviews: [Review]
     ingredients: [Ingredient]
     tags: [Tag]
+    rating: Float
 }

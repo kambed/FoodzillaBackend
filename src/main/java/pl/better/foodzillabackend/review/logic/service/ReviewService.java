@@ -8,6 +8,7 @@ import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
+import pl.better.foodzillabackend.recipe.logic.listener.RateCalculateListener;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.recommendation.logic.service.RecommendationService;
@@ -30,6 +31,8 @@ public class ReviewService {
 
     @Transactional
     public ReviewDto createReview(CreateReviewCommand command) {
+        RateCalculateListener rateCalculateListener = new RateCalculateListener();
+
         String principal = SecurityContextHolder
                 .getContext()
                 .getAuthentication().getName();
@@ -52,9 +55,10 @@ public class ReviewService {
                 recipe);
 
         reviewRepository.saveAndFlush(review);
-
         recommendationService.train();
         recommendationService.recommend(principal);
+
+        rateCalculateListener.calculateAvgOpinion(recipe);
 
         return reviewDtoMapper.apply(review);
     }

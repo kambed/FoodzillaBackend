@@ -24,6 +24,8 @@ public record RecipeDto(
         int protein,
         int saturatedFat,
         int carbohydrates,
+
+        double rating,
         String image,
         Set<Review> reviews,
         Set<Ingredient> ingredients,

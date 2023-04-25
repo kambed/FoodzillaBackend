@@ -15,6 +15,7 @@ spring:
     properties:
       hibernate:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        show_sql: true
   security:
     jwt:
       secret: ${SECRET_API_KEY}
