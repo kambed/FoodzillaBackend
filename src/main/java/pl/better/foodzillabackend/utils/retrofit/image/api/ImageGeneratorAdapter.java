@@ -13,6 +13,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.util.stream.Collectors;
+
 @Component
 public class ImageGeneratorAdapter {
     private final String url;
@@ -37,7 +39,11 @@ public class ImageGeneratorAdapter {
         StableDiffusionAPI stableDiffusionAPI = retrofit.create(StableDiffusionAPI.class);
 
         try {
-            String ingredients = String.join(",", recipe.getIngredients().stream().map(Ingredient::getName).toArray(String[]::new));
+            String ingredients = recipe
+                    .getIngredients()
+                    .stream()
+                    .map(Ingredient::getName)
+                    .collect(Collectors.joining(","));
             String result = String.format("%s made from: %s", recipe.getName(), ingredients);
             Response<GenerateRecipeImageResponseDto> response = stableDiffusionAPI
                     .generateImage(new GenerateRecipeImageRequestDto(result, 1))
