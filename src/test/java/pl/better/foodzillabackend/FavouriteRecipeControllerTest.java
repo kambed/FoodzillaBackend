@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureGraphQlTester
 @ActiveProfiles("test")
-public class FavouriteRecipeControllerTest extends TestBase {
+class FavouriteRecipeControllerTest extends TestBase {
 
     @BeforeEach
     public void setUp() {

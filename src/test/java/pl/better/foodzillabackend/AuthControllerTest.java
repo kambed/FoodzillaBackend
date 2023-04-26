@@ -26,7 +26,7 @@ class AuthControllerTest extends TestBase {
     }
 
     @Test
-    public void shouldLoginUserAndReturnTokenForLoggedCustomer() {
+    void shouldLoginUserAndReturnTokenForLoggedCustomer() {
         GraphQlTester.Response res = sendLogin("Boob123",
                 "bOb@4321");
 
@@ -40,7 +40,7 @@ class AuthControllerTest extends TestBase {
     }
 
     @Test
-    public void shouldReturnErrorThatCustomerDoesNotExist() {
+    void shouldReturnErrorThatCustomerDoesNotExist() {
         GraphQlTester.Response res = sendLogin("Rick",
                 "s@ncHez321");
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
