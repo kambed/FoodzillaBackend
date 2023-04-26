@@ -146,8 +146,11 @@ public class RecipeSearchService {
                 }
 
                 subquery.select(subRoot.get("id"))
-                                .where(criteriaBuilder.not(path.in(filter.hasOnly())))
-                                .distinct(true);
+                        .where(criteriaBuilder.or(
+                                criteriaBuilder.not(path.in(filter.hasOnly())),
+                                criteriaBuilder.isNull(path)
+                        ))
+                        .distinct(true);
                 predicates.add(criteriaBuilder.not(root.get("id").in(subquery)));
             }
         });
