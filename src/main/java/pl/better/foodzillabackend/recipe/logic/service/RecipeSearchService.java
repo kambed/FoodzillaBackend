@@ -22,6 +22,7 @@ import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdap
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RecipeSearchService {
@@ -31,8 +32,7 @@ public class RecipeSearchService {
     private final CriteriaBuilder criteriaBuilder;
     private final CriteriaQuery<Long> criteriaQuery;
     private final Root<Recipe> root;
-    private final Join<Recipe, Ingredient> ingredientsJoin;
-    private final Join<Recipe, Tag> tagsJoin;
+    private final Map<String, Join<Recipe, ?>> joins;
     private final RecipeRepository recipeRepository;
     private final CompletionsAdapter completionsAdapter;
 
@@ -47,8 +47,10 @@ public class RecipeSearchService {
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
-        ingredientsJoin = root.join("ingredients", JoinType.LEFT);
-        tagsJoin = root.join("tags", JoinType.LEFT);
+        joins = Map.of(
+                "ingredients", root.join("ingredients", JoinType.LEFT),
+                "tags", root.join("tags", JoinType.LEFT)
+        );
         this.recipeRepository = recipeRepository;
         this.completionsAdapter = completionsAdapter;
     }
@@ -106,7 +108,7 @@ public class RecipeSearchService {
         }
         List<Predicate> predicates = new ArrayList<>();
         input.filters().forEach(filter -> {
-            Path<Object> path = resolvePath(filter.attribute());
+            Path<Object> path = resolvePath(filter.attribute(), joins);
             String type = path.getModel().getBindableJavaType().getName();
             boolean isInt = type.equals("int");
             if (isInt) {
@@ -130,39 +132,34 @@ public class RecipeSearchService {
                 predicates.add(path.in(filter.in()));
             }
             if (filter.hasOnly() != null) {
-                // Add predicate that path has only values from filter.hasOnly() or part of them, but not other values
-
                 Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
                 Root<Recipe> subRoot = subquery.from(Recipe.class);
                 Join<Recipe, Ingredient> subIngredientsJoin = subRoot.join("ingredients", JoinType.LEFT);
                 Join<Recipe, Tag> subTagsJoin = subRoot.join("tags", JoinType.LEFT);
-
-
-                if (filter.attribute().equals("ingredients")) {
-                    path = subIngredientsJoin.get("name");
-                }
-                if (filter.hasOnly().equals("tags")) {
-                    path = subTagsJoin.get("name");
-                }
+                Path<Object> hasOnlyPath = resolvePath(
+                        filter.attribute(),
+                        Map.of(
+                                "ingredients", subIngredientsJoin,
+                                "tags", subTagsJoin
+                        )
+                );
 
                 subquery.select(subRoot.get("id"))
                         .where(criteriaBuilder.or(
-                                criteriaBuilder.not(path.in(filter.hasOnly())),
-                                criteriaBuilder.isNull(path)
+                                criteriaBuilder.not(hasOnlyPath.in(filter.hasOnly())),
+                                criteriaBuilder.isNull(hasOnlyPath)
                         ))
                         .distinct(true);
+
                 predicates.add(criteriaBuilder.not(root.get("id").in(subquery)));
             }
         });
         return predicates;
     }
 
-    private Path<Object> resolvePath(String attribute) {
-        if (attribute.equals("ingredients")) {
-            return ingredientsJoin.get("name");
-        }
-        if (attribute.equals("tags")) {
-            return tagsJoin.get("name");
+    private Path<Object> resolvePath(String attribute, Map<String, Join<Recipe, ?>> joins) {
+        if (joins.containsKey(attribute)) {
+            return joins.get(attribute).get("name");
         }
         return root.get(attribute);
     }
