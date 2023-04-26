@@ -134,8 +134,16 @@ public class RecipeSearchService {
 
                 Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
                 Root<Recipe> subRoot = subquery.from(Recipe.class);
-                subRoot.join("ingredients", JoinType.LEFT);
-                subRoot.join("tags", JoinType.LEFT);
+                Join<Recipe, Ingredient> subIngredientsJoin = subRoot.join("ingredients", JoinType.LEFT);
+                Join<Recipe, Tag> subTagsJoin = subRoot.join("tags", JoinType.LEFT);
+
+
+                if (filter.attribute().equals("ingredients")) {
+                    path = subIngredientsJoin.get("name");
+                }
+                if (filter.hasOnly().equals("tags")) {
+                    path = subTagsJoin.get("name");
+                }
 
                 subquery.select(subRoot.get("id"))
                                 .where(criteriaBuilder.not(path.in(filter.hasOnly())))
