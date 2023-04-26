@@ -22,6 +22,8 @@ import java.util.Set;
 @Entity
 @EntityListeners(RateCalculateListener.class)
 public class Recipe {
+    public static final String INGREDIENTS = "ingredients";
+    public static final String TAGS = "tags";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

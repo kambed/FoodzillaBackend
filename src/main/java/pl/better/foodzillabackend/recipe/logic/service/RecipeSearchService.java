@@ -48,8 +48,8 @@ public class RecipeSearchService {
         criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
         joins = Map.of(
-                "ingredients", root.join("ingredients", JoinType.LEFT),
-                "tags", root.join("tags", JoinType.LEFT)
+                Recipe.INGREDIENTS, root.join(Recipe.INGREDIENTS, JoinType.LEFT),
+                Recipe.TAGS, root.join(Recipe.TAGS, JoinType.LEFT)
         );
         this.recipeRepository = recipeRepository;
         this.completionsAdapter = completionsAdapter;
@@ -134,13 +134,13 @@ public class RecipeSearchService {
             if (filter.hasOnly() != null) {
                 Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
                 Root<Recipe> subRoot = subquery.from(Recipe.class);
-                Join<Recipe, Ingredient> subIngredientsJoin = subRoot.join("ingredients", JoinType.LEFT);
-                Join<Recipe, Tag> subTagsJoin = subRoot.join("tags", JoinType.LEFT);
+                Join<Recipe, Ingredient> subIngredientsJoin = subRoot.join(Recipe.INGREDIENTS, JoinType.LEFT);
+                Join<Recipe, Tag> subTagsJoin = subRoot.join(Recipe.TAGS, JoinType.LEFT);
                 Path<Object> hasOnlyPath = resolvePath(
                         filter.attribute(),
                         Map.of(
-                                "ingredients", subIngredientsJoin,
-                                "tags", subTagsJoin
+                                Recipe.INGREDIENTS, subIngredientsJoin,
+                                Recipe.TAGS, subTagsJoin
                         )
                 );
 
