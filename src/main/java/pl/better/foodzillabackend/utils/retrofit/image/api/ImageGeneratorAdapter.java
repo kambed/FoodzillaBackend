@@ -5,11 +5,15 @@ import okhttp3.Request;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
+import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.utils.retrofit.image.api.model.GenerateRecipeImageRequestDto;
 import pl.better.foodzillabackend.utils.retrofit.image.api.model.GenerateRecipeImageResponseDto;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+
+import java.util.stream.Collectors;
 
 @Component
 public class ImageGeneratorAdapter {
@@ -19,7 +23,7 @@ public class ImageGeneratorAdapter {
         this.url = environment.getRequiredProperty("STABLE_DIFFUSION_API_URL");
     }
 
-    public synchronized String generateImage(String prompt) {
+    public synchronized String generateImage(Recipe recipe) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .client(new OkHttpClient.Builder()
@@ -35,8 +39,14 @@ public class ImageGeneratorAdapter {
         StableDiffusionAPI stableDiffusionAPI = retrofit.create(StableDiffusionAPI.class);
 
         try {
+            String ingredients = recipe
+                    .getIngredients()
+                    .stream()
+                    .map(Ingredient::getName)
+                    .collect(Collectors.joining(","));
+            String result = String.format("%s made from: %s", recipe.getName(), ingredients);
             Response<GenerateRecipeImageResponseDto> response = stableDiffusionAPI
-                    .generateImage(new GenerateRecipeImageRequestDto(prompt, 1))
+                    .generateImage(new GenerateRecipeImageRequestDto(result, 1))
                             .execute();
             if (!response.isSuccessful() || response.body() == null) {
                 return null;
