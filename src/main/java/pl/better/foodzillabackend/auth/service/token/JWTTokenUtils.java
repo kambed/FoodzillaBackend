@@ -2,11 +2,13 @@ package pl.better.foodzillabackend.auth.service.token;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.auth.model.domain.Role;
 import pl.better.foodzillabackend.auth.model.domain.Token;
 import pl.better.foodzillabackend.customer.logic.model.dto.CustomerDto;
+import pl.better.foodzillabackend.exceptions.type.TokenExpirationException;
 
 import java.util.Date;
 
@@ -14,13 +16,17 @@ import java.util.Date;
 public class JWTTokenUtils extends TokenUtils {
 
     public TokenPayload decodeToken(String authorizationHeader) {
-        DecodedJWT decodedToken = JWT
-                .require(Algorithm.HMAC512(getSecret().getBytes()))
-                .build()
-                .verify(authorizationHeader.replace(getTokenPrefix(), ""));
+        try {
+            DecodedJWT decodedToken = JWT
+                    .require(Algorithm.HMAC512(getSecret().getBytes()))
+                    .build()
+                    .verify(authorizationHeader.replace(getTokenPrefix(), ""));
 
-        return new TokenPayload(decodedToken.getSubject(), decodedToken.getClaim("role")
-                .as(Role.class));
+            return new TokenPayload(decodedToken.getSubject(), decodedToken.getClaim("role")
+                    .as(Role.class));
+        } catch (TokenExpiredException e) {
+            throw new TokenExpirationException(e.getMessage());
+        }
     }
 
     public Token generateToken(String username, CustomerDto customerDto) {
