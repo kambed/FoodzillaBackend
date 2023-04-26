@@ -84,7 +84,7 @@ public class RecipeService {
     }
 
     private void generateImageForRecipe(Recipe recipe) {
-        String image = imageGeneratorAdapter.generateImage(recipe));
+        String image = imageGeneratorAdapter.generateImage(recipe);
         if (image != null) {
             recipe.setImage(image);
         }

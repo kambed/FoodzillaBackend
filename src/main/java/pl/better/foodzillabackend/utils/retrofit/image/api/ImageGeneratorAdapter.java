@@ -38,7 +38,7 @@ public class ImageGeneratorAdapter {
 
         try {
             String ingredients = String.join(",", recipe.getIngredients().stream().map(Ingredient::getName).toArray(String[]::new));
-            String result = String.format("%s dish made from: %s", recipe.getName(), ingredients);
+            String result = String.format("%s made from: %s", recipe.getName(), ingredients);
             Response<GenerateRecipeImageResponseDto> response = stableDiffusionAPI
                     .generateImage(new GenerateRecipeImageRequestDto(result, 1))
                             .execute();
