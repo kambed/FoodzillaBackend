@@ -61,6 +61,11 @@ Alternatively, for JetBrains Intellij users they can use green button on the lef
 
 [GraphiQL UI](http://localhost:8080/graphiql?path=/graphql)
 
+## Troubleshooting
+If MySQL drops error when using search endpoint, execute following query on database:
+
+> SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+
 ### Reference Documentation
 
 For further reference, please consider the following sections:
