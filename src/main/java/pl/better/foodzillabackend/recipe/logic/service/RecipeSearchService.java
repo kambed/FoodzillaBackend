@@ -129,6 +129,19 @@ public class RecipeSearchService {
             if (filter.in() != null) {
                 predicates.add(path.in(filter.in()));
             }
+            if (filter.hasOnly() != null) {
+                // Add predicate that path has only values from filter.hasOnly() or part of them, but not other values
+
+                Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
+                Root<Recipe> subRoot = subquery.from(Recipe.class);
+                subRoot.join("ingredients", JoinType.LEFT);
+                subRoot.join("tags", JoinType.LEFT);
+
+                subquery.select(subRoot.get("id"))
+                                .where(criteriaBuilder.not(path.in(filter.hasOnly())))
+                                .distinct(true);
+                predicates.add(criteriaBuilder.not(root.get("id").in(subquery)));
+            }
         });
         return predicates;
     }
