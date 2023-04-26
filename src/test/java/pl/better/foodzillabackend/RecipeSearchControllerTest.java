@@ -16,20 +16,6 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RecipeSearchControllerTest extends TestBase {
-//    private static final MockWebServer mockWebServer = new MockWebServer();;
-//
-//    @BeforeAll
-//    public static void setup() throws IOException {
-//        mockWebServer.start();
-//        System.setProperty("COMPLETIONS_API_URL", mockWebServer.url("/").toString());
-//    }
-//
-//    @AfterAll
-//    public static void tearDown() throws IOException {
-//        mockWebServer.shutdown();
-//        System.clearProperty("COMPLETIONS_API_URL");
-//    }
-
     @BeforeEach
     public void resetDb() {
         super.resetDb();
@@ -187,6 +173,27 @@ class RecipeSearchControllerTest extends TestBase {
         response.path("search.recipes").entityList(Recipe.class).satisfies(recipes -> {
             assertEquals(1, recipes.size());
             assertEquals("Recipe 1", Objects.requireNonNull(recipes.get(0)).getName());
+        });
+    }
+
+    @Test
+    @DirtiesContext
+    void shouldReturnRecipesWhichHasOnlyConcreteIngredients() {
+        GraphQlTester.Response response = graphQlTester.documentName("recipe-search")
+                .variable(
+                        "filters",
+                        Set.of(
+                                Map.of(
+                                        "attribute", "ingredients",
+                                        "hasOnly", Set.of("Ingredient 1")
+                                )
+                        )
+                )
+                .execute();
+        response.errors().satisfy(errors -> assertEquals(0, errors.size()));
+        response.path("search.recipes").entityList(Recipe.class).satisfies(recipes -> {
+            assertEquals(1, recipes.size());
+            assertEquals("Recipe 2", Objects.requireNonNull(recipes.get(0)).getName());
         });
     }
 
