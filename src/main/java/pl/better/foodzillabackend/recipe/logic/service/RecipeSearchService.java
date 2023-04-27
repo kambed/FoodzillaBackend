@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
@@ -62,6 +63,7 @@ public class RecipeSearchService {
         this.completionsAdapter = completionsAdapter;
     }
 
+    @Transactional
     public SearchResultDto search(SearchPojo input) {
 
         String principal = SecurityContextHolder.getContext()
@@ -109,15 +111,12 @@ public class RecipeSearchService {
                 .recipes(page.getContent())
                 .build();
     }
-
-    //FIXME: exception for searches
+    
     public List<SearchPojo> getSearches() {
-
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         Customer customer = getCustomer(principal);
-
-        return customer.getSearches();
+        return customer.getSearches() == null ? new ArrayList<>() : customer.getSearches();
     }
 
     private List<Predicate> getPhrasePredicates(SearchPojo input) {
