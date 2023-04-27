@@ -78,7 +78,7 @@ public class RecipeSearchService {
                 .limit(pageable.getPageSize())
                 .toList();
 
-        List<Recipe> recipes = recipeRepository.getRecipesIds(recipeIds);
+        List<Recipe> recipes = recipeRepository.getRecipesSummarizationIds(recipeIds);
 
         List<RecipeDto> recipeDtos = recipes.stream()
                 .map(mapper)

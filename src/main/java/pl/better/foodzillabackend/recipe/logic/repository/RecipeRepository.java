@@ -14,8 +14,10 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "LEFT JOIN FETCH r.reviews re " +
             "LEFT JOIN FETCH r.tags t WHERE r.id = :id")
     Optional<Recipe> getRecipeDetailsById(long id);
-    @Query("SELECT r FROM Recipe r LEFT JOIN FETCH r.ingredients i " +
-            "LEFT JOIN FETCH r.reviews re " +
-            "LEFT JOIN FETCH r.tags t WHERE r.id IN :id")
-    List<Recipe> getRecipesIds(List<Long> id);
+
+    @Query("SELECT r FROM Recipe r WHERE r.id IN :id")
+    List<Recipe> getRecipesSummarizationIds(List<Long> id);
+
+    @Query("SELECT r FROM Recipe r LEFT JOIN FETCH r.ingredients i WHERE r.id = :id")
+    Optional<Recipe> getRecipeByIdWithIngredients(long id);
 }

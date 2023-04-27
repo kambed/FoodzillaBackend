@@ -75,8 +75,10 @@ public class RecipeService {
     }
 
     public String getRecipeImageById(RecipeDto recipe) {
-        Recipe r = recipeMapper.apply(recipe);
-        if (recipe.image() == null) {
+        Recipe r = recipeRepository.getRecipeByIdWithIngredients(recipe.id()).orElseThrow(() -> new RecipeNotFoundException(
+                RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
+        ));
+        if (r.getImage() == null) {
             generateImageForRecipe(r);
             recipeRepository.saveAndFlush(r);
         }
