@@ -19,7 +19,6 @@ import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
-import pl.better.foodzillabackend.recipe.logic.model.pojo.SavedSearchPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
@@ -27,7 +26,6 @@ import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -111,7 +109,7 @@ public class RecipeSearchService {
                 .recipes(page.getContent())
                 .build();
     }
-    
+
     public List<SearchPojo> getSearches() {
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
