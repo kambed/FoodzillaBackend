@@ -15,6 +15,7 @@ import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.filter.RecipeFilterPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
@@ -22,6 +23,7 @@ import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdap
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RecipeSearchService {
@@ -31,8 +33,7 @@ public class RecipeSearchService {
     private final CriteriaBuilder criteriaBuilder;
     private final CriteriaQuery<Long> criteriaQuery;
     private final Root<Recipe> root;
-    private final Join<Recipe, Ingredient> ingredientsJoin;
-    private final Join<Recipe, Tag> tagsJoin;
+    private final Map<String, Join<Recipe, ?>> joins;
     private final RecipeRepository recipeRepository;
     private final CompletionsAdapter completionsAdapter;
 
@@ -47,8 +48,10 @@ public class RecipeSearchService {
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
-        ingredientsJoin = root.join("ingredients", JoinType.LEFT);
-        tagsJoin = root.join("tags", JoinType.LEFT);
+        joins = Map.of(
+                Recipe.INGREDIENTS, root.join(Recipe.INGREDIENTS, JoinType.LEFT),
+                Recipe.TAGS, root.join(Recipe.TAGS, JoinType.LEFT)
+        );
         this.recipeRepository = recipeRepository;
         this.completionsAdapter = completionsAdapter;
     }
@@ -106,13 +109,9 @@ public class RecipeSearchService {
         }
         List<Predicate> predicates = new ArrayList<>();
         input.filters().forEach(filter -> {
-            Path<Object> path = resolvePath(filter.attribute());
+            Path<Object> path = resolvePath(filter.attribute(), joins);
             String type = path.getModel().getBindableJavaType().getName();
-            boolean isInt = type.equals("int");
-            if (isInt) {
-                path.as(Integer.class);
-            }
-            if (!isInt && (filter.from() != null || filter.to() != null)) {
+            if (!type.equals("int") && (filter.from() != null || filter.to() != null)) {
                 throw new FilterInputException(
                         "Cannot filter by range on non-number attribute " + filter.attribute() + "."
                 );
@@ -129,16 +128,38 @@ public class RecipeSearchService {
             if (filter.in() != null) {
                 predicates.add(path.in(filter.in()));
             }
+            if (filter.hasOnly() != null) {
+                predicates.add(getHasOnlyPredicate(filter));
+            }
         });
         return predicates;
     }
 
-    private Path<Object> resolvePath(String attribute) {
-        if (attribute.equals("ingredients")) {
-            return ingredientsJoin.get("name");
-        }
-        if (attribute.equals("tags")) {
-            return tagsJoin.get("name");
+    private Predicate getHasOnlyPredicate(RecipeFilterPojo filter) {
+        Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
+        Root<Recipe> subRoot = subquery.from(Recipe.class);
+        Join<Recipe, Ingredient> subIngredientsJoin = subRoot.join(Recipe.INGREDIENTS, JoinType.LEFT);
+        Join<Recipe, Tag> subTagsJoin = subRoot.join(Recipe.TAGS, JoinType.LEFT);
+        Path<Object> hasOnlyPath = resolvePath(
+                filter.attribute(),
+                Map.of(
+                        Recipe.INGREDIENTS, subIngredientsJoin,
+                        Recipe.TAGS, subTagsJoin
+                )
+        );
+
+        subquery.select(subRoot.get("id"))
+                .where(criteriaBuilder.or(
+                        criteriaBuilder.not(hasOnlyPath.in(filter.hasOnly())),
+                        criteriaBuilder.isNull(hasOnlyPath)
+                ))
+                .distinct(true);
+        return criteriaBuilder.not(root.get("id").in(subquery));
+    }
+
+    private Path<Object> resolvePath(String attribute, Map<String, Join<Recipe, ?>> joins) {
+        if (joins.containsKey(attribute)) {
+            return joins.get(attribute).get("name");
         }
         return root.get(attribute);
     }
