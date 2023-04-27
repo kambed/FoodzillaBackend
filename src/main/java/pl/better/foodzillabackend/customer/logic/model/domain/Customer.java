@@ -1,5 +1,6 @@
 package pl.better.foodzillabackend.customer.logic.model.domain;
 
+import com.vladmihalcea.hibernate.type.json.JsonBlobType;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,7 +35,7 @@ public class Customer implements UserDetails {
     @Type(JsonStringType.class)
     private List<Long> recommendations;
 
-    @Type(JsonStringType.class)
+    @Type(JsonBlobType.class)
     private List<SearchPojo> searches;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)

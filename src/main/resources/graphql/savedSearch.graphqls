@@ -1,0 +1,20 @@
+extend type Query {
+    getSavedSearch: [SavedSearchResult]!
+}
+
+type SavedSearchResult {
+    id: Int
+    phrase: String
+    filters: [SavedSearchFilterType]
+    sort: [SavedSearchSortType]
+}
+
+type SavedSearchFilterType  {
+    attribute: String!
+    equals: String
+}
+
+type SavedSearchSortType {
+    attribute: String!
+    direction: SortDirection!
+}

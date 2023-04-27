@@ -28,8 +28,8 @@ public class RecipeSearchController {
     }
 
     @QueryMapping
-    public List<SearchPojo> getSavedSearch(@Argument SavedSearchPojo input) {
-        return recipeSearchService.getSearches(input);
+    public List<SearchPojo> getSavedSearch() {
+        return recipeSearchService.getSearches();
     }
 
     @SchemaMapping(typeName = "SearchResult", field = "opinion")

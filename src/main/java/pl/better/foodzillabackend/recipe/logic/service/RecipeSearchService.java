@@ -63,14 +63,17 @@ public class RecipeSearchService {
     }
 
     public SearchResultDto search(SearchPojo input) {
+
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         Customer customer = getCustomer(principal);
-
-        if (customer.getSearches() == null) {
-            customer.setSearches(new ArrayList<>());
+        List<SearchPojo> userSearches = customer.getSearches();
+        if (userSearches == null) {
+            customer.setSearches(List.of(input));
+        } else {
+            userSearches.add(input);
+            customer.setSearches(userSearches);
         }
-        customer.getSearches().add(input);
 
         Pageable pageable = PageRequest.of(input.currentPage() - 1, input.pageSize());
         List<Predicate> predicates = new ArrayList<>();
@@ -108,26 +111,13 @@ public class RecipeSearchService {
     }
 
     //FIXME: exception for searches
-    public List<SearchPojo> getSearches(SavedSearchPojo input) {
+    public List<SearchPojo> getSearches() {
 
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         Customer customer = getCustomer(principal);
 
-        if (customer.getSearches() == null) {
-            customer.setSearches(new ArrayList<>());
-        }
-
         return customer.getSearches();
-
-//        return customer.getSearches();
-
-
-//        return customer.getSearches().stream().findFirst()
-//                .orElseThrow(() -> {
-//                    throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND,
-//                            customer));
-//                });
     }
 
     private List<Predicate> getPhrasePredicates(SearchPojo input) {
