@@ -18,6 +18,7 @@ import pl.better.foodzillabackend.utils.retrofit.image.api.ImageGeneratorAdapter
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,18 +38,18 @@ public class RecipeService {
         Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
                 RECIPE_NOT_FOUND_MESSAGE.formatted(id)
         ));
-        recipe.setIngredients(new HashSet<>(getRecipeItems(ingredientRepository.findAllByRecipeId(id))));
-        recipe.setTags(new HashSet<>(getRecipeItems(tagRepository.findAllByRecipeId(id))));
-        recipe.setReviews(new HashSet<>(getRecipeItems(reviewRepository.findAllByRecipeId(id))));
+        recipe.setIngredients(getRecipeItems(ingredientRepository.findAllByRecipeId(id)));
+        recipe.setTags(getRecipeItems(tagRepository.findAllByRecipeId(id)));
+        recipe.setReviews(getRecipeItems(reviewRepository.findAllByRecipeId(id)));
         publishCustomEvent(recipe);
         return recipeDtoMapper.apply(recipe);
     }
 
-    public <T> List<T> getRecipeItems(List<T> items) {
+    public <T> Set<T> getRecipeItems(List<T> items) {
         if (items.size() == 1 && items.get(0) == null) {
             items = List.of();
         }
-        return items;
+        return new HashSet<>(items);
     }
 
     @Transactional
