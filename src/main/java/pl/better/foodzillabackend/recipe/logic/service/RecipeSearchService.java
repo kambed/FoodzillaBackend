@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
-import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
+import pl.better.foodzillabackend.recipe.logic.mapper.RecipeSummarizationDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class RecipeSearchService {
 
     private final EntityManager entityManager;
-    private final RecipeDtoMapper mapper;
+    private final RecipeSummarizationDtoMapper mapper;
     private final CriteriaBuilder criteriaBuilder;
     private final CriteriaQuery<Long> criteriaQuery;
     private final Root<Recipe> root;
@@ -39,7 +39,7 @@ public class RecipeSearchService {
 
     public RecipeSearchService(
             EntityManagerFactory entityManagerFactory,
-            RecipeDtoMapper mapper,
+            RecipeSummarizationDtoMapper mapper,
             RecipeRepository recipeRepository,
             CompletionsAdapter completionsAdapter
     ) {
