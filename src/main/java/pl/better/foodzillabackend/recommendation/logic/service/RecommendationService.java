@@ -8,7 +8,7 @@ import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.RecommendationErrorException;
-import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
+import pl.better.foodzillabackend.recipe.logic.mapper.RecipeSummarizationDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.utils.retrofit.recommendations.api.RecommendationAdapter;
@@ -21,7 +21,7 @@ public class RecommendationService {
 
     private final CustomerRepository customerRepository;
     private final RecipeRepository recipeRepository;
-    private final RecipeDtoMapper recipeDtoMapper;
+    private final RecipeSummarizationDtoMapper recipeSummarizationDtoMapper;
     private final RecommendationAdapter recommendationAdapter;
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
 
@@ -57,9 +57,9 @@ public class RecommendationService {
             }
         }
         return recipeRepository
-                .getRecipesIds(recommendationIds)
+                .getRecipesSummarizationIds(recommendationIds)
                 .stream()
-                .map(recipeDtoMapper)
+                .map(recipeSummarizationDtoMapper)
                 .toList();
     }
 
