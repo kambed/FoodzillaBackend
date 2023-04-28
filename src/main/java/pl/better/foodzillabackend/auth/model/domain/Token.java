@@ -10,5 +10,6 @@ import pl.better.foodzillabackend.customer.logic.model.dto.CustomerDto;
 @Builder
 public class Token {
     String token;
+    String refreshToken;
     CustomerDto customer;
 }
