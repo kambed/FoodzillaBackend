@@ -8,15 +8,16 @@ import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.listener.RecentlyViewedRecipesEvent;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
-import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.review.logic.repository.ReviewRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 import pl.better.foodzillabackend.utils.retrofit.image.api.ImageGeneratorAdapter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,18 +27,28 @@ public class RecipeService {
     private final IngredientRepository ingredientRepository;
     private final TagRepository tagRepository;
     private final RecipeDtoMapper recipeDtoMapper;
-    private final RecipeMapper recipeMapper;
     private final ImageGeneratorAdapter imageGeneratorAdapter;
     private final ApplicationEventPublisher applicationEventPublisher;
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
+    private final ReviewRepository reviewRepository;
 
     @Transactional
     public RecipeDto getRecipeById(long id) {
         Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
                 RECIPE_NOT_FOUND_MESSAGE.formatted(id)
         ));
+        recipe.setIngredients(new HashSet<>(getRecipeItems(ingredientRepository.findAllByRecipeId(id))));
+        recipe.setTags(new HashSet<>(getRecipeItems(tagRepository.findAllByRecipeId(id))));
+        recipe.setReviews(new HashSet<>(getRecipeItems(reviewRepository.findAllByRecipeId(id))));
         publishCustomEvent(recipe);
         return recipeDtoMapper.apply(recipe);
+    }
+
+    public <T> List<T> getRecipeItems(List<T> items) {
+        if (items.size() == 1 && items.get(0) == null) {
+            items = List.of();
+        }
+        return items;
     }
 
     @Transactional

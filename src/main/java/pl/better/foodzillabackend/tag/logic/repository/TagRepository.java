@@ -11,4 +11,7 @@ import java.util.List;
 public interface TagRepository extends JpaRepository<Tag, Long> {
     @Query("SELECT t FROM Tag t WHERE t.name = :name")
     List<Tag> findTagByName(String name);
+
+    @Query("SELECT t FROM Recipe r LEFT JOIN r.tags t WHERE r.id = :id")
+    List<Tag> findAllByRecipeId(long id);
 }
