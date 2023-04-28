@@ -1,4 +1,4 @@
-query refreshToken($refreshToken: String!) {
+mutation refreshToken($refreshToken: String!) {
     refreshToken(
         refreshToken: $refreshToken
     ) {

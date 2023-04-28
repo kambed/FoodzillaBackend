@@ -3,7 +3,6 @@ package pl.better.foodzillabackend.auth.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import pl.better.foodzillabackend.auth.model.domain.Token;
 import pl.better.foodzillabackend.auth.service.AuthService;
@@ -19,7 +18,7 @@ public class AuthController {
         return tokenService.generateToken(username, password);
     }
 
-    @QueryMapping
+    @MutationMapping
     public Token refreshToken(@Argument String refreshToken) {
         return tokenService.refreshToken(refreshToken);
     }
