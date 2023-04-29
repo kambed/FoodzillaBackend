@@ -1,4 +1,4 @@
 extend type Query {
-    recommendations: [Recipe]!
+    recommendations: [RecipeSummarization]!
 }
 

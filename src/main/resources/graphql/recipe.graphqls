@@ -43,3 +43,10 @@ type Recipe {
     tags: [Tag]
     rating: Float
 }
+
+type RecipeSummarization {
+    id: ID
+    name: String!
+    timeOfPreparation: Int
+    image: String
+}
