@@ -15,11 +15,11 @@ public class PublisherMq {
 
     private final AsyncRabbitTemplate rabbitTemplate;
     private final DirectExchange exchange;
+    private final MessageConverter converter = new SimpleMessageConverter();
 
     public RabbitMessageFuture sendAndReceive(int priority, String message) {
         MessageProperties messageProperties = new MessageProperties();
         messageProperties.setPriority(priority);
-        MessageConverter converter = new SimpleMessageConverter();
 
         return rabbitTemplate.sendAndReceive(
                 exchange.getName(),

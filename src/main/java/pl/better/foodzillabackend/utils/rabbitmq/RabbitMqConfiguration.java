@@ -41,8 +41,9 @@ public class RabbitMqConfiguration {
 
     @Bean
     public Queue queue() {
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-max-priority", 10);
+        Map<String, Object> args = Map.of(
+                "x-max-priority", 10
+        );
         return new Queue("imageGenerateQueue", true, false, false, args);
     }
 

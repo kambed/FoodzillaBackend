@@ -11,6 +11,7 @@ import pl.better.foodzillabackend.auth.service.accesstype.LoggedInUser;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.service.RecipeService;
+import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,7 +19,6 @@ public class RecipeController {
 
     private final RecipeService recipeService;
 
-    @LoggedInUser
     @QueryMapping
     public RecipeDto recipe(@Argument long id) {
         return recipeService.getRecipeById(id);
@@ -26,12 +26,12 @@ public class RecipeController {
 
     @SchemaMapping(typeName = "Recipe", field = "image")
     public String recipeImage(RecipeDto recipe) {
-        return recipeService.getRecipeImageById(recipe, 2);
+        return recipeService.getRecipeImageById(recipe, Priority.HIGH);
     }
 
     @SchemaMapping(typeName = "RecipeSummarization", field = "image")
     public String recipeSummarizationImage(RecipeDto recipe) {
-        return recipeService.getRecipeImageById(recipe, 1);
+        return recipeService.getRecipeImageById(recipe, Priority.NORMAL);
     }
 
     @LoggedInUser

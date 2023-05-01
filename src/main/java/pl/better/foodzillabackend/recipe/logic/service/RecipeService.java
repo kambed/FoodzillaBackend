@@ -15,6 +15,7 @@ import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.review.logic.repository.ReviewRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
+import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 
 import java.util.HashSet;
@@ -88,7 +89,7 @@ public class RecipeService {
         return recipeDtoMapper.apply(recipe);
     }
 
-    public String getRecipeImageById(RecipeDto recipe, int priority) {
+    public String getRecipeImageById(RecipeDto recipe, Priority priority) {
         Recipe r = recipeRepository.getRecipeByIdWithIngredients(recipe.id()).orElseThrow(() -> new RecipeNotFoundException(
                 RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
         ));
@@ -100,7 +101,10 @@ public class RecipeService {
                     .collect(Collectors.joining(","));
             try {
                 r.setImage(
-                        new String(publisherMq.sendAndReceive(priority, String.format("%s made from: %s", r.getName(), ingredients)).get().getBody())
+                        new String(publisherMq.sendAndReceive(
+                                priority.getPriorityValue(),
+                                String.format("%s made from: %s", r.getName(), ingredients)
+                        ).get().getBody())
                 );
                 recipeRepository.saveAndFlush(r);
             } catch (ExecutionException | InterruptedException e) {

@@ -25,7 +25,7 @@ public class ImageGeneratorAdapter {
     }
 
     @RabbitListener(queues = "imageGenerateQueue")
-    public synchronized String generateImage(String recipe) {
+    public synchronized String generateImage(String imageGeneratePrompt) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .client(new OkHttpClient.Builder()
@@ -42,7 +42,7 @@ public class ImageGeneratorAdapter {
 
         try {
             Response<GenerateRecipeImageResponseDto> response = stableDiffusionAPI
-                    .generateImage(new GenerateRecipeImageRequestDto(recipe, 1))
+                    .generateImage(new GenerateRecipeImageRequestDto(imageGeneratePrompt, 1))
                             .execute();
             if (!response.isSuccessful() || response.body() == null) {
                 return null;
