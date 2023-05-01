@@ -20,7 +20,6 @@ import pl.better.foodzillabackend.recipe.logic.model.pojo.filter.RecipeFilterPoj
 import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
-import pl.better.foodzillabackend.utils.RecipePromptGenerator;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;

@@ -1,7 +1,6 @@
 package pl.better.foodzillabackend.recommendation.logic.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.rabbit.RabbitMessageFuture;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,16 +9,13 @@ import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.RecommendationErrorException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeSummarizationDtoMapper;
-import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
-import pl.better.foodzillabackend.utils.RecipePromptGenerator;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 import pl.better.foodzillabackend.utils.retrofit.recommendations.api.RecommendationAdapter;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
