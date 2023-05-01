@@ -14,6 +14,7 @@ query {
         protein
         saturatedFat
         carbohydrates
+        image
         reviews {
             review
             rating

@@ -18,6 +18,7 @@ import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -100,15 +101,16 @@ public class RecipeService {
                     .map(Ingredient::getName)
                     .collect(Collectors.joining(","));
             try {
+                String result = Arrays.toString(publisherMq.sendAndReceive(
+                        priority.getPriorityValue(),
+                        String.format("%s made from: %s", r.getName(), ingredients)
+                ).get().getBody());
                 r.setImage(
-                        new String(publisherMq.sendAndReceive(
-                                priority.getPriorityValue(),
-                                String.format("%s made from: %s", r.getName(), ingredients)
-                        ).get().getBody())
+                        result
                 );
                 recipeRepository.saveAndFlush(r);
             } catch (ExecutionException | InterruptedException e) {
-                throw new RuntimeException(e);
+                //ignored
             }
         }
         return r.getImage();
