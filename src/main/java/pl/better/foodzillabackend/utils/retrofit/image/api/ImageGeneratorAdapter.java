@@ -1,5 +1,6 @@
 package pl.better.foodzillabackend.utils.retrofit.image.api;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -17,6 +18,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class ImageGeneratorAdapter {
     private final String url;
 
@@ -26,6 +28,7 @@ public class ImageGeneratorAdapter {
 
     @RabbitListener(queues = "imageGenerateQueue")
     public synchronized String generateImage(String imageGeneratePrompt) {
+        log.info("Received message: {}", imageGeneratePrompt);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .client(new OkHttpClient.Builder()

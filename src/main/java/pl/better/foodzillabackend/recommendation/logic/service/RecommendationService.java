@@ -1,6 +1,7 @@
 package pl.better.foodzillabackend.recommendation.logic.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.RabbitMessageFuture;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,9 @@ import pl.better.foodzillabackend.exceptions.type.RecommendationErrorException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeSummarizationDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.utils.RecipePromptGenerator;
+import pl.better.foodzillabackend.utils.rabbitmq.Priority;
+import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 import pl.better.foodzillabackend.utils.retrofit.recommendations.api.RecommendationAdapter;
 
 import java.util.List;
@@ -23,6 +27,7 @@ public class RecommendationService {
     private final RecipeRepository recipeRepository;
     private final RecipeSummarizationDtoMapper recipeSummarizationDtoMapper;
     private final RecommendationAdapter recommendationAdapter;
+    private final PublisherMq publisherMq;
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
 
     @Async("recommendationTaskExecutor")
@@ -36,6 +41,19 @@ public class RecommendationService {
             List<Long> recommendationIds = recommendationAdapter.getRecommendations(customer.getId());
             customer.setRecommendations(recommendationIds);
             customerRepository.saveAndFlush(customer);
+            recipeRepository.getRecipesSummarizationIds(recommendationIds)
+                    .stream()
+                    .filter(recipe -> recipe.getImage() == null)
+                    .forEach(recipe -> publisherMq.sendAndReceive(
+                                    Priority.IDLE.getPriorityValue(),
+                                    RecipePromptGenerator.generatePrompt(recipe)
+                            ).thenAccept(
+                                    rabbitMessage -> {
+                                        recipe.setImage(new String(rabbitMessage.getBody()));
+                                        recipeRepository.saveAndFlush(recipe);
+                                    }
+                            )
+                    );
         } catch (Exception e) {
             throw new RecommendationErrorException("Error during using recommendation module");
         }

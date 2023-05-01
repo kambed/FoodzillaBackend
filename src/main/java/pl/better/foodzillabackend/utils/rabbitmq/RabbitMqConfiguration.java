@@ -49,7 +49,10 @@ public class RabbitMqConfiguration {
 
     @Bean
     public DirectExchange exchange() {
-        return new DirectExchange("imageExchange");
+        Map<String, Object> args = Map.of(
+                "x-max-priority", 10
+        );
+        return new DirectExchange("imageExchange", true, false, args);
     }
 
     @Bean

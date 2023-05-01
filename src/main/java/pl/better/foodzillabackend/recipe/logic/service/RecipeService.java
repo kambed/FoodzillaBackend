@@ -15,6 +15,7 @@ import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.review.logic.repository.ReviewRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
+import pl.better.foodzillabackend.utils.RecipePromptGenerator;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 
@@ -95,15 +96,10 @@ public class RecipeService {
                 RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
         ));
         if (r.getImage() == null) {
-            String ingredients = r
-                    .getIngredients()
-                    .stream()
-                    .map(Ingredient::getName)
-                    .collect(Collectors.joining(","));
             try {
-                String result = Arrays.toString(publisherMq.sendAndReceive(
+                String result = new String(publisherMq.sendAndReceive(
                         priority.getPriorityValue(),
-                        String.format("%s made from: %s", r.getName(), ingredients)
+                        RecipePromptGenerator.generatePrompt(r)
                 ).get().getBody());
                 r.setImage(
                         result
