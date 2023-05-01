@@ -87,19 +87,18 @@ public class RecipeSearchService {
                 .toList();
 
         List<Recipe> recipes = recipeRepository.getRecipesSummarizationIds(recipeIds);
-
         recipes.forEach(recipe -> {
             if (recipe.getImage() == null) {
                 try {
                     String result = new String(publisherMq.sendAndReceive(
                             Priority.NORMAL.getPriorityValue(),
-                            RecipePromptGenerator.generatePrompt(recipe)
+                            recipe
                     ).get().getBody());
                     recipe.setImage(
                             result
                     );
                     recipeRepository.saveAndFlush(recipe);
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (ExecutionException | InterruptedException e) {
                     //ignored
                 }
             }
@@ -130,7 +129,7 @@ public class RecipeSearchService {
                 .filter(recipe -> recipe.getImage() == null)
                 .forEach(recipe -> publisherMq.sendAndReceive(
                                 Priority.LOW.getPriorityValue(),
-                                RecipePromptGenerator.generatePrompt(recipe)
+                                recipe
                         ).thenAccept(
                                 rabbitMessage -> {
                                     recipe.setImage(new String(rabbitMessage.getBody()));

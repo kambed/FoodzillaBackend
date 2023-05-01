@@ -99,7 +99,7 @@ public class RecipeService {
             try {
                 String result = new String(publisherMq.sendAndReceive(
                         priority.getPriorityValue(),
-                        RecipePromptGenerator.generatePrompt(r)
+                        r
                 ).get().getBody());
                 r.setImage(
                         result

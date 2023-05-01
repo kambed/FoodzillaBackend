@@ -10,6 +10,7 @@ import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.RecommendationErrorException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeSummarizationDtoMapper;
+import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.utils.RecipePromptGenerator;
@@ -18,6 +19,7 @@ import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 import pl.better.foodzillabackend.utils.retrofit.recommendations.api.RecommendationAdapter;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +48,7 @@ public class RecommendationService {
                     .filter(recipe -> recipe.getImage() == null)
                     .forEach(recipe -> publisherMq.sendAndReceive(
                                     Priority.IDLE.getPriorityValue(),
-                                    RecipePromptGenerator.generatePrompt(recipe)
+                                    recipe
                             ).thenAccept(
                                     rabbitMessage -> {
                                         recipe.setImage(new String(rabbitMessage.getBody()));
