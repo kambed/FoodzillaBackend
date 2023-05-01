@@ -18,6 +18,7 @@ public class RecipeController {
 
     private final RecipeService recipeService;
 
+    @LoggedInUser
     @QueryMapping
     public RecipeDto recipe(@Argument long id) {
         return recipeService.getRecipeById(id);
@@ -25,7 +26,12 @@ public class RecipeController {
 
     @SchemaMapping(typeName = "Recipe", field = "image")
     public String recipeImage(RecipeDto recipe) {
-        return recipeService.getRecipeImageById(recipe);
+        return recipeService.getRecipeImageById(recipe, 2);
+    }
+
+    @SchemaMapping(typeName = "RecipeSummarization", field = "image")
+    public String recipeSummarizationImage(RecipeDto recipe) {
+        return recipeService.getRecipeImageById(recipe, 1);
     }
 
     @LoggedInUser

@@ -2,6 +2,7 @@ package pl.better.foodzillabackend.utils.retrofit.image.api;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,8 @@ public class ImageGeneratorAdapter {
         this.url = environment.getRequiredProperty("STABLE_DIFFUSION_API_URL");
     }
 
-    public synchronized String generateImage(Recipe recipe) {
+    @RabbitListener(queues = "imageGenerateQueue")
+    public synchronized String generateImage(String recipe) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .client(new OkHttpClient.Builder()
@@ -39,14 +41,8 @@ public class ImageGeneratorAdapter {
         StableDiffusionAPI stableDiffusionAPI = retrofit.create(StableDiffusionAPI.class);
 
         try {
-            String ingredients = recipe
-                    .getIngredients()
-                    .stream()
-                    .map(Ingredient::getName)
-                    .collect(Collectors.joining(","));
-            String result = String.format("%s made from: %s", recipe.getName(), ingredients);
             Response<GenerateRecipeImageResponseDto> response = stableDiffusionAPI
-                    .generateImage(new GenerateRecipeImageRequestDto(result, 1))
+                    .generateImage(new GenerateRecipeImageRequestDto(recipe, 1))
                             .execute();
             if (!response.isSuccessful() || response.body() == null) {
                 return null;
