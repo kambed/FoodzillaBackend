@@ -2,6 +2,7 @@ package pl.better.foodzillabackend.utils.rabbitmq;
 
 public enum Priority {
     HIGH(10),
+    MEDIUM(8),
     NORMAL(5),
     LOW(2),
     IDLE(0);

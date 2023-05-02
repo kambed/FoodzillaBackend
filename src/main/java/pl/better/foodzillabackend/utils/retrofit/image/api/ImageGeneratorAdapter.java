@@ -8,6 +8,7 @@ import okhttp3.Request;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.domain.RecipeShort;
@@ -31,12 +32,13 @@ public class ImageGeneratorAdapter {
     }
 
     @RabbitListener(queues = "imageGenerateQueue")
-    public String generateImage(String recipeJson) throws JsonProcessingException {
+    @Async("rabbitMqTaskExecutor")
+    public synchronized void generateImage(String recipeJson) throws JsonProcessingException {
         RecipeShort recipe = objectMapper.readValue(recipeJson, RecipeShort.class);
         log.info("Generating image for recipe: {}", recipe.prompt());
         Recipe recipeInDb = recipeRepository.findById(recipe.id()).orElseThrow();
         if (recipeInDb.getImage() != null) {
-            return recipeInDb.getImage();
+            return;
         }
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
@@ -57,11 +59,12 @@ public class ImageGeneratorAdapter {
                     .generateImage(new GenerateRecipeImageRequestDto(recipe.prompt(), 1))
                             .execute();
             if (!response.isSuccessful() || response.body() == null) {
-                return null;
+                return;
             }
-            return response.body().generatedImgs().get(0);
+            recipeInDb.setImage(response.body().generatedImgs().get(0));
+            recipeRepository.saveAndFlush(recipeInDb);
         } catch (Exception e) {
-            return null;
+            //ignored
         }
     }
 }

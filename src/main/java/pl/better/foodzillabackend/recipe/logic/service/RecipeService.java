@@ -93,21 +93,18 @@ public class RecipeService {
                 RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
         ));
         if (r.getImage() == null) {
-            try {
-                String result = new String(publisherMq.sendAndReceive(
-                        priority.getPriorityValue(),
-                        r
-                ).get().getBody());
-                r.setImage(
-                        result
-                );
-                recipeRepository.saveAndFlush(r);
-            } catch (ExecutionException e) {
-                //ignored
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            publisherMq.send(priority.getPriorityValue(), r);
         }
+        do {
+            try {
+                r = recipeRepository.getRecipeByIdWithIngredients(recipe.id()).orElseThrow(() -> new RecipeNotFoundException(
+                        RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
+                ));
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } while (r.getImage() == null);
         return r.getImage();
     }
 

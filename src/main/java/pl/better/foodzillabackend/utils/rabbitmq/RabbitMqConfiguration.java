@@ -1,11 +1,6 @@
 package pl.better.foodzillabackend.utils.rabbitmq;
 
-
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -33,32 +28,10 @@ public class RabbitMqConfiguration {
     }
 
     @Bean
-    public AsyncRabbitTemplate asyncRabbitTemplate(
-            RabbitTemplate rabbitTemplate){
-        return new AsyncRabbitTemplate(rabbitTemplate);
-    }
-
-    @Bean
     public Queue queue() {
         Map<String, Object> args = Map.of(
                 "x-max-priority", 10
         );
         return new Queue("imageGenerateQueue", true, false, false, args);
-    }
-
-    @Bean
-    public DirectExchange exchange() {
-        Map<String, Object> args = Map.of(
-                "x-max-priority", 10
-        );
-        return new DirectExchange("imageExchange", true, false, args);
-    }
-
-    @Bean
-    public Binding binding(DirectExchange exchange,
-                           Queue queue) {
-        return BindingBuilder.bind(queue)
-                .to(exchange)
-                .with("images");
     }
 }

@@ -20,6 +20,8 @@ import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 
+import pl.better.foodzillabackend.utils.rabbitmq.Priority;
+import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
 
 import java.util.ArrayList;
@@ -37,13 +39,16 @@ public class RecipeSearchService {
     private final Map<String, Join<Recipe, ?>> joins;
     private final RecipeRepository recipeRepository;
     private final CompletionsAdapter completionsAdapter;
+    private final PublisherMq publisherMq;
     public RecipeSearchService(
             EntityManagerFactory entityManagerFactory,
             RecipeSummarizationDtoMapper mapper,
             RecipeRepository recipeRepository,
-            CompletionsAdapter completionsAdapter) {
+            CompletionsAdapter completionsAdapter,
+            PublisherMq publisherMq) {
         this.mapper = mapper;
         entityManager = entityManagerFactory.createEntityManager();
+        this.publisherMq = publisherMq;
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
@@ -79,10 +84,24 @@ public class RecipeSearchService {
 
         List<Recipe> recipes = recipeRepository.getRecipesSummarizationIds(recipeIds);
 
+        recipes.forEach(
+                recipe -> publisherMq.send(Priority.NORMAL.getPriorityValue(), recipe)
+        );
+
         List<RecipeDto> recipeDtos = recipes.stream()
                 .map(mapper)
                 .toList();
         Page<RecipeDto> page = new PageImpl<>(recipeDtos, pageable, results.size());
+
+        List<Long> recipeNextPageIds = results.stream()
+                .skip(pageable.getOffset() + pageable.getPageSize())
+                .limit(pageable.getPageSize())
+                .toList();
+
+        recipeNextPageIds.forEach(
+                id -> publisherMq.send(Priority.LOW.getPriorityValue(),
+                        recipeRepository.getRecipeByIdWithIngredients(id).orElseThrow())
+        );
 
         return SearchResultDto.builder()
                 .currentPage(page.getNumber() + 1)
