@@ -2,6 +2,7 @@ package pl.better.foodzillabackend.utils.retrofit.image.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -18,6 +19,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 @Component
+@Slf4j
 public class ImageGeneratorAdapter {
     private final String url;
     private final RecipeRepository recipeRepository;
@@ -29,8 +31,9 @@ public class ImageGeneratorAdapter {
     }
 
     @RabbitListener(queues = "imageGenerateQueue")
-    public synchronized String generateImage(String recipeJson) throws JsonProcessingException {
+    public String generateImage(String recipeJson) throws JsonProcessingException {
         RecipeShort recipe = objectMapper.readValue(recipeJson, RecipeShort.class);
+        log.info("Generating image for recipe: {}", recipe.prompt());
         Recipe recipeInDb = recipeRepository.findById(recipe.id()).orElseThrow();
         if (recipeInDb.getImage() != null) {
             return recipeInDb.getImage();

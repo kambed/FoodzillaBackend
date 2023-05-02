@@ -102,8 +102,10 @@ public class RecipeService {
                         result
                 );
                 recipeRepository.saveAndFlush(r);
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (ExecutionException e) {
                 //ignored
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
         return r.getImage();

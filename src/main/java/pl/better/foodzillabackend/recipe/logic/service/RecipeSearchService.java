@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
@@ -20,14 +19,12 @@ import pl.better.foodzillabackend.recipe.logic.model.pojo.filter.RecipeFilterPoj
 import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
-import pl.better.foodzillabackend.utils.rabbitmq.Priority;
-import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
+
 import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 @Service
 public class RecipeSearchService {
@@ -40,18 +37,13 @@ public class RecipeSearchService {
     private final Map<String, Join<Recipe, ?>> joins;
     private final RecipeRepository recipeRepository;
     private final CompletionsAdapter completionsAdapter;
-    private final PublisherMq publisherMq;
-
     public RecipeSearchService(
             EntityManagerFactory entityManagerFactory,
             RecipeSummarizationDtoMapper mapper,
             RecipeRepository recipeRepository,
-            CompletionsAdapter completionsAdapter,
-            PublisherMq publisherMq
-    ) {
+            CompletionsAdapter completionsAdapter) {
         this.mapper = mapper;
         entityManager = entityManagerFactory.createEntityManager();
-        this.publisherMq = publisherMq;
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
@@ -86,24 +78,6 @@ public class RecipeSearchService {
                 .toList();
 
         List<Recipe> recipes = recipeRepository.getRecipesSummarizationIds(recipeIds);
-        recipes.forEach(recipe -> {
-            if (recipe.getImage() == null) {
-                try {
-                    String result = new String(publisherMq.sendAndReceive(
-                            Priority.NORMAL.getPriorityValue(),
-                            recipe
-                    ).get().getBody());
-                    recipe.setImage(
-                            result
-                    );
-                    recipeRepository.saveAndFlush(recipe);
-                } catch (ExecutionException | InterruptedException e) {
-                    //ignored
-                }
-            }
-        });
-
-        generateImagesForNextPage(results, pageable);
 
         List<RecipeDto> recipeDtos = recipes.stream()
                 .map(mapper)
@@ -115,27 +89,6 @@ public class RecipeSearchService {
                 .numberOfPages(page.getTotalPages())
                 .recipes(page.getContent())
                 .build();
-    }
-
-    @Async("searchTaskExecutor")
-    public void generateImagesForNextPage(List<Long> recipes, Pageable pageable) {
-        List<Long> recipeIdsNextPage = recipes.stream()
-                .skip(pageable.getOffset() + pageable.getPageSize())
-                .limit(pageable.getPageSize())
-                .toList();
-        recipeRepository.getRecipesSummarizationIds(recipeIdsNextPage)
-                .stream()
-                .filter(recipe -> recipe.getImage() == null)
-                .forEach(recipe -> publisherMq.sendAndReceive(
-                                Priority.LOW.getPriorityValue(),
-                                recipe
-                        ).thenAccept(
-                                rabbitMessage -> {
-                                    recipe.setImage(new String(rabbitMessage.getBody()));
-                                    recipeRepository.saveAndFlush(recipe);
-                                }
-                        )
-                );
     }
 
     private List<Predicate> getPhrasePredicates(SearchPojo input) {
