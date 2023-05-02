@@ -93,18 +93,9 @@ public class RecipeService {
                 RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
         ));
         if (r.getImage() == null) {
-            publisherMq.send(priority.getPriorityValue(), r);
+            r.setImage(publisherMq.sendAndReceive(priority.getPriorityValue(), r));
+            recipeRepository.saveAndFlush(r);
         }
-        do {
-            try {
-                r = recipeRepository.getRecipeByIdWithIngredients(recipe.id()).orElseThrow(() -> new RecipeNotFoundException(
-                        RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
-                ));
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } while (r.getImage() == null);
         return r.getImage();
     }
 
