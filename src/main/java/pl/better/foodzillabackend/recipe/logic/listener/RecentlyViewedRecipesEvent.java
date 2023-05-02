@@ -4,7 +4,7 @@ import org.springframework.context.ApplicationEvent;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 
 public class RecentlyViewedRecipesEvent extends ApplicationEvent {
-    private Recipe recipe;
+    private final Recipe recipe;
 
     public RecentlyViewedRecipesEvent(Object source, Recipe recipe) {
         super(source);
