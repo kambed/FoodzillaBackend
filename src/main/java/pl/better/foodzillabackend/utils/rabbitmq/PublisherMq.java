@@ -26,9 +26,9 @@ public class PublisherMq {
     private final MessageConverter converter = new SimpleMessageConverter();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public void send(int priority, Recipe recipe) {
+    public void send(Priority priority, Recipe recipe) {
         MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setPriority(priority);
+        messageProperties.setPriority(priority.getPriorityValue());
 
         RecipeShort recipeShort = RecipeShort.builder()
                 .id(recipe.getId())
@@ -45,9 +45,9 @@ public class PublisherMq {
         }
     }
 
-    public String sendAndReceive(int priority, Recipe recipe) {
+    public String sendAndReceive(Priority priority, Recipe recipe) {
         MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setPriority(priority);
+        messageProperties.setPriority(priority.getPriorityValue());
 
         RecipeShort recipeShort = RecipeShort.builder()
                 .id(recipe.getId())

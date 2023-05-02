@@ -93,7 +93,7 @@ public class RecipeService {
                 RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
         ));
         if (r.getImage() == null) {
-            r.setImage(publisherMq.sendAndReceive(priority.getPriorityValue(), r));
+            r.setImage(publisherMq.sendAndReceive(priority, r));
             recipeRepository.saveAndFlush(r);
         }
         return r.getImage();

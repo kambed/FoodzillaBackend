@@ -42,7 +42,7 @@ public class RecommendationService {
             customer.setRecommendations(recommendationIds);
             customerRepository.saveAndFlush(customer);
             recommendationIds.forEach(
-                    id -> publisherMq.send(Priority.IDLE.getPriorityValue(),
+                    id -> publisherMq.send(Priority.IDLE,
                             recipeRepository.getRecipeByIdWithIngredients(id).orElseThrow())
             );
         } catch (Exception e) {

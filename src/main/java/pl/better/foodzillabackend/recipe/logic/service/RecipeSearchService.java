@@ -85,7 +85,7 @@ public class RecipeSearchService {
         List<Recipe> recipes = recipeRepository.getRecipesSummarizationIds(recipeIds);
 
         recipes.forEach(
-                recipe -> publisherMq.send(Priority.NORMAL.getPriorityValue(), recipe)
+                recipe -> publisherMq.send(Priority.NORMAL, recipe)
         );
 
         List<RecipeDto> recipeDtos = recipes.stream()
@@ -99,7 +99,7 @@ public class RecipeSearchService {
                 .toList();
 
         recipeNextPageIds.forEach(
-                id -> publisherMq.send(Priority.LOW.getPriorityValue(),
+                id -> publisherMq.send(Priority.LOW,
                         recipeRepository.getRecipeByIdWithIngredients(id).orElseThrow())
         );
 
