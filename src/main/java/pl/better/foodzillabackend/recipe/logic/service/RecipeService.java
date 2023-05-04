@@ -89,6 +89,9 @@ public class RecipeService {
     }
 
     public String getRecipeImageById(RecipeDto recipe, Priority priority) {
+        if (recipe.image() != null) {
+            return recipe.image();
+        }
         Recipe r = recipeRepository.getRecipeByIdWithIngredients(recipe.id()).orElseThrow(() -> new RecipeNotFoundException(
                 RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
         ));
