@@ -21,21 +21,22 @@ public class SearchController {
     private final SearchService searchService;
 
     @QueryMapping
-    public SearchDto savedSearch(@Argument long id) {
-        return searchService.getSearchById(id);
+    public Set<SearchDto> savedSearch() {
+        return searchService.getSearches();
     }
 
     @LoggedInUser
     @MutationMapping
-    public SearchDto addSavedSearch(@Argument @Valid CreateSearchCommand search) {
-        return searchService.createNewSearchAndSaveInDb(search);
+    public SearchDto addSavedSearch(@Argument @Valid CreateSearchCommand input) {
+        System.out.println(input);
+        return searchService.createNewSearchAndSaveInDb(input);
     }
 
-//    @LoggedInUser
-//    @MutationMapping
-//    public Set<SearchDto> deleteSavedSearch(@Argument long id) {
-//        String principal = SecurityContextHolder.getContext()
-//                .getAuthentication().getName();
-//        return searchService.deleteSavedSearch(principal, id);
-//    }
+    @LoggedInUser
+    @MutationMapping
+    public Set<SearchDto> deleteSavedSearch(@Argument long id) {
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        return searchService.deleteSavedSearch(principal, id);
+    }
 }

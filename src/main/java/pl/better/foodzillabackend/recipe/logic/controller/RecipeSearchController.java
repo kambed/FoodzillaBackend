@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.recipe.logic.service.RecipeSearchService;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,11 +18,6 @@ public class RecipeSearchController {
     @QueryMapping
     public SearchResultDto search(@Argument SearchPojo input) {
         return recipeSearchService.search(input);
-    }
-
-    @QueryMapping
-    public List<SearchPojo> getSavedSearch() {
-        return recipeSearchService.getSearches();
     }
 
     @SchemaMapping(typeName = "SearchResult", field = "opinion")

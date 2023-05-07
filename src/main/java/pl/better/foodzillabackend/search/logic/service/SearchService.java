@@ -2,6 +2,7 @@ package pl.better.foodzillabackend.search.logic.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
@@ -11,13 +12,17 @@ import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.search.logic.mapper.SearchDtoMapper;
 import pl.better.foodzillabackend.search.logic.model.command.CreateSearchCommand;
 import pl.better.foodzillabackend.search.logic.model.domain.Search;
+import pl.better.foodzillabackend.search.logic.model.domain.SearchFilters;
+import pl.better.foodzillabackend.search.logic.model.domain.SearchSort;
 import pl.better.foodzillabackend.search.logic.model.dto.SearchDto;
 import pl.better.foodzillabackend.search.logic.repository.SearchRepository;
 import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +36,16 @@ public class SearchService {
     private final PublisherMq publisherMq;
 
     @Transactional
-    public SearchDto getSearchById(long id) {
-        Search search = searchRepository.getSearchById(id).orElseThrow(() -> new RecipeNotFoundException(
-                SEARCH_NOT_FOUND.formatted(id)
+    public Set<SearchDto> getSearches() {
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        Customer customer = getCustomer(principal);
+        Set<Search> searches = searchRepository.getSearchByUserId(customer.getId()).orElseThrow(() -> new RecipeNotFoundException(
+                SEARCH_NOT_FOUND.formatted(customer.getId())
         ));
-        return searchDtoMapper.apply(search);
+        Set<SearchDto> mappedSearches = new HashSet<>();
+        searches.forEach(search -> mappedSearches.add(searchDtoMapper.apply(search)));
+        return mappedSearches;
     }
 
     public <T> Set<T> getSearchItems(List<T> items) {
@@ -47,29 +57,39 @@ public class SearchService {
 
     @Transactional
     public SearchDto createNewSearchAndSaveInDb(CreateSearchCommand command) {
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        Customer customer = getCustomer(principal);
+
+        List<SearchFilters> filters = new ArrayList<>(command.filters());
+        List<SearchSort> sort = new ArrayList<>(command.sort());
+
         Search search = Search.builder()
                 .phrase(command.phrase())
-                .filterAttribute(command.filterAttribute())
-                .filterEquals(command.filterEquals())
-                .sortAttribute(command.sortAttribute())
-                .isSortAscending(command.isSortAscending())
+                .filterAttribute(filters.stream().findFirst().get().getFilterAttribute())
+                .filterEquals(filters.stream().findFirst().get().getFilterEquals())
+                .sortAttribute(sort.stream().findFirst().get().getSortAttribute())
+                .sortDirection(sort.stream().findFirst().get().getSortDirection())
                 .build();
+
+        customer.getSavedSearches().add(search);
         searchRepository.saveAndFlush(search);
         return searchDtoMapper.apply(search);
     }
 
-//    @Transactional
-//    public Set<SearchDto> deleteSavedSearch(String principal, long searchId) {
-//        Customer customer = getCustomer(principal);
-//
-//        customer.getFavouriteRecipes().remove(recipe);
-//        customerRepository.saveAndFlush(customer);
-//
-//        return customer.getFavouriteRecipes()
-//                .stream()
-//                .map(recipeDtoMapper)
-//                .collect(Collectors.toSet());
-//    }
+    @Transactional
+    public Set<SearchDto> deleteSavedSearch(String principal, long searchId) {
+        Customer customer = getCustomer(principal);
+        Search search = getSearch(searchId);
+        searchRepository.delete(search);
+        customer.getSavedSearches().remove(search);
+        customerRepository.saveAndFlush(customer);
+
+        return customer.getSavedSearches()
+                .stream()
+                .map(searchDtoMapper)
+                .collect(Collectors.toSet());
+    }
 
     private Customer getCustomer(String customer) {
         return customerRepository.findByUsername(customer)
@@ -77,5 +97,12 @@ public class SearchService {
                     throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND,
                             customer));
                 });
+    }
+
+    private Search getSearch(long id) {
+        return searchRepository.findById(id).orElseThrow(() -> {
+            throw new RecipeNotFoundException(String.format(SEARCH_NOT_FOUND,
+                    id));
+        });
     }
 }

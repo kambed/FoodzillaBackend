@@ -1,5 +1,10 @@
 extend type Query {
-    getSavedSearch: [SavedSearchResult]!
+    savedSearch: [SavedSearchResult]
+}
+
+extend type Mutation {
+    deleteSavedSearch(id: Int): SavedSearchResult
+    addSavedSearch(input: SearchInput! = {}): SavedSearchResult!
 }
 
 type SavedSearchResult {
@@ -10,11 +15,11 @@ type SavedSearchResult {
 }
 
 type SavedSearchFilterType  {
-    attribute: String!
+    attribute: String
     equals: String
 }
 
 type SavedSearchSortType {
-    attribute: String!
-    direction: SortDirection!
+    attribute: String
+    direction: SortDirection
 }

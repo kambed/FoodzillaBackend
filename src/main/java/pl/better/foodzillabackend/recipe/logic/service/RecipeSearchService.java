@@ -72,17 +72,6 @@ public class RecipeSearchService {
     @Transactional
     public SearchResultDto search(SearchPojo input) {
 
-        String principal = SecurityContextHolder.getContext()
-                .getAuthentication().getName();
-        Customer customer = getCustomer(principal);
-        List<SearchPojo> userSearches = customer.getSearches();
-        if (userSearches == null) {
-            customer.setSearches(List.of(input));
-        } else {
-            userSearches.add(input);
-            customer.setSearches(userSearches);
-        }
-
         Pageable pageable = PageRequest.of(input.currentPage() - 1, input.pageSize());
         List<Predicate> predicates = new ArrayList<>();
         predicates.addAll(getPhrasePredicates(input));
@@ -130,13 +119,6 @@ public class RecipeSearchService {
                 .numberOfPages(page.getTotalPages())
                 .recipes(page.getContent())
                 .build();
-    }
-
-    public List<SearchPojo> getSearches() {
-        String principal = SecurityContextHolder.getContext()
-                .getAuthentication().getName();
-        Customer customer = getCustomer(principal);
-        return customer.getSearches() == null ? new ArrayList<>() : customer.getSearches();
     }
 
     private List<Predicate> getPhrasePredicates(SearchPojo input) {

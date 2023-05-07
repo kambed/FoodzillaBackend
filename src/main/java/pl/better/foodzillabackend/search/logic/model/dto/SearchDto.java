@@ -1,14 +1,16 @@
 package pl.better.foodzillabackend.search.logic.model.dto;
 
 import lombok.Builder;
+import pl.better.foodzillabackend.search.logic.model.domain.SearchFilters;
+import pl.better.foodzillabackend.search.logic.model.domain.SearchSort;
+
+import java.util.Set;
 
 @Builder
 public record SearchDto(
         Long id,
         String phrase,
-        String filterAttribute,
-        String filterEquals,
-        String sortAttribute,
-        Boolean isSortAscending
+        Set<SearchFilters> filters,
+        Set<SearchSort> sort
 ) {
 }

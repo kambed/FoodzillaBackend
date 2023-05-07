@@ -17,6 +17,5 @@ public class Search {
     private String filterAttribute;
     private String filterEquals;
     private String sortAttribute;
-    private Boolean isSortAscending;
-
+    private String sortDirection;
 }

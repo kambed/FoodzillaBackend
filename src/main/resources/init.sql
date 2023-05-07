@@ -75,8 +75,7 @@ create table customer
     lastname        varchar(250) not null,
     username        varchar(250) not null,
     password        varchar(250) not null,
-    recommendations varchar(250) null,
-    searches        blob null
+    recommendations varchar(250) null
 );
 
 ALTER TABLE customer AUTO_INCREMENT=432123;
@@ -129,12 +128,12 @@ create table recently_viewed_recipes
 
 create table search
 (
-    id                      int auto_increment primary key,
-    phrase                  varchar(250) not null,
-    filterAttribute         varchar(250) null,
-    filterEquals            varchar(250) null,
-    sortAttribute           varchar(250) null,
-    isSortAscending         BOOLEAN null
+    id                       int auto_increment primary key,
+    phrase                   varchar(250) not null,
+    filter_attribute         varchar(250) null,
+    filter_equals            varchar(250) null,
+    sort_attribute           varchar(250) null,
+    sort_direction           enum('ASC', 'DESC') null
 );
 
 create table user_saved_searches

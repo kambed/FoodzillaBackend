@@ -11,6 +11,7 @@ import pl.better.foodzillabackend.auth.model.domain.Role;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
+import pl.better.foodzillabackend.search.logic.model.domain.Search;
 
 import java.util.*;
 
@@ -35,8 +36,6 @@ public class Customer implements UserDetails {
     @Type(JsonStringType.class)
     private List<Long> recommendations;
 
-    @Type(JsonBlobType.class)
-    private List<SearchPojo> searches;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();
@@ -54,6 +53,13 @@ public class Customer implements UserDetails {
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
     private Set<Recipe> recentlyViewedRecipes = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.REMOVE)
+    @JoinTable(
+            name = "user_saved_searches",
+            joinColumns = @JoinColumn(name = "customer_id"),
+            inverseJoinColumns = @JoinColumn(name = "search_id"))
+    private Set<Search> savedSearches = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
