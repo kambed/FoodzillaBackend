@@ -2,6 +2,7 @@ version: '3.3'
 services:
   db:
     image: mysql:5.7
+    command: mysqld --sql_mode=""
     restart: unless-stopped
     env_file: .env
     ports:
@@ -24,5 +25,17 @@ services:
       - '${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}'
     volumes:
       - .m2:/root/.m2
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
 volumes:
   db:
+networks:
+  default:
+    driver: bridge

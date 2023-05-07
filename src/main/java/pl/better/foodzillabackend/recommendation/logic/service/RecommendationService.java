@@ -9,8 +9,12 @@ import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.RecommendationErrorException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
+import pl.better.foodzillabackend.recipe.logic.mapper.RecipeSummarizationDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.recipe.logic.service.RecipeService;
+import pl.better.foodzillabackend.utils.rabbitmq.Priority;
+import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 import pl.better.foodzillabackend.utils.retrofit.recommendations.api.RecommendationAdapter;
 
 import java.util.List;
@@ -21,8 +25,9 @@ public class RecommendationService {
 
     private final CustomerRepository customerRepository;
     private final RecipeRepository recipeRepository;
-    private final RecipeDtoMapper recipeDtoMapper;
+    private final RecipeSummarizationDtoMapper recipeSummarizationDtoMapper;
     private final RecommendationAdapter recommendationAdapter;
+    private final PublisherMq publisherMq;
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
 
     @Async("recommendationTaskExecutor")
@@ -36,6 +41,10 @@ public class RecommendationService {
             List<Long> recommendationIds = recommendationAdapter.getRecommendations(customer.getId());
             customer.setRecommendations(recommendationIds);
             customerRepository.saveAndFlush(customer);
+            recommendationIds.forEach(
+                    id -> publisherMq.send(Priority.IDLE,
+                            recipeRepository.getRecipeByIdWithIngredients(id).orElseThrow())
+            );
         } catch (Exception e) {
             throw new RecommendationErrorException("Error during using recommendation module");
         }
@@ -57,9 +66,9 @@ public class RecommendationService {
             }
         }
         return recipeRepository
-                .getRecipesIds(recommendationIds)
+                .getRecipesSummarizationIds(recommendationIds)
                 .stream()
-                .map(recipeDtoMapper)
+                .map(recipeSummarizationDtoMapper)
                 .toList();
     }
 

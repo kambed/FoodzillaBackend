@@ -7,6 +7,7 @@ public record RecipeFilterPojo(
         String equals,
         String from,
         String to,
-        Set<String> in
+        Set<String> in,
+        Set<String> hasOnly
 ) {
 }

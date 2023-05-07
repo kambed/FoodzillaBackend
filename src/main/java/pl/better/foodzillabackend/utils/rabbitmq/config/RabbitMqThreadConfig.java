@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.config;
+package pl.better.foodzillabackend.utils.rabbitmq.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,14 +9,14 @@ import java.util.concurrent.Executor;
 
 @Configuration
 @EnableAsync
-public class RecommendationConfig {
+public class RabbitMqThreadConfig {
     @Bean
-    public Executor recommendationTaskExecutor() {
+    public Executor rabbitMqTaskExecutor() {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(10);
         executor.setMaxPoolSize(20);
         executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("recommendation-task-");
+        executor.setThreadNamePrefix("rabbitmq-task-");
         executor.initialize();
         return executor;
     }

@@ -8,15 +8,19 @@ import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.listener.RecentlyViewedRecipesEvent;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
-import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.review.logic.repository.ReviewRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
-import pl.better.foodzillabackend.utils.retrofit.image.api.ImageGeneratorAdapter;
+import pl.better.foodzillabackend.utils.rabbitmq.Priority;
+import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,18 +30,28 @@ public class RecipeService {
     private final IngredientRepository ingredientRepository;
     private final TagRepository tagRepository;
     private final RecipeDtoMapper recipeDtoMapper;
-    private final RecipeMapper recipeMapper;
-    private final ImageGeneratorAdapter imageGeneratorAdapter;
     private final ApplicationEventPublisher applicationEventPublisher;
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
+    private final ReviewRepository reviewRepository;
+    private final PublisherMq publisherMq;
 
     @Transactional
     public RecipeDto getRecipeById(long id) {
         Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
                 RECIPE_NOT_FOUND_MESSAGE.formatted(id)
         ));
+        recipe.setIngredients(getRecipeItems(ingredientRepository.findAllByRecipeId(id)));
+        recipe.setTags(getRecipeItems(tagRepository.findAllByRecipeId(id)));
+        recipe.setReviews(getRecipeItems(reviewRepository.findAllByRecipeId(id)));
         publishCustomEvent(recipe);
         return recipeDtoMapper.apply(recipe);
+    }
+
+    public <T> Set<T> getRecipeItems(List<T> items) {
+        if (items.size() == 1 && items.get(0) == null) {
+            items = List.of();
+        }
+        return new HashSet<>(items);
     }
 
     @Transactional
@@ -74,20 +88,18 @@ public class RecipeService {
         return recipeDtoMapper.apply(recipe);
     }
 
-    public String getRecipeImageById(RecipeDto recipe) {
-        Recipe r = recipeMapper.apply(recipe);
-        if (recipe.image() == null) {
-            generateImageForRecipe(r);
+    public String getRecipeImageById(RecipeDto recipe, Priority priority) {
+        if (recipe.image() != null) {
+            return recipe.image();
+        }
+        Recipe r = recipeRepository.getRecipeByIdWithIngredients(recipe.id()).orElseThrow(() -> new RecipeNotFoundException(
+                RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
+        ));
+        if (r.getImage() == null) {
+            r.setImage(publisherMq.sendAndReceive(priority, r));
             recipeRepository.saveAndFlush(r);
         }
         return r.getImage();
-    }
-
-    private void generateImageForRecipe(Recipe recipe) {
-        String image = imageGeneratorAdapter.generateImage(recipe.getName());
-        if (image != null) {
-            recipe.setImage(image);
-        }
     }
 
     private void publishCustomEvent(Recipe recipe) {

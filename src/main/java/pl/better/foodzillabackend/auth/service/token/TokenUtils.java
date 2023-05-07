@@ -16,6 +16,9 @@ public abstract class TokenUtils {
     @Value("${spring.security.jwt.expiration}")
     private long expirationTime;
 
+    @Value("${spring.security.jwt.refresh-expiration}")
+    private long refreshExpirationTime;
+
     public abstract TokenPayload decodeToken(String authorizationHeader);
 
     public String getHeaderString() {
@@ -32,5 +35,9 @@ public abstract class TokenUtils {
 
     public long getExpirationTime() {
         return expirationTime;
+    }
+
+    public long getRefreshExpirationTime() {
+        return refreshExpirationTime;
     }
 }

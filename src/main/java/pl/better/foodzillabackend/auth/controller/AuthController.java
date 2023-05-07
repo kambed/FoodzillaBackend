@@ -17,4 +17,9 @@ public class AuthController {
     public Token login(@Argument String username, @Argument String password) {
         return tokenService.generateToken(username, password);
     }
+
+    @MutationMapping
+    public Token refreshToken(@Argument String refreshToken) {
+        return tokenService.refreshToken(refreshToken);
+    }
 }
