@@ -6,6 +6,7 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import pl.better.foodzillabackend.search.logic.model.domain.SearchFilters;
 import pl.better.foodzillabackend.search.logic.model.domain.SearchSort;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -14,7 +15,7 @@ public record CreateSearchCommand(
         @NotNull
         @Size(min = 1, max = 250,  message = "Search phrase must be between 1 and 250 characters.")
         String phrase,
-        Set<SearchFilters> filters,
-        Set<SearchSort> sort
+        List<SearchFilters> filters,
+        List<SearchSort> sort
 ) {
 }

@@ -1,14 +1,10 @@
 package pl.better.foodzillabackend.search.logic.model.domain;
 
-import lombok.*;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class SearchSort {
-
-    private String sortAttribute;
-    private String sortDirection;
+@SchemaMapping
+public record SearchSort(
+        String attribute,
+        String direction
+) {
 }

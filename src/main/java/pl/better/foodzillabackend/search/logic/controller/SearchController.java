@@ -28,13 +28,12 @@ public class SearchController {
     @LoggedInUser
     @MutationMapping
     public SearchDto addSavedSearch(@Argument @Valid CreateSearchCommand input) {
-        System.out.println(input);
         return searchService.createNewSearchAndSaveInDb(input);
     }
 
     @LoggedInUser
     @MutationMapping
-    public Set<SearchDto> deleteSavedSearch(@Argument long id) {
+    public SearchDto deleteSavedSearch(@Argument long id) {
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         return searchService.deleteSavedSearch(principal, id);

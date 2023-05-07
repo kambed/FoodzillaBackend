@@ -66,10 +66,10 @@ public class SearchService {
 
         Search search = Search.builder()
                 .phrase(command.phrase())
-                .filterAttribute(filters.stream().findFirst().get().getFilterAttribute())
-                .filterEquals(filters.stream().findFirst().get().getFilterEquals())
-                .sortAttribute(sort.stream().findFirst().get().getSortAttribute())
-                .sortDirection(sort.stream().findFirst().get().getSortDirection())
+                .filterAttribute(filters.stream().findFirst().get().attribute())
+                .filterEquals(filters.stream().findFirst().get().equals())
+                .sortAttribute(sort.stream().findFirst().get().attribute())
+                .sortDirection(sort.stream().findFirst().get().direction())
                 .build();
 
         customer.getSavedSearches().add(search);
@@ -78,17 +78,14 @@ public class SearchService {
     }
 
     @Transactional
-    public Set<SearchDto> deleteSavedSearch(String principal, long searchId) {
+    public SearchDto deleteSavedSearch(String principal, long searchId) {
         Customer customer = getCustomer(principal);
         Search search = getSearch(searchId);
         searchRepository.delete(search);
         customer.getSavedSearches().remove(search);
         customerRepository.saveAndFlush(customer);
 
-        return customer.getSavedSearches()
-                .stream()
-                .map(searchDtoMapper)
-                .collect(Collectors.toSet());
+        return searchDtoMapper.apply(search);
     }
 
     private Customer getCustomer(String customer) {

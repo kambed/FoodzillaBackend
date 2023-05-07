@@ -1,14 +1,10 @@
 package pl.better.foodzillabackend.search.logic.model.domain;
 
-import lombok.*;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class SearchFilters {
-
-    private String filterAttribute;
-    private String filterEquals;
+@SchemaMapping
+public record SearchFilters(
+        String attribute,
+        String equals
+) {
 }
