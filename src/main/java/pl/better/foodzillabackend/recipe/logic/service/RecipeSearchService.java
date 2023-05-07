@@ -51,7 +51,7 @@ public class RecipeSearchService {
             EntityManagerFactory entityManagerFactory,
             RecipeSummarizationDtoMapper mapper,
             RecipeRepository recipeRepository,
-            PublisherMq publisherMq) {
+            PublisherMq publisherMq,
             CompletionsAdapter completionsAdapter,
             CustomerRepository customerRepository) {
         this.mapper = mapper;
