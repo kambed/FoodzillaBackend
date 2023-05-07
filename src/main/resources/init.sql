@@ -126,3 +126,25 @@ create table recently_viewed_recipes
     constraint recently_viewed_recipes_Recipe_null_fk
         foreign key (recipe_id) references recipe (id)
 );
+
+create table search
+(
+    id                      int auto_increment primary key,
+    phrase                  varchar(250) not null,
+    filterAttribute         varchar(250) null,
+    filterEquals            varchar(250) null,
+    sortAttribute           varchar(250) null,
+    isSortAscending         BOOLEAN null
+);
+
+create table user_saved_searches
+(
+    id          int auto_increment primary key,
+    customer_id int not null,
+    search_id   int not null,
+    constraint user_saved_searches_Customer_null_fk
+        foreign key (customer_id) references customer (id),
+    constraint user_saved_searches_Search_null_fk
+        foreign key (search_id) references search (id)
+);
+
