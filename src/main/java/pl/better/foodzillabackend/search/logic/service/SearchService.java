@@ -35,11 +35,9 @@ public class SearchService {
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         Customer customer = getCustomer(principal);
-        Set<Search> searches = searchRepository.getSearchByUserId(customer.getId()).orElseThrow(() -> new RecipeNotFoundException(
-                SEARCH_NOT_FOUND.formatted(customer.getId())
-        ));
+
         Set<SearchDto> mappedSearches = new HashSet<>();
-        searches.forEach(search -> mappedSearches.add(searchDtoMapper.apply(search)));
+        customer.getSavedSearches().forEach(search -> mappedSearches.add(searchDtoMapper.apply(search)));
         return mappedSearches;
     }
 
@@ -55,8 +53,8 @@ public class SearchService {
                 .sort(command.sort())
                 .build();
 
-        customer.getSavedSearches().add(search);
         searchRepository.saveAndFlush(search);
+        customer.getSavedSearches().add(search);
         return searchDtoMapper.apply(search);
     }
 
@@ -67,7 +65,6 @@ public class SearchService {
 
         searchRepository.delete(search);
         customer.getSavedSearches().remove(search);
-        customerRepository.saveAndFlush(customer);
 
         return searchDtoMapper.apply(search);
     }

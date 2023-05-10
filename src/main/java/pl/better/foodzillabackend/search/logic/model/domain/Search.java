@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import pl.better.foodzillabackend.utils.SetToBlobConverter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -13,6 +14,7 @@ import java.util.Set;
 @Builder
 @Entity
 public class Search {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
