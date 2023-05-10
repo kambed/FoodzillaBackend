@@ -1,0 +1,14 @@
+query {
+    savedSearch {
+        id
+        phrase
+        filters {
+            attribute
+            equals
+        }
+        sort {
+            attribute
+            direction
+        }
+    }
+}
