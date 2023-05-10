@@ -1,9 +1,9 @@
 package pl.better.foodzillabackend.recipe.logic.model.dto;
 
 import lombok.Builder;
-import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
-import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
-import pl.better.foodzillabackend.review.logic.model.domain.Review;
+import pl.better.foodzillabackend.ingredient.logic.model.dto.IngredientDto;
+import pl.better.foodzillabackend.review.logic.model.dto.ReviewDto;
+import pl.better.foodzillabackend.tag.logic.model.dto.TagDto;
 
 import java.util.List;
 import java.util.Set;
@@ -26,8 +26,8 @@ public record RecipeDto(
         int carbohydrates,
         double rating,
         String image,
-        Set<Review> reviews,
-        Set<Ingredient> ingredients,
-        Set<Tag> tags
+        Set<ReviewDto> reviews,
+        Set<IngredientDto> ingredients,
+        Set<TagDto> tags
 ) {
 }

@@ -11,6 +11,7 @@ import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
+import pl.better.foodzillabackend.recipe.logic.redis.RecipeTemplate;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 import pl.better.foodzillabackend.review.logic.repository.ReviewRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
@@ -20,7 +21,6 @@ import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +31,7 @@ public class RecipeService {
     private final TagRepository tagRepository;
     private final RecipeDtoMapper recipeDtoMapper;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final RecipeTemplate recipeTemplate;
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
     private final ReviewRepository reviewRepository;
     private final PublisherMq publisherMq;
@@ -44,7 +45,12 @@ public class RecipeService {
         recipe.setTags(getRecipeItems(tagRepository.findAllByRecipeId(id)));
         recipe.setReviews(getRecipeItems(reviewRepository.findAllByRecipeId(id)));
         publishCustomEvent(recipe);
-        return recipeDtoMapper.apply(recipe);
+        RecipeDto recipeDto = recipeDtoMapper.apply(recipe);
+        recipeTemplate.save(recipeDto);
+        RecipeDto redisRecipe = recipeTemplate.getById(id).orElseThrow(() -> new RecipeNotFoundException(
+                RECIPE_NOT_FOUND_MESSAGE.formatted(id)
+        ));
+        return recipeDto;
     }
 
     public <T> Set<T> getRecipeItems(List<T> items) {

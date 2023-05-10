@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.utils.rabbitmq;
+package pl.better.foodzillabackend.utils.rabbitmq.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
