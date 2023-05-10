@@ -56,8 +56,6 @@ class SavedSearchTest extends TestBase {
                 .sort(new HashSet<>(sort1))
                 .build();
 
-        searchRepository.saveAllAndFlush(List.of(search1, search2, search3));
-
         user = Customer.builder()
                 .id(1337L)
                 .firstname("Bob")
@@ -66,9 +64,9 @@ class SavedSearchTest extends TestBase {
                 .password("b0bL0bl@w")
                 .build();
         customerRepository.saveAndFlush(user);
-
-        user = customerRepository.findByUsername("BobLoblaw").orElse(null);
-        user.getSavedSearches().addAll(List.of(search1, search2, search3));
+        searchRepository.saveAllAndFlush(List.of(search1, search2, search3));
+        user.setSavedSearches(Set.of(search1, search2, search3));
+        customerRepository.saveAndFlush(user);
     }
 
     @Test
