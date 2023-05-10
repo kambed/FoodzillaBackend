@@ -31,7 +31,6 @@ class SavedSearchTest extends TestBase {
     private Search search3;
 
     @BeforeEach
-    @Transactional
     public void resetDb() {
         super.resetDb();
 
@@ -70,7 +69,6 @@ class SavedSearchTest extends TestBase {
     }
 
     @Test
-    @DirtiesContext
     @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldReturnRecipesAllRecipes() {
         GraphQlTester.Response response = graphQlTester.documentName("saved-search-get").execute();
