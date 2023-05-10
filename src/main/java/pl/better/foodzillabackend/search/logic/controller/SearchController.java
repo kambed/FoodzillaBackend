@@ -20,6 +20,7 @@ public class SearchController {
 
     private final SearchService searchService;
 
+    @LoggedInUser
     @QueryMapping
     public Set<SearchDto> savedSearch() {
         return searchService.getSearches();

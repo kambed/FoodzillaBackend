@@ -1,5 +1,6 @@
 package pl.better.foodzillabackend;
 
+import jakarta.transaction.Transactional;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class TestBase {
             System.setProperty("COMPLETIONS_API_URL", completionsMockWebServer.url("/").toString());
         }
     }
-
+    
     protected void resetDb() {
         recipeRepository.deleteAll();
         ingredientRepository.deleteAll();

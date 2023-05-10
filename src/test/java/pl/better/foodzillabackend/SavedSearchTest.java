@@ -1,10 +1,14 @@
 package pl.better.foodzillabackend;
 
+import jakarta.transaction.Transactional;
 import okhttp3.mockwebserver.MockResponse;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.search.logic.model.domain.Search;
@@ -12,79 +16,68 @@ import pl.better.foodzillabackend.search.logic.model.domain.SearchFilters;
 import pl.better.foodzillabackend.search.logic.model.domain.SearchSort;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SavedSearchTest extends TestBase {
+
+    private Customer user;
+    private HashSet<SearchFilters> filters1 = new HashSet<>();
+    private HashSet<SearchFilters> filters2 = new HashSet<>();
+    private HashSet<SearchSort> sort1 = new HashSet<>();
+    private Search search1;
+    private Search search2;
+    private Search search3;
+
     @BeforeEach
+    @Transactional
     public void resetDb() {
         super.resetDb();
 
-//        Ingredient ingredient1 = Ingredient.builder()
-//                .name("Ingredient 1")
-//                .build();
-//        Ingredient ingredient2 = Ingredient.builder()
-//                .name("Ingredient 2")
-//                .build();
-//        ingredientRepository.save(ingredient1);
-//        ingredientRepository.save(ingredient2);
-//
-//        Recipe recipe1 = Recipe.builder()
-//                .name("pyszna jajecznica")
-//                .description("Description 1")
-//                .calories(100)
-//                .ingredients(Set.of(ingredient1, ingredient2))
-//                .build();
-//
-//        Recipe recipe2 = Recipe.builder()
-//                .name("pyszny stek")
-//                .description("Description 2")
-//                .calories(200)
-//                .ingredients(Set.of(ingredient1))
-//                .build();
-//
-//        recipeRepository.save(recipe1);
-//        recipeRepository.save(recipe2);
-
-        HashSet<SearchFilters> filters1 = new HashSet<>();
+        filters1 = new HashSet<>();
         filters1.add(SearchFilters.builder().attribute("name").equals("pyszna").build());
-
-        HashSet<SearchFilters> filters2 = new HashSet<>();
         filters2.add(SearchFilters.builder().attribute("name").equals("stek").build());
         filters2.add(SearchFilters.builder().attribute("asdasd").equals("eeeeeeee").build());
-
-        HashSet<SearchSort> sort1 = new HashSet<>();
         sort1.add(SearchSort.builder().attribute("name").direction("ASC").build());
 
-        Search search1 = Search.builder()
+        search1 = Search.builder()
                 .phrase("pyszna jajecznica")
                 .build();
 
-        Search search2 = Search.builder()
+        search2 = Search.builder()
                 .phrase("pyszny stek")
                 .filters(new HashSet<>(filters1))
                 .build();
 
-        Search search3 = Search.builder()
+        search3 = Search.builder()
                 .phrase("krewetki w sosie śmietanowym")
                 .filters(new HashSet<>(filters2))
                 .sort(new HashSet<>(sort1))
                 .build();
 
-        searchRepository.save(search1);
-        searchRepository.save(search2);
-        searchRepository.save(search3);
+        searchRepository.saveAllAndFlush(List.of(search1, search2, search3));
+
+        user = Customer.builder()
+                .id(1337L)
+                .firstname("Bob")
+                .lastname("Loblaw")
+                .username("BobLoblaw")
+                .password("b0bL0bl@w")
+                .build();
+        customerRepository.saveAndFlush(user);
+
+        user = customerRepository.findByUsername("BobLoblaw").orElse(null);
+        user.getSavedSearches().addAll(List.of(search1, search2, search3));
     }
 
     @Test
     @DirtiesContext
+    @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldReturnRecipesAllRecipes() {
         GraphQlTester.Response response = graphQlTester.documentName("saved-search-get").execute();
         response.errors().satisfy(errors -> assertEquals(0, errors.size()));
-        response.path("addSavedSearch").entityList(Search.class).satisfies(search -> {
+        response.path("savedSearch").entityList(Search.class).satisfies(search -> {
             assertEquals(3, search.size());
 //            assertEquals("Recipe 1", Objects.requireNonNull(recipes.get(0)).getName());
 //            assertEquals("Recipe 2", Objects.requireNonNull(recipes.get(1)).getName());
