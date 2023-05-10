@@ -12,17 +12,12 @@ import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.search.logic.mapper.SearchDtoMapper;
 import pl.better.foodzillabackend.search.logic.model.command.CreateSearchCommand;
 import pl.better.foodzillabackend.search.logic.model.domain.Search;
-import pl.better.foodzillabackend.search.logic.model.domain.SearchFilters;
-import pl.better.foodzillabackend.search.logic.model.domain.SearchSort;
 import pl.better.foodzillabackend.search.logic.model.dto.SearchDto;
 import pl.better.foodzillabackend.search.logic.repository.SearchRepository;
 import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,28 +43,16 @@ public class SearchService {
         return mappedSearches;
     }
 
-    public <T> Set<T> getSearchItems(List<T> items) {
-        if (items.size() == 1 && items.get(0) == null) {
-            items = List.of();
-        }
-        return new HashSet<>(items);
-    }
-
     @Transactional
     public SearchDto createNewSearchAndSaveInDb(CreateSearchCommand command) {
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         Customer customer = getCustomer(principal);
 
-        List<SearchFilters> filters = new ArrayList<>(command.filters());
-        List<SearchSort> sort = new ArrayList<>(command.sort());
-
         Search search = Search.builder()
                 .phrase(command.phrase())
-                .filterAttribute(filters.stream().findFirst().get().attribute())
-                .filterEquals(filters.stream().findFirst().get().equals())
-                .sortAttribute(sort.stream().findFirst().get().attribute())
-                .sortDirection(sort.stream().findFirst().get().direction())
+                .filters(command.filters())
+                .sort(command.sort())
                 .build();
 
         customer.getSavedSearches().add(search);
@@ -81,6 +64,7 @@ public class SearchService {
     public SearchDto deleteSavedSearch(String principal, long searchId) {
         Customer customer = getCustomer(principal);
         Search search = getSearch(searchId);
+
         searchRepository.delete(search);
         customer.getSavedSearches().remove(search);
         customerRepository.saveAndFlush(customer);

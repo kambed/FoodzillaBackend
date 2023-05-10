@@ -10,16 +10,20 @@ extend type Mutation {
 type SavedSearchResult {
     id: Int
     phrase: String
-    filters: [SavedSearchFilterType]
+    filters: [FilterTypeResult]
     sort: [SavedSearchSortType]
-}
-
-type SavedSearchFilterType  {
-    attribute: String
-    equals: String
 }
 
 type SavedSearchSortType {
     attribute: String
     direction: SortDirection
+}
+
+type FilterTypeResult {
+    attribute: String!
+    equals: String
+    from: Int
+    to: Int
+    in: [String]
+    hasOnly: [String]
 }

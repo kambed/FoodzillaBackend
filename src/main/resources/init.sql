@@ -130,10 +130,8 @@ create table search
 (
     id                       int auto_increment primary key,
     phrase                   varchar(250) not null,
-    filter_attribute         varchar(250) null,
-    filter_equals            varchar(250) null,
-    sort_attribute           varchar(250) null,
-    sort_direction           enum('ASC', 'DESC') null
+    filters                  blob null,
+    sort                     blob null
 );
 
 create table user_saved_searches

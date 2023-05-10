@@ -2,6 +2,9 @@ package pl.better.foodzillabackend.search.logic.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.better.foodzillabackend.utils.SetToBlobConverter;
+
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,8 +17,12 @@ public class Search {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String phrase;
-    private String filterAttribute;
-    private String filterEquals;
-    private String sortAttribute;
-    private String sortDirection;
+
+    @Lob
+    @Convert(converter = SetToBlobConverter.class)
+    private Set<SearchFilters> filters;
+
+    @Lob
+    @Convert(converter = SetToBlobConverter.class)
+    private Set<SearchSort> sort;
 }
