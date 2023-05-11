@@ -2,8 +2,10 @@ package pl.better.foodzillabackend.search.logic.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 import pl.better.foodzillabackend.utils.SetToBlobConverter;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 

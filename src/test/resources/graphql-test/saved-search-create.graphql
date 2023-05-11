@@ -1,6 +1,6 @@
 mutation {
     addSavedSearch(input: {
-        phrase: "String"
+        phrase: "search phrase"
         filters: [
             {
                 attribute: "name"
