@@ -33,7 +33,8 @@ public class WebSecurityConfig {
                         .permitAll()
                         .anyRequest().denyAll())
                 .addFilter(new JWTAuthorizationFilter(authenticationManagerBean(httpSecurity), tokenUtils))
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         return httpSecurity.build();
     }
