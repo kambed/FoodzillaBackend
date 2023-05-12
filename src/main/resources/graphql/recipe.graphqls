@@ -42,6 +42,7 @@ type Recipe {
     ingredients: [Ingredient]
     tags: [Tag]
     rating: Float
+    isFavourite: Boolean
 }
 
 type RecipeSummarization {

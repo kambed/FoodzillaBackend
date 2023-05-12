@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
+import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
+import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.listener.RecentlyViewedRecipesEvent;
@@ -20,23 +23,25 @@ import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class RecipeService {
+    private static final String ANONYMOUS = "anonymousUser";
+    private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
     private final TagRepository tagRepository;
     private final RecipeDtoMapper recipeDtoMapper;
+    private final CustomerRepository customerRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
     private final ReviewRepository reviewRepository;
     private final PublisherMq publisherMq;
 
     @Transactional
-    public RecipeDto getRecipeById(long id) {
+    public RecipeDto getRecipeById(long id, String principal) {
         Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
                 RECIPE_NOT_FOUND_MESSAGE.formatted(id)
         ));
@@ -44,7 +49,20 @@ public class RecipeService {
         recipe.setTags(getRecipeItems(tagRepository.findAllByRecipeId(id)));
         recipe.setReviews(getRecipeItems(reviewRepository.findAllByRecipeId(id)));
         publishCustomEvent(recipe);
-        return recipeDtoMapper.apply(recipe);
+        RecipeDto dto = recipeDtoMapper.apply(recipe);
+        if (principal.equals(ANONYMOUS)) {
+            dto.setIsFavourite(null);
+        } else {
+            Customer customer = customerRepository.findByUsername(principal)
+                    .orElseThrow(() -> {
+                        throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND,
+                                principal));
+                    });
+            dto.setIsFavourite(customer.getFavouriteRecipes()
+                    .stream()
+                    .anyMatch(rec -> rec.getId() == id));
+        }
+        return dto;
     }
 
     public <T> Set<T> getRecipeItems(List<T> items) {
@@ -89,11 +107,11 @@ public class RecipeService {
     }
 
     public String getRecipeImageById(RecipeDto recipe, Priority priority) {
-        if (recipe.image() != null) {
-            return recipe.image();
+        if (recipe.getImage() != null) {
+            return recipe.getImage();
         }
-        Recipe r = recipeRepository.getRecipeByIdWithIngredients(recipe.id()).orElseThrow(() -> new RecipeNotFoundException(
-                RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.id())
+        Recipe r = recipeRepository.getRecipeByIdWithIngredients(recipe.getId()).orElseThrow(() -> new RecipeNotFoundException(
+                RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.getId())
         ));
         if (r.getImage() == null) {
             r.setImage(publisherMq.sendAndReceive(priority, r));
