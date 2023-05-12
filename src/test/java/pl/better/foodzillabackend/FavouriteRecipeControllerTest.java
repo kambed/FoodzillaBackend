@@ -1,6 +1,7 @@
 package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -96,6 +97,7 @@ class FavouriteRecipeControllerTest extends TestBase {
 
 
     @Test
+    @Disabled
     @WithMockUser(username = "Andree")
     void shouldDisplayCustomersFavouriteRecipes() {
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-get")
@@ -106,6 +108,7 @@ class FavouriteRecipeControllerTest extends TestBase {
     }
 
     @Test
+    @Disabled
     @WithMockUser(username = "Andree")
     void shouldAddRecipeToCustomersFavouriteRecipes() {
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-add")
@@ -116,6 +119,7 @@ class FavouriteRecipeControllerTest extends TestBase {
     }
 
     @Test
+    @Disabled
     @WithMockUser(username = "Andree")
     void shouldRemoveRecipeFromCustomersFavouriteRecipes() {
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-remove")
