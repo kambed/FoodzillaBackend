@@ -12,7 +12,7 @@ import java.util.Optional;
 public class RecipeTemplate {
     private final RedisTemplate<Long, RecipeDto> redisTemplate;
     public void save(RecipeDto recipe) {
-        redisTemplate.opsForValue().set(recipe.id(), recipe);
+        redisTemplate.opsForValue().set(recipe.getId(), recipe);
     }
 
     public Optional<RecipeDto> getById(Long id) {

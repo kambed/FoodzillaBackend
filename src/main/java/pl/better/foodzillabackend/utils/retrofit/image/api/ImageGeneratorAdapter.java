@@ -19,6 +19,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.util.concurrent.CompletableFuture;
+
 @Component
 @Slf4j
 public class ImageGeneratorAdapter {
@@ -33,12 +35,12 @@ public class ImageGeneratorAdapter {
 
     @RabbitListener(queues = "imageGenerateQueue")
     @Async("rabbitMqTaskExecutor")
-    public synchronized void generateImage(String recipeJson) throws JsonProcessingException {
+    public synchronized CompletableFuture<String> generateImage(String recipeJson) throws JsonProcessingException {
         RecipeShort recipe = objectMapper.readValue(recipeJson, RecipeShort.class);
         log.info("Generating image for recipe: {}", recipe.prompt());
         Recipe recipeInDb = recipeRepository.findById(recipe.id()).orElseThrow();
         if (recipeInDb.getImage() != null) {
-            return;
+            return CompletableFuture.completedFuture(null);
         }
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
@@ -59,12 +61,14 @@ public class ImageGeneratorAdapter {
                     .generateImage(new GenerateRecipeImageRequestDto(recipe.prompt(), 1))
                             .execute();
             if (!response.isSuccessful() || response.body() == null) {
-                return;
+                return CompletableFuture.completedFuture(null);
             }
-            recipeInDb.setImage(response.body().generatedImgs().get(0));
+            String image = response.body().generatedImgs().get(0);
+            recipeInDb.setImage(image);
             recipeRepository.saveAndFlush(recipeInDb);
+            return CompletableFuture.completedFuture(image);
         } catch (Exception e) {
-            //ignored
+            return CompletableFuture.completedFuture(null);
         }
     }
 }

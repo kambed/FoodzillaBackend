@@ -14,6 +14,7 @@ import pl.better.foodzillabackend.exceptions.type.NotFoundException;
 
 @Component
 public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter {
+
     @Override
     protected GraphQLError resolveToSingleError(@NotNull Throwable ex, @NotNull DataFetchingEnvironment env) {
         ErrorType errorType = ErrorType.INTERNAL_ERROR;
