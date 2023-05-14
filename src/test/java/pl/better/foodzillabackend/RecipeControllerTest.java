@@ -136,6 +136,52 @@ class RecipeControllerTest extends TestBase {
 
     @Test
     @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
+    void shouldDisplayRecenltyViewedRecipes() {
+        Ingredient i = new Ingredient("Water");
+        Tag t = new Tag("Yummy");
+        Recipe r = Recipe.builder()
+                .name("Name")
+                .description("Description")
+                .timeOfPreparation(2)
+                .numberOfSteps(2)
+                .steps(List.of("Step1", "Step2"))
+                .numberOfIngredients(1)
+                .calories(3)
+                .fat(4)
+                .sugar(5)
+                .sodium(6)
+                .protein(7)
+                .saturatedFat(8)
+                .carbohydrates(9)
+                .reviews(new HashSet<>())
+                .ingredients(Set.of(
+                        ingredientRepository.findIngredientByName(i.getName()).stream().findFirst().orElseGet(() -> {
+                            ingredientRepository.saveAndFlush(i);
+                            return i;
+                        })
+                ))
+                .tags(Set.of(
+                        tagRepository.findTagByName(t.getName()).stream().findFirst().orElseGet(() -> {
+                            tagRepository.saveAndFlush(t);
+                            return t;
+                        })
+                )).build();
+        recipeRepository.saveAndFlush(r);
+        assertEquals(1, recipeRepository.findAll().size());
+
+        GraphQlTester.Response res1 = graphQlTester.documentName("recipe-get").variable("id", r.getId()).execute();
+        res1.errors().verify();
+
+        GraphQlTester.Response res2 = graphQlTester.documentName("recipe-get-recently-viewed").execute();
+        res2.errors().verify();
+        res2.path("recentlyViewedRecipes").entityList(Recipe.class).satisfies(recipe -> {
+            assertEquals(1, recipe.size());
+        });
+    }
+
+
+    @Test
+    @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldReturnErrorWhenRecipeIdNotFound() {
         GraphQlTester.Response res = graphQlTester.documentName("recipe-get").variable("id", -1).execute();
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
