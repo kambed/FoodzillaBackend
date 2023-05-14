@@ -44,17 +44,17 @@ public class Recipe {
     private String image;
     private double rating;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "recipe", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "recipe_ingredient",
             joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "ingredient_id"))
     private Set<Ingredient> ingredients = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "recipe_tag",
             joinColumns = @JoinColumn(name = "recipe_id"),

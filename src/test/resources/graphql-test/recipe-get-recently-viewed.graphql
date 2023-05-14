@@ -2,30 +2,7 @@ query recentlyViewedRecipes {
     recentlyViewedRecipes {
         id
         name
-        description
         timeOfPreparation
-        numberOfSteps
-        steps
-        numberOfIngredients
-        calories
-        fat
-        sugar
-        sodium
-        protein
-        saturatedFat
-        carbohydrates
-        reviews {
-            id
-            review
-            rating
-        }
-        ingredients {
-            id
-            name
-        }
-        tags {
-            id
-            name
-        }
+        image
     }
 }

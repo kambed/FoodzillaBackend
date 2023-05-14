@@ -48,7 +48,7 @@ public class Customer implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
     private Set<Recipe> favouriteRecipes = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "recently_viewed_recipes",
             joinColumns = @JoinColumn(name = "customer_id"),
