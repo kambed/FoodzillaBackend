@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 
+import java.util.Set;
 import java.util.function.Function;
 
 @Component
@@ -29,6 +30,9 @@ public class RecipeMapper implements Function<RecipeDto, Recipe> {
                 .carbohydrates(recipe.getCarbohydrates())
                 .rating(recipe.getRating())
                 .image(recipe.getImage())
+                .ingredients(Set.of())
+                .tags(Set.of())
+                .reviews(Set.of())
                 .build();
     }
 }

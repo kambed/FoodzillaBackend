@@ -7,12 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
-import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
-import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
@@ -42,18 +38,14 @@ public class RecipeSearchService {
     private final RecipeRepositoryAdapter recipeRepository;
     private final CompletionsAdapter completionsAdapter;
     private final PublisherMq publisherMq;
-    private final CustomerRepository customerRepository;
     public RecipeSearchService(
             EntityManagerFactory entityManagerFactory,
-            RecipeSummarizationDtoMapper mapper,
             RecipeRepositoryAdapter recipeRepository,
             PublisherMq publisherMq,
-            CompletionsAdapter completionsAdapter,
-            PublisherMq publisherMq,
-            CustomerRepository customerRepository) {
+            CompletionsAdapter completionsAdapter
+    ) {
         entityManager = entityManagerFactory.createEntityManager();
         this.publisherMq = publisherMq;
-        this.customerRepository = customerRepository;
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
