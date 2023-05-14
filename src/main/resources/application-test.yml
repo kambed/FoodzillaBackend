@@ -12,3 +12,6 @@ spring:
   h2:
     console:
       enabled: true
+  data:
+    redis:
+      port: ${REDIS_TEST_PORT}

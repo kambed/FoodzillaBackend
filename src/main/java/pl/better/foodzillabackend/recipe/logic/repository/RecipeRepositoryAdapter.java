@@ -44,6 +44,7 @@ public class RecipeRepositoryAdapter {
 
     public void deleteAll() {
         recipeRepository.deleteAll();
+        recipeTemplate.deleteAll();
     }
 
     public Collection<Recipe> findAll() {

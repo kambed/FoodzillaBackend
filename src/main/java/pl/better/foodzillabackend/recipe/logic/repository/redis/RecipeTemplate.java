@@ -1,6 +1,7 @@
 package pl.better.foodzillabackend.recipe.logic.repository.redis;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
@@ -22,5 +23,12 @@ public class RecipeTemplate {
 
     public List<RecipeDto> getRecipesByIds(List<Long> ids) {
         return redisTemplate.opsForValue().multiGet(ids);
+    }
+
+    public void deleteAll() {
+        redisTemplate.execute((RedisCallback<Object>) connection -> {
+            connection.flushDb();
+            return null;
+        });
     }
 }

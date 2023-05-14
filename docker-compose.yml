@@ -43,6 +43,14 @@ services:
     env_file: .env
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+  test_redis:
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    env_file: .env
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
 volumes:
   db:
 networks:
