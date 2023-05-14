@@ -65,6 +65,18 @@ public class RecipeService {
         return dto;
     }
 
+    @Transactional
+    public Set<RecipeDto> getRecentlyViewedRecipes(String principal) {
+
+        Customer customer = customerRepository.findByUsername(principal)
+                .orElseThrow(() -> {
+                    throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND,
+                            principal));
+        });
+
+        return customer.getRecentlyViewedRecipes().stream().map(recipeDtoMapper).collect(Collectors.toSet());
+    }
+
     public <T> Set<T> getRecipeItems(List<T> items) {
         if (items.size() == 1 && items.get(0) == null) {
             items = List.of();

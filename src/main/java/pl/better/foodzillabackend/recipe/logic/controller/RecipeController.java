@@ -14,6 +14,8 @@ import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.service.RecipeService;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 
+import java.util.Set;
+
 @Controller
 @RequiredArgsConstructor
 public class RecipeController {
@@ -25,6 +27,13 @@ public class RecipeController {
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         return recipeService.getRecipeById(id, principal);
+    }
+
+    @QueryMapping
+    public Set<RecipeDto> recentlyViewedRecipes() {
+        String principal = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        return recipeService.getRecentlyViewedRecipes(principal);
     }
 
     @SchemaMapping(typeName = "Recipe", field = "image")
