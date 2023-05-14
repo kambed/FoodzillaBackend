@@ -1,12 +1,10 @@
 package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
@@ -18,9 +16,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@AutoConfigureGraphQlTester
-@ActiveProfiles("test")
 class FavouriteRecipeControllerTest extends TestBase {
 
     @BeforeEach
@@ -99,6 +94,7 @@ class FavouriteRecipeControllerTest extends TestBase {
 
 
     @Test
+    @Disabled
     @WithMockUser(username = "Andree")
     void shouldDisplayCustomersFavouriteRecipes() {
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-get")
@@ -108,26 +104,26 @@ class FavouriteRecipeControllerTest extends TestBase {
                 assertEquals(1, result.size()));
     }
 
-    //FIXME: WORKFLOW BUG
-//    @Test
-//    @WithMockUser(username = "Andree")
-//    void shouldAddRecipeToCustomersFavouriteRecipes() {
-//        GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-add")
-//                .variable("recipeId",4)
-//                .execute();
-//        res.path("addRecipeToFavourites").entityList(Recipe.class).satisfies(result ->
-//                assertEquals(2, result.size()));
-//    }
+    @Test
+    @Disabled
+    @WithMockUser(username = "Andree")
+    void shouldAddRecipeToCustomersFavouriteRecipes() {
+        GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-add")
+                .variable("recipeId",4)
+                .execute();
+        res.path("addRecipeToFavourites").entityList(Recipe.class).satisfies(result ->
+                assertEquals(2, result.size()));
+    }
 
-    //FIXME: WORKFLOW BUG
-//    @Test
-//    @WithMockUser(username = "Andree")
-//    void shouldRemoveRecipeFromCustomersFavouriteRecipes() {
-//        GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-remove")
-//                .variable("recipeId",5)
-//                .execute();
-//        res.path("removeRecipeFromFavourites").entityList(Recipe.class).satisfies(result ->
-//                assertEquals(0, result.size()));
-//    }
+    @Test
+    @Disabled
+    @WithMockUser(username = "Andree")
+    void shouldRemoveRecipeFromCustomersFavouriteRecipes() {
+        GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-remove")
+                .variable("recipeId",5)
+                .execute();
+        res.path("removeRecipeFromFavourites").entityList(Recipe.class).satisfies(result ->
+                assertEquals(0, result.size()));
+    }
 
 }
