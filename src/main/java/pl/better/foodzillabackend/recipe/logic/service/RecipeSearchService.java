@@ -138,26 +138,26 @@ public class RecipeSearchService {
         }
         List<Predicate> predicates = new ArrayList<>();
         input.filters().forEach(filter -> {
-            Path<Object> path = resolvePath(filter.attribute(), joins);
+            Path<Object> path = resolvePath(filter.getAttribute(), joins);
             String type = path.getModel().getBindableJavaType().getName();
-            if (!type.equals("int") && (filter.from() != null || filter.to() != null)) {
+            if (!type.equals("int") && (filter.getFrom() != null || filter.getTo() != null)) {
                 throw new FilterInputException(
-                        "Cannot filter by range on non-number attribute " + filter.attribute() + "."
+                        "Cannot filter by range on non-number attribute " + filter.getAttribute() + "."
                 );
             }
-            if (filter.equals() != null) {
-                predicates.add(criteriaBuilder.equal(path, filter.equals()));
+            if (filter.getEquals() != null) {
+                predicates.add(criteriaBuilder.equal(path, filter.getEquals()));
             }
-            if (filter.from() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(filter.attribute()), filter.from()));
+            if (filter.getFrom() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(filter.getAttribute()), filter.getFrom()));
             }
-            if (filter.to() != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(filter.attribute()), filter.to()));
+            if (filter.getTo() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(filter.getAttribute()), filter.getTo()));
             }
-            if (filter.in() != null) {
-                predicates.add(path.in(filter.in()));
+            if (filter.getIn() != null) {
+                predicates.add(path.in(filter.getIn()));
             }
-            if (filter.hasOnly() != null) {
+            if (filter.getHasOnly() != null) {
                 predicates.add(getHasOnlyPredicate(filter));
             }
         });
@@ -170,7 +170,7 @@ public class RecipeSearchService {
         Join<Recipe, Ingredient> subIngredientsJoin = subRoot.join(Recipe.INGREDIENTS, JoinType.LEFT);
         Join<Recipe, Tag> subTagsJoin = subRoot.join(Recipe.TAGS, JoinType.LEFT);
         Path<Object> hasOnlyPath = resolvePath(
-                filter.attribute(),
+                filter.getAttribute(),
                 Map.of(
                         Recipe.INGREDIENTS, subIngredientsJoin,
                         Recipe.TAGS, subTagsJoin
@@ -179,7 +179,7 @@ public class RecipeSearchService {
 
         subquery.select(subRoot.get("id"))
                 .where(criteriaBuilder.or(
-                        criteriaBuilder.not(hasOnlyPath.in(filter.hasOnly())),
+                        criteriaBuilder.not(hasOnlyPath.in(filter.getHasOnly())),
                         criteriaBuilder.isNull(hasOnlyPath)
                 ))
                 .distinct(true);
@@ -193,24 +193,16 @@ public class RecipeSearchService {
         return root.get(attribute);
     }
 
-    private Customer getCustomer(String customer) {
-        return customerRepository.findByUsername(customer)
-                .orElseThrow(() -> {
-                    throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND,
-                            customer));
-                });
-    }
-
     private List<Order> getOrders(SearchPojo input) {
         if (input.sort() == null) {
             return List.of();
         }
         List<Order> orders = new ArrayList<>();
         input.sort().forEach(sort -> {
-            if (sort.direction().equals(SortDirectionPojo.ASC)) {
-                orders.add(criteriaBuilder.asc(root.get(sort.attribute())));
+            if (sort.getDirection().equals(SortDirectionPojo.ASC)) {
+                orders.add(criteriaBuilder.asc(root.get(sort.getAttribute())));
             } else {
-                orders.add(criteriaBuilder.desc(root.get(sort.attribute())));
+                orders.add(criteriaBuilder.desc(root.get(sort.getAttribute())));
             }
         });
         return orders;

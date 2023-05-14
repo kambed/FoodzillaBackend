@@ -2,11 +2,9 @@ package pl.better.foodzillabackend.search.logic.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.jetbrains.annotations.NotNull;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.filter.RecipeFilterPojo;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.RecipeSort;
 import pl.better.foodzillabackend.utils.SetToBlobConverter;
-
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -24,9 +22,9 @@ public class Search {
 
     @Lob
     @Convert(converter = SetToBlobConverter.class)
-    private Set<SearchFilters> filters;
+    private Set<RecipeFilterPojo> filters;
 
     @Lob
     @Convert(converter = SetToBlobConverter.class)
-    private Set<SearchSort> sort;
+    private Set<RecipeSort> sort;
 }

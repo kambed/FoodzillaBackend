@@ -5,9 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.test.context.support.WithMockUser;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.filter.RecipeFilterPojo;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.RecipeSort;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
 import pl.better.foodzillabackend.search.logic.model.domain.Search;
-import pl.better.foodzillabackend.search.logic.model.domain.SearchFilters;
-import pl.better.foodzillabackend.search.logic.model.domain.SearchSort;
 
 import java.util.*;
 
@@ -19,14 +20,15 @@ class SavedSearchTest extends TestBase {
     public void resetDb() {
         super.resetDb();
 
-        HashSet<SearchFilters> filters1 = new HashSet<>();
-        HashSet<SearchFilters> filters2 = new HashSet<>();
-        HashSet<SearchSort> sort1 = new HashSet<>();
+        HashSet<RecipeFilterPojo> filters1 = new HashSet<>();
+        HashSet<RecipeFilterPojo    > filters2 = new HashSet<>();
+        HashSet<RecipeSort> sort1 = new HashSet<>();
 
-        filters1.add(SearchFilters.builder().attribute("name").equals("pyszna").build());
-        filters2.add(SearchFilters.builder().attribute("name").equals("stek").build());
-        filters2.add(SearchFilters.builder().attribute("asdasd").equals("eeeeeeee").build());
-        sort1.add(SearchSort.builder().attribute("name").direction("ASC").build());
+
+        filters1.add(RecipeFilterPojo.builder().attribute("name").equals("pyszna").build());
+        filters2.add(RecipeFilterPojo.builder().attribute("name").equals("stek").build());
+        filters2.add(RecipeFilterPojo.builder().attribute("asdasd").equals("eeeeeeee").build());
+        sort1.add(RecipeSort.builder().attribute("name").direction(SortDirectionPojo.ASC).build());
 
         Search search1 = Search.builder()
                 .phrase("pyszna jajecznica")
