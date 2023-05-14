@@ -21,7 +21,7 @@ class SavedSearchTest extends TestBase {
         super.resetDb();
 
         HashSet<RecipeFilterPojo> filters1 = new HashSet<>();
-        HashSet<RecipeFilterPojo    > filters2 = new HashSet<>();
+        HashSet<RecipeFilterPojo> filters2 = new HashSet<>();
         HashSet<RecipeSort> sort1 = new HashSet<>();
 
 
