@@ -1,5 +1,6 @@
 extend type Query {
     recipe(id: ID!): Recipe
+    recentlyViewedRecipes: [RecipeSummarization]
 }
 
 extend type Mutation {

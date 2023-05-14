@@ -2,28 +2,6 @@ query {
     favouriteRecipes {
         id
         name
-        description
         timeOfPreparation
-        numberOfSteps
-        steps
-        numberOfIngredients
-        calories
-        fat
-        sugar
-        sodium
-        protein
-        saturatedFat
-        carbohydrates
-        image
-        reviews {
-            review
-            rating
-        }
-        ingredients {
-            name
-        }
-        tags {
-            name
-        }
     }
 }

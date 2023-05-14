@@ -9,6 +9,7 @@ import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
+import pl.better.foodzillabackend.recipe.logic.mapper.RecipeSummarizationDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
@@ -25,6 +26,7 @@ public class FavouriteRecipeService {
     private final RecipeRepository recipeRepository;
     private final CustomerRepository customerRepository;
     private final RecipeDtoMapper recipeDtoMapper;
+    private final RecipeSummarizationDtoMapper recipeSummarizationDtoMapper;
 
     @Transactional
     public Set<RecipeDto> addRecipeToFavourites(String principal, int recipeId) {
@@ -36,7 +38,7 @@ public class FavouriteRecipeService {
 
         return customer.getFavouriteRecipes()
                 .stream()
-                .map(recipeDtoMapper)
+                .map(recipeSummarizationDtoMapper)
                 .collect(Collectors.toSet());
     }
 
