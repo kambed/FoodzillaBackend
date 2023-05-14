@@ -94,7 +94,6 @@ class FavouriteRecipeControllerTest extends TestBase {
 
 
     @Test
-    @Disabled
     @WithMockUser(username = "Andree")
     void shouldDisplayCustomersFavouriteRecipes() {
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-get")

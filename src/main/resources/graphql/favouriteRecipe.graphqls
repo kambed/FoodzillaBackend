@@ -1,5 +1,5 @@
 extend type Query {
-    favouriteRecipes: [Recipe]
+    favouriteRecipes: [RecipeSummarization]
 }
 
 extend type Mutation {

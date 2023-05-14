@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
+import pl.better.foodzillabackend.search.logic.repository.SearchRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 
 import java.io.IOException;
@@ -26,6 +27,8 @@ public class TestBase {
     protected RecipeRepositoryAdapter recipeRepository;
     @Autowired
     protected IngredientRepository ingredientRepository;
+    @Autowired
+    protected SearchRepository searchRepository;
     @Autowired
     protected TagRepository tagRepository;
     @Autowired
@@ -48,5 +51,6 @@ public class TestBase {
         ingredientRepository.deleteAll();
         tagRepository.deleteAll();
         customerRepository.deleteAll();
+        searchRepository.deleteAll();
     }
 }

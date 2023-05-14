@@ -1,0 +1,29 @@
+extend type Query {
+    savedSearch: [SavedSearchResult]
+}
+
+extend type Mutation {
+    deleteSavedSearch(id: Int): SavedSearchResult
+    addSavedSearch(input: SearchInput!): SavedSearchResult!
+}
+
+type SavedSearchResult {
+    id: Int
+    phrase: String
+    filters: [FilterTypeResult]
+    sort: [SavedSearchSortType]
+}
+
+type SavedSearchSortType {
+    attribute: String
+    direction: SortDirection
+}
+
+type FilterTypeResult {
+    attribute: String!
+    equals: String
+    from: Int
+    to: Int
+    in: [String]
+    hasOnly: [String]
+}
