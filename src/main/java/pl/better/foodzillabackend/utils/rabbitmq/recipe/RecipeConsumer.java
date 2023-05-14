@@ -29,6 +29,9 @@ public class RecipeConsumer {
     @RabbitListener(queues = "recipes")
     public void saveToRedis(Long id) {
         Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow();
+        recipe.setIngredients(null);
+        recipe.setTags(null);
+        recipe.setReviews(null);
         saveToRedis(recipe);
     }
 

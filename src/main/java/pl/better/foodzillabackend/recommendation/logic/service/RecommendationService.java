@@ -26,7 +26,7 @@ public class RecommendationService {
     private final PublisherMq publisherMq;
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
 
-    @Async("recommendationTaskExecutor")
+    @Async("recipeSync")
     public void recommend(String principal) {
         Customer customer = customerRepository
                 .findByUsername(principal)
@@ -63,7 +63,7 @@ public class RecommendationService {
         return recipeRepository.getRecipesByIds(recommendationIds);
     }
 
-    @Async("recommendationTaskExecutor")
+    @Async("recipeSync")
     public void train() {
         try {
             recommendationAdapter.train();
