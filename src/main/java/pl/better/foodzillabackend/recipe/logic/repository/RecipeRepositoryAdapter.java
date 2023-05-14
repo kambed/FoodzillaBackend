@@ -39,7 +39,7 @@ public class RecipeRepositoryAdapter {
 
     public void saveAndFlush(Recipe recipe) {
         recipeRepository.saveAndFlush(recipe);
-        recipeConsumer.saveToRedis(recipe.getId());
+        recipeConsumer.saveToRedis(recipe);
     }
 
     public void deleteAll() {
