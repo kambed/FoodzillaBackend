@@ -4,7 +4,7 @@ extend type Query {
 
 extend type Mutation {
     deleteSavedSearch(id: Int): SavedSearchResult
-    addSavedSearch(input: SearchInput! = {}): SavedSearchResult!
+    addSavedSearch(input: SearchInput!): SavedSearchResult!
 }
 
 type SavedSearchResult {

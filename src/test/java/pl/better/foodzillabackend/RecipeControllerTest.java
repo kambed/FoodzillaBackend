@@ -18,7 +18,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class  RecipeControllerTest extends TestBase {
+class RecipeControllerTest extends TestBase {
 
     @BeforeEach
     public void setUp() {
