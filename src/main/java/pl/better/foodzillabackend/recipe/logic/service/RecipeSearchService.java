@@ -10,16 +10,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
-import pl.better.foodzillabackend.recipe.logic.mapper.RecipeSummarizationDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.filter.RecipeFilterPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
-import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
-
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
@@ -32,21 +30,18 @@ import java.util.Map;
 public class RecipeSearchService {
 
     private final EntityManager entityManager;
-    private final RecipeSummarizationDtoMapper mapper;
     private final CriteriaBuilder criteriaBuilder;
     private final CriteriaQuery<Long> criteriaQuery;
     private final Root<Recipe> root;
     private final Map<String, Join<Recipe, ?>> joins;
-    private final RecipeRepository recipeRepository;
+    private final RecipeRepositoryAdapter recipeRepository;
     private final CompletionsAdapter completionsAdapter;
     private final PublisherMq publisherMq;
     public RecipeSearchService(
             EntityManagerFactory entityManagerFactory,
-            RecipeSummarizationDtoMapper mapper,
-            RecipeRepository recipeRepository,
+            RecipeRepositoryAdapter recipeRepository,
             CompletionsAdapter completionsAdapter,
             PublisherMq publisherMq) {
-        this.mapper = mapper;
         entityManager = entityManagerFactory.createEntityManager();
         this.publisherMq = publisherMq;
         criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -82,16 +77,13 @@ public class RecipeSearchService {
                 .limit(pageable.getPageSize())
                 .toList();
 
-        List<Recipe> recipes = recipeRepository.getRecipesSummarizationIds(recipeIds);
+        List<RecipeDto> recipes = recipeRepository.getRecipesByIds(recipeIds);
 
         recipes.forEach(
                 recipe -> publisherMq.send(Priority.NORMAL, recipe)
         );
 
-        List<RecipeDto> recipeDtos = recipes.stream()
-                .map(mapper)
-                .toList();
-        Page<RecipeDto> page = new PageImpl<>(recipeDtos, pageable, results.size());
+        Page<RecipeDto> page = new PageImpl<>(recipes, pageable, results.size());
 
         List<Long> recipeNextPageIds = results.stream()
                 .skip(pageable.getOffset() + pageable.getPageSize())
@@ -99,8 +91,7 @@ public class RecipeSearchService {
                 .toList();
 
         recipeNextPageIds.forEach(
-                id -> publisherMq.send(Priority.LOW,
-                        recipeRepository.getRecipeByIdWithIngredients(id).orElseThrow())
+                id -> publisherMq.send(Priority.LOW, recipeRepository.getRecipeById(id))
         );
 
         return SearchResultDto.builder()

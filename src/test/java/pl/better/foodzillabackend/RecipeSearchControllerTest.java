@@ -42,8 +42,8 @@ class RecipeSearchControllerTest extends TestBase {
                 .ingredients(Set.of(ingredient1))
                 .build();
 
-        recipeRepository.save(recipe1);
-        recipeRepository.save(recipe2);
+        recipeRepository.saveAndFlush(recipe1);
+        recipeRepository.saveAndFlush(recipe2);
     }
 
     @Test

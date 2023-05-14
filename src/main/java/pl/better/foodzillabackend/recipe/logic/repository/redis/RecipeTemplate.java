@@ -1,10 +1,11 @@
-package pl.better.foodzillabackend.recipe.logic.redis;
+package pl.better.foodzillabackend.recipe.logic.repository.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -17,5 +18,9 @@ public class RecipeTemplate {
 
     public Optional<RecipeDto> getById(Long id) {
         return Optional.ofNullable(redisTemplate.opsForValue().get(id));
+    }
+
+    public List<RecipeDto> getRecipesByIds(List<Long> ids) {
+        return redisTemplate.opsForValue().multiGet(ids);
     }
 }

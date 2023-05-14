@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
-import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class TestBase {
     @Autowired
     protected GraphQlTester graphQlTester;
     @Autowired
-    protected RecipeRepository recipeRepository;
+    protected RecipeRepositoryAdapter recipeRepository;
     @Autowired
     protected IngredientRepository ingredientRepository;
     @Autowired

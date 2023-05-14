@@ -7,10 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
-import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.recipe.logic.listener.RateCalculateListener;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
-import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.recommendation.logic.service.RecommendationService;
 import pl.better.foodzillabackend.review.logic.mapper.ReviewDtoMapper;
 import pl.better.foodzillabackend.review.logic.model.command.CreateReviewCommand;
@@ -24,10 +23,9 @@ public class ReviewService {
     private final RecommendationService recommendationService;
     private final ReviewRepository reviewRepository;
     private final CustomerRepository customerRepository;
-    private final RecipeRepository recipeRepository;
+    private final RecipeRepositoryAdapter recipeRepository;
     private final ReviewDtoMapper reviewDtoMapper;
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
-    private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
 
     @Transactional
     public ReviewDto createReview(CreateReviewCommand command) {
@@ -43,11 +41,7 @@ public class ReviewService {
                         CUSTOMER_NOT_FOUND.formatted(principal)
                 ));
 
-        Recipe recipe = recipeRepository
-                .findById(command.recipeId())
-                .orElseThrow(() -> new RecipeNotFoundException(
-                        RECIPE_NOT_FOUND_MESSAGE.formatted(command.recipeId())
-                ));
+        Recipe recipe = recipeRepository.findById(command.recipeId());
 
         Review review = new Review(command.review(),
                 command.rating(),
