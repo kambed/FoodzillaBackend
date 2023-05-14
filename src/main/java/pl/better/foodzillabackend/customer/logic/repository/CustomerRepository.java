@@ -16,9 +16,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Optional<Customer> findByUsername(String username);
 
-    @Query("SELECT u FROM Customer u JOIN FETCH u.recentlyViewedRecipes WHERE u.username = :username")
-    Optional<Customer> findUserByUsernameWithRecentlyViewedRecipes(String username);
-
     Optional<Customer> findById(Long username);
 
     boolean existsByUsername(String username);

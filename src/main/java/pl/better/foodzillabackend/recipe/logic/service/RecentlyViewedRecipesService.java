@@ -22,11 +22,12 @@ public class RecentlyViewedRecipesService {
     @Transactional
     public Set<RecipeDto> getRecentlyViewedRecipes(String principal) {
 
-        Customer customer = customerRepository.findUserByUsernameWithRecentlyViewedRecipes(principal)
+        Customer customer = customerRepository.findByUsername(principal)
                 .orElseThrow(() -> {
                     throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND,
                             principal));
                 });
+
         return customer
                 .getRecentlyViewedRecipes()
                 .stream()
