@@ -1,0 +1,32 @@
+mutation {
+    addSavedSearch(input: {
+        phrase: "search phrase"
+        filters: [
+            {
+                attribute: "name"
+                equals: "abc"
+            },
+            {
+                attribute: "asdasd"
+                equals: "eeeeeeee"
+            }
+        ]
+        sort: [
+            {
+                attribute: "name"
+                direction: ASC
+            }
+        ]
+    }) {
+        id
+        phrase
+        filters {
+            attribute
+            equals
+        }
+        sort {
+            attribute
+            direction
+        }
+    }
+}

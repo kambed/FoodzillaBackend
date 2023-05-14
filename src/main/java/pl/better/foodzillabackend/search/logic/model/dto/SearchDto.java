@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.recipe.logic.model.pojo;
+package pl.better.foodzillabackend.search.logic.model.dto;
 
 import lombok.Builder;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.filter.RecipeFilterPojo;
@@ -7,12 +7,10 @@ import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.RecipeSort;
 import java.util.Set;
 
 @Builder
-public record SearchPojo(
+public record SearchDto(
+        Long id,
         String phrase,
-        Integer currentPage,
-        Integer pageSize,
-        Set<RecipeSort> sort,
-        Set<RecipeFilterPojo> filters
+        Set<RecipeFilterPojo> filters,
+        Set<RecipeSort> sort
 ) {
 }
-
