@@ -40,9 +40,7 @@ public class RecipeService {
     public RecipeDto getRecipeById(long id, String principal) {
         RecipeDto recipe = recipeRepository.getRecipeById(id);
         publishCustomEvent(recipe);
-        if (principal.equals(ANONYMOUS)) {
-            recipe.setIsFavourite(null);
-        } else {
+        if (!principal.equals(ANONYMOUS)) {
             Customer customer = customerRepository.findByUsername(principal)
                     .orElseThrow(() -> new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND, principal)));
             recipe.setIsFavourite(customer.getFavouriteRecipes()
