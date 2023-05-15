@@ -15,7 +15,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RecenltyViewedRecipesTest extends TestBase {
+class RecentlyViewedRecipesTest extends TestBase {
 
     @BeforeEach
     public void setUp() {
@@ -32,7 +32,7 @@ public class RecenltyViewedRecipesTest extends TestBase {
 
     @Test
     @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
-    void shouldDisplayRecenltyViewedRecipes() {
+    void shouldDisplayRecentlyViewedRecipes() {
         Ingredient i = new Ingredient("Water");
         Tag t = new Tag("Yummy");
         Recipe r = Recipe.builder()
