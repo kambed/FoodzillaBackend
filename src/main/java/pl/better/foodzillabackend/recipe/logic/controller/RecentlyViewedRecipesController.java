@@ -8,7 +8,7 @@ import pl.better.foodzillabackend.auth.service.accesstype.LoggedInUser;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.service.RecentlyViewedRecipesService;
 
-import java.util.Set;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,7 +18,7 @@ public class RecentlyViewedRecipesController {
 
     @LoggedInUser
     @QueryMapping
-    public Set<RecipeDto> recentlyViewedRecipes() {
+    public List<RecipeDto> recentlyViewedRecipes() {
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         return service.getRecentlyViewedRecipes(principal);

@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;

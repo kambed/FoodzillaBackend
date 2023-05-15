@@ -1,7 +1,6 @@
 package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -84,7 +83,7 @@ class FavouriteRecipeControllerTest extends TestBase {
                 .lastname("eerdna")
                 .username("Andree")
                 .password(passwordEncoder.encode("password"))
-                .favouriteRecipes(Set.of(r))
+                .favouriteRecipes(List.of(r))
                 .build();
 
         recipeRepository.saveAndFlush(r);
@@ -104,22 +103,22 @@ class FavouriteRecipeControllerTest extends TestBase {
     }
 
     @Test
-    @Disabled
     @WithMockUser(username = "Andree")
     void shouldAddRecipeToCustomersFavouriteRecipes() {
+        Recipe recipe = recipeRepository.findAll().get(1);
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-add")
-                .variable("recipeId",4)
+                .variable("recipeId", recipe.getId())
                 .execute();
         res.path("addRecipeToFavourites").entityList(Recipe.class).satisfies(result ->
                 assertEquals(2, result.size()));
     }
 
     @Test
-    @Disabled
     @WithMockUser(username = "Andree")
     void shouldRemoveRecipeFromCustomersFavouriteRecipes() {
+        Recipe recipe = recipeRepository.findAll().get(0);
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-remove")
-                .variable("recipeId",5)
+                .variable("recipeId", recipe.getId())
                 .execute();
         res.path("removeRecipeFromFavourites").entityList(Recipe.class).satisfies(result ->
                 assertEquals(0, result.size()));
