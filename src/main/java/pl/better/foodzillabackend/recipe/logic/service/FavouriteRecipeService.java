@@ -14,6 +14,7 @@ import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,7 @@ public class FavouriteRecipeService {
     private final RecipeSummarizationDtoMapper recipeSummarizationDtoMapper;
 
     @Transactional
-    public Set<RecipeDto> addRecipeToFavourites(String principal, int recipeId) {
+    public List<RecipeDto> addRecipeToFavourites(String principal, int recipeId) {
         Customer customer = getCustomer(principal);
         Recipe recipe = getRecipe(recipeId);
 
@@ -39,11 +40,11 @@ public class FavouriteRecipeService {
         return customer.getFavouriteRecipes()
                 .stream()
                 .map(recipeSummarizationDtoMapper)
-                .collect(Collectors.toSet());
+                .toList();
     }
 
     @Transactional
-    public Set<RecipeDto> removeRecipeFromFavourites(String principal, int recipeId) {
+    public List<RecipeDto> removeRecipeFromFavourites(String principal, int recipeId) {
         Customer customer = getCustomer(principal);
         Recipe recipe = getRecipe(recipeId);
 
@@ -53,16 +54,16 @@ public class FavouriteRecipeService {
         return customer.getFavouriteRecipes()
                 .stream()
                 .map(recipeDtoMapper)
-                .collect(Collectors.toSet());
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public Set<RecipeDto> favouriteRecipes(String principal) {
+    public List<RecipeDto> favouriteRecipes(String principal) {
         Customer customer = getCustomer(principal);
         return customer.getFavouriteRecipes()
                 .stream()
                 .map(recipeDtoMapper)
-                .collect(Collectors.toSet());
+                .toList();
     }
 
     private Customer getCustomer(String customer) {

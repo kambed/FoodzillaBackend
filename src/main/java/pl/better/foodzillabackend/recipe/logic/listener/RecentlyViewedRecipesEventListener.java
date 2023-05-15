@@ -9,6 +9,8 @@ import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 
+import java.util.stream.IntStream;
+
 @Component
 @RequiredArgsConstructor
 public class RecentlyViewedRecipesEventListener implements ApplicationListener<RecentlyViewedRecipesEvent> {
@@ -27,6 +29,15 @@ public class RecentlyViewedRecipesEventListener implements ApplicationListener<R
             Customer customer = customerRepository.findByUsername(principal).orElseThrow(
                     () -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND.formatted(principal)));
 
+            if (customer.getRecentlyViewedRecipes().contains(recipe)) {
+                customer.getRecentlyViewedRecipes().remove(recipe);
+                customerRepository.saveAndFlush(customer);
+            }
+            IntStream.range(19, customer.getRecentlyViewedRecipes().size()).forEach(i ->
+                    customer.getRecentlyViewedRecipes().remove(
+                            customer.getRecentlyViewedRecipes().iterator().next()
+                    )
+            );
             customer.getRecentlyViewedRecipes().add(recipe);
             customerRepository.saveAndFlush(customer);
         }

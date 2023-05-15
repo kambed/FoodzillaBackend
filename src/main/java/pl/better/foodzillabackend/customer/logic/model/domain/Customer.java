@@ -45,14 +45,14 @@ public class Customer implements UserDetails {
             name = "customer_recipe",
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
-    private Set<Recipe> favouriteRecipes = new HashSet<>();
+    private List<Recipe> favouriteRecipes = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "recently_viewed_recipes",
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
-    private Set<Recipe> recentlyViewedRecipes = new HashSet<>();
+    private List<Recipe> recentlyViewedRecipes = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(

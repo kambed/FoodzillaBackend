@@ -10,6 +10,7 @@ import pl.better.foodzillabackend.auth.service.accesstype.LoggedInUser;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.service.FavouriteRecipeService;
 
+import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -20,7 +21,7 @@ public class FavouriteRecipeController {
 
     @LoggedInUser
     @QueryMapping
-    public Set<RecipeDto> favouriteRecipes() {
+    public List<RecipeDto> favouriteRecipes() {
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         return service.favouriteRecipes(principal);
@@ -28,7 +29,7 @@ public class FavouriteRecipeController {
 
     @LoggedInUser
     @MutationMapping
-    public Set<RecipeDto> addRecipeToFavourites(@Argument int recipeId) {
+    public List<RecipeDto> addRecipeToFavourites(@Argument int recipeId) {
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         return service.addRecipeToFavourites(principal, recipeId);
@@ -36,7 +37,7 @@ public class FavouriteRecipeController {
 
     @LoggedInUser
     @MutationMapping
-    public Set<RecipeDto> removeRecipeFromFavourites(@Argument int recipeId) {
+    public List<RecipeDto> removeRecipeFromFavourites(@Argument int recipeId) {
         String principal = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
         return service.removeRecipeFromFavourites(principal, recipeId);

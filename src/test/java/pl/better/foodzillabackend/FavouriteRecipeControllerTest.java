@@ -83,7 +83,7 @@ class FavouriteRecipeControllerTest extends TestBase {
                 .lastname("eerdna")
                 .username("Andree")
                 .password(passwordEncoder.encode("password"))
-                .favouriteRecipes(Set.of(r))
+                .favouriteRecipes(List.of(r))
                 .build();
 
         recipeRepository.saveAndFlush(r);
