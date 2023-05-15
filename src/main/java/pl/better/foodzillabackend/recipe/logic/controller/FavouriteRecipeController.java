@@ -11,7 +11,6 @@ import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.service.FavouriteRecipeService;
 
 import java.util.List;
-import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor
