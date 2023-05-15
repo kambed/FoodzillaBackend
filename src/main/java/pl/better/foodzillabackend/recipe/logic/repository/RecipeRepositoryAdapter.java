@@ -50,4 +50,8 @@ public class RecipeRepositoryAdapter {
     public Collection<Recipe> findAll() {
         return recipeRepository.findAll();
     }
+
+    public Recipe findAllAndGet(int id) {
+        return recipeRepository.findAll().get(id);
+    }
 }
