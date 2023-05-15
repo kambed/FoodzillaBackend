@@ -5,10 +5,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     @Query("SELECT r FROM Recipe r WHERE r.id = :id")
     Optional<Recipe> getRecipeDetailsById(long id);
+
+    @Query("SELECT r.id FROM Recipe r")
+    List<Long> getAllIds();
 }

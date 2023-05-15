@@ -22,6 +22,6 @@ public class SyncRecipes implements ApplicationRunner {
         if (Boolean.FALSE.equals(myEnvVariable)) {
             return;
         }
-        recipeRepository.findAll().forEach(recipe -> recipeProducer.send(recipe.getId()));
+        recipeRepository.getAllIds().forEach(recipeProducer::send);
     }
 }
