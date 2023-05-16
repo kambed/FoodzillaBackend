@@ -14,7 +14,7 @@ type SearchResult {
     currentPage: Int!
     numberOfPages: Int!
     opinion: String
-    recipes: [RecipeSummarization]!
+    recipes: [Recipe]!
 }
 
 input RecipeSort {

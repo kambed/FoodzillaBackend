@@ -11,7 +11,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.recipe.logic.model.domain.RecipeShort;
-import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
+import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.utils.RecipePromptGenerator;
 
 import java.util.concurrent.ExecutionException;
@@ -26,7 +26,7 @@ public class PublisherMq {
     private final MessageConverter converter = new SimpleMessageConverter();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public void send(Priority priority, Recipe recipe) {
+    public void send(Priority priority, RecipeDto recipe) {
         MessageProperties messageProperties = new MessageProperties();
         messageProperties.setPriority(priority.getPriorityValue());
 
@@ -45,7 +45,7 @@ public class PublisherMq {
         }
     }
 
-    public String sendAndReceive(Priority priority, Recipe recipe) {
+    public String sendAndReceive(Priority priority, RecipeDto recipe) {
         MessageProperties messageProperties = new MessageProperties();
         messageProperties.setPriority(priority.getPriorityValue());
 

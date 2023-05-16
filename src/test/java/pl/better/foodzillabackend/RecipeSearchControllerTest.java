@@ -33,6 +33,8 @@ class RecipeSearchControllerTest extends TestBase {
                 .description("Description 1")
                 .calories(100)
                 .ingredients(Set.of(ingredient1, ingredient2))
+                .tags(Set.of())
+                .reviews(Set.of())
                 .build();
 
         Recipe recipe2 = Recipe.builder()
@@ -40,10 +42,12 @@ class RecipeSearchControllerTest extends TestBase {
                 .description("Description 2")
                 .calories(200)
                 .ingredients(Set.of(ingredient1))
+                .tags(Set.of())
+                .reviews(Set.of())
                 .build();
 
-        recipeRepository.save(recipe1);
-        recipeRepository.save(recipe2);
+        recipeRepository.saveAndFlush(recipe1);
+        recipeRepository.saveAndFlush(recipe2);
     }
 
     @Test

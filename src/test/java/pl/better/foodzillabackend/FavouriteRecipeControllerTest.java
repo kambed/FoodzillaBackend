@@ -105,7 +105,7 @@ class FavouriteRecipeControllerTest extends TestBase {
     @Test
     @WithMockUser(username = "Andree")
     void shouldAddRecipeToCustomersFavouriteRecipes() {
-        Recipe recipe = recipeRepository.findAll().get(1);
+        Recipe recipe = recipeRepository.findAllAndGet(1);
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-add")
                 .variable("recipeId", recipe.getId())
                 .execute();
@@ -116,12 +116,12 @@ class FavouriteRecipeControllerTest extends TestBase {
     @Test
     @WithMockUser(username = "Andree")
     void shouldRemoveRecipeFromCustomersFavouriteRecipes() {
-        Recipe recipe = recipeRepository.findAll().get(0);
+        Recipe recipe = recipeRepository.findAllAndGet(1);
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-remove")
                 .variable("recipeId", recipe.getId())
                 .execute();
         res.path("removeRecipeFromFavourites").entityList(Recipe.class).satisfies(result ->
-                assertEquals(0, result.size()));
+                assertEquals(1, result.size()));
     }
 
 }

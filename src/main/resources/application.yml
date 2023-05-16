@@ -2,6 +2,7 @@ spring:
   graphql:
     graphiql:
       enabled: true
+
   config:
     import: optional:file:.env[.properties]
   application:
@@ -22,3 +23,12 @@ spring:
       refresh-expiration: ${REFRESH_EXPIRATION_LENGTH}
       header-name: ${HEADER_NAME}
       prefix: ${PREFIX_NAME}
+  data:
+    redis:
+      database: ${REDIS_DATABASE}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      timeout: ${REDIS_TIMEOUT}
+      url: redis://${REDIS_HOST}:${REDIS_PORT}
+      run-sync-task: false # Set to true if db is filled on first run.

@@ -1,6 +1,6 @@
 extend type Query {
     recipe(id: ID!): Recipe
-    recentlyViewedRecipes: [RecipeSummarization]
+    recentlyViewedRecipes: [Recipe]
 }
 
 extend type Mutation {
@@ -44,11 +44,4 @@ type Recipe {
     tags: [Tag]
     rating: Float
     isFavourite: Boolean
-}
-
-type RecipeSummarization {
-    id: ID
-    name: String!
-    timeOfPreparation: Int
-    image: String
 }

@@ -32,11 +32,6 @@ public class RecipeController {
         return recipeService.getRecipeImageById(recipe, Priority.HIGH);
     }
 
-    @SchemaMapping(typeName = "RecipeSummarization", field = "image")
-    public String recipeSummarizationImage(RecipeDto recipe) {
-        return recipeService.getRecipeImageById(recipe, Priority.MEDIUM);
-    }
-
     @LoggedInUser
     @MutationMapping
     public RecipeDto createRecipe(@Argument @Valid CreateRecipeCommand recipe) {

@@ -7,22 +7,19 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
-import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.listener.RecentlyViewedRecipesEvent;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
+import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
-import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
-import pl.better.foodzillabackend.review.logic.repository.ReviewRepository;
+import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,46 +27,27 @@ import java.util.stream.Collectors;
 public class RecipeService {
     private static final String ANONYMOUS = "anonymousUser";
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
-    private final RecipeRepository recipeRepository;
+    private final RecipeRepositoryAdapter recipeRepository;
     private final IngredientRepository ingredientRepository;
     private final TagRepository tagRepository;
     private final RecipeDtoMapper recipeDtoMapper;
     private final CustomerRepository customerRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
-    private final ReviewRepository reviewRepository;
+    private final RecipeMapper recipeMapper;
     private final PublisherMq publisherMq;
 
     @Transactional
     public RecipeDto getRecipeById(long id, String principal) {
-        Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
-                RECIPE_NOT_FOUND_MESSAGE.formatted(id)
-        ));
-        recipe.setIngredients(getRecipeItems(ingredientRepository.findAllByRecipeId(id)));
-        recipe.setTags(getRecipeItems(tagRepository.findAllByRecipeId(id)));
-        recipe.setReviews(getRecipeItems(reviewRepository.findAllByRecipeId(id)));
+        RecipeDto recipe = recipeRepository.getRecipeById(id);
         publishCustomEvent(recipe);
-        RecipeDto dto = recipeDtoMapper.apply(recipe);
-        if (principal.equals(ANONYMOUS)) {
-            dto.setIsFavourite(null);
-        } else {
+        if (!principal.equals(ANONYMOUS)) {
             Customer customer = customerRepository.findByUsername(principal)
-                    .orElseThrow(() -> {
-                        throw new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND,
-                                principal));
-                    });
-            dto.setIsFavourite(customer.getFavouriteRecipes()
+                    .orElseThrow(() -> new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND, principal)));
+            recipe.setIsFavourite(customer.getFavouriteRecipes()
                     .stream()
                     .anyMatch(rec -> rec.getId() == id));
         }
-        return dto;
-    }
-
-    public <T> Set<T> getRecipeItems(List<T> items) {
-        if (items.size() == 1 && items.get(0) == null) {
-            items = List.of();
-        }
-        return new HashSet<>(items);
+        return recipe;
     }
 
     @Transactional
@@ -110,18 +88,18 @@ public class RecipeService {
         if (recipe.getImage() != null) {
             return recipe.getImage();
         }
-        Recipe r = recipeRepository.getRecipeByIdWithIngredients(recipe.getId()).orElseThrow(() -> new RecipeNotFoundException(
-                RECIPE_NOT_FOUND_MESSAGE.formatted(recipe.getId())
-        ));
+        RecipeDto r = recipeRepository.getRecipeById(recipe.getId());
         if (r.getImage() == null) {
             r.setImage(publisherMq.sendAndReceive(priority, r));
-            recipeRepository.saveAndFlush(r);
+            recipeRepository.saveAndFlush(recipeMapper.apply(r));
         }
         return r.getImage();
     }
 
-    private void publishCustomEvent(Recipe recipe) {
-        RecentlyViewedRecipesEvent recentlyViewedRecipesEvent = new RecentlyViewedRecipesEvent(this, recipe);
+    private void publishCustomEvent(RecipeDto recipe) {
+        RecentlyViewedRecipesEvent recentlyViewedRecipesEvent = new RecentlyViewedRecipesEvent(
+                this, recipeMapper.apply(recipe)
+        );
         applicationEventPublisher.publishEvent(recentlyViewedRecipesEvent);
     }
 }
