@@ -11,7 +11,7 @@ tensorboard-data-server==0.7.0
 tensorboard-plugin-wit==1.8.1
 tensorboard==2.12.2
 tensorflow-estimator==2.12.0
-tensorflow-intel==2.12.0
+
 tensorflow-io-gcs-filesystem==0.31.0
 tensorflow-recommenders==0.7.3
 tensorflow==2.12.0

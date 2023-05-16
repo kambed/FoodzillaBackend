@@ -14,6 +14,12 @@ services:
     volumes:
       - ./src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./src/main/resources/testData.sql:/docker-entrypoint-initdb.d/testData.sql
+  ai:
+    build: ./recommendations
+    container_name: recommendation_module
+    env_file: .env
+    ports:
+      - "5000:5000"
   app:
     depends_on:
       db:
