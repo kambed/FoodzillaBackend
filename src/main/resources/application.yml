@@ -31,4 +31,4 @@ spring:
       password: ${REDIS_PASSWORD}
       timeout: ${REDIS_TIMEOUT}
       url: redis://${REDIS_HOST}:${REDIS_PORT}
-      run-sync-task: false # Set to true if db is filled on first run.
+      run-sync-task: true # Set to true if db is filled on first run.
