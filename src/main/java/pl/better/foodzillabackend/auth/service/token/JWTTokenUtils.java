@@ -18,19 +18,43 @@ public class JWTTokenUtils extends TokenUtils {
                 .require(Algorithm.HMAC512(getSecret().getBytes()))
                 .build()
                 .verify(authorizationHeader.replace(getTokenPrefix(), ""));
+        return new TokenPayload(decodedToken.getSubject(), decodedToken.getClaim("role")
+                .as(Role.class));
+    }
 
+    public TokenPayload decodeRawToken(String token) {
+        DecodedJWT decodedToken = JWT
+                .require(Algorithm.HMAC512(getSecret().getBytes()))
+                .build()
+                .verify(token);
         return new TokenPayload(decodedToken.getSubject(), decodedToken.getClaim("role")
                 .as(Role.class));
     }
 
     public Token generateToken(String username, CustomerDto customerDto) {
         return Token.builder()
-                .token(JWT.create()
-                        .withSubject(username)
-                        .withClaim("role", Role.NORMAL.toString())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + getExpirationTime()))
-                        .sign(Algorithm.HMAC512(getSecret().getBytes())))
+                .token(createToken(username,
+                        new Date(System.currentTimeMillis() + getExpirationTime())))
+                .refreshToken(createToken(username,
+                        new Date(System.currentTimeMillis() + getRefreshExpirationTime())))
                 .customer(customerDto)
                 .build();
+    }
+
+    public Token generateToken(String username, CustomerDto customerDto, String refreshToken) {
+        return Token.builder()
+                .token(createToken(username,
+                        new Date(System.currentTimeMillis() + getExpirationTime())))
+                .refreshToken(refreshToken)
+                .customer(customerDto)
+                .build();
+    }
+
+    private String createToken(String username, Date date) {
+        return JWT.create()
+                .withSubject(username)
+                .withClaim("role", Role.NORMAL.toString())
+                .withExpiresAt(date)
+                .sign(Algorithm.HMAC512(getSecret().getBytes()));
     }
 }

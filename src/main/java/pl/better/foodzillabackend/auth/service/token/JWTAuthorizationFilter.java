@@ -1,9 +1,17 @@
 package pl.better.foodzillabackend.auth.service.token;
 
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import graphql.GraphQLError;
+import graphql.GraphqlErrorBuilder;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.graphql.execution.ErrorType;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,10 +41,26 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
+        try {
+            UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            chain.doFilter(req, res);
+        } catch (TokenExpiredException | SignatureVerificationException e) {
+            GraphQLError error = GraphqlErrorBuilder.newError()
+                    .errorType(ErrorType.UNAUTHORIZED)
+                    .message(e.getMessage())
+                    .build();
+            res.setStatus(HttpStatus.UNAUTHORIZED.value());
+            res.getWriter().write(convertObjectToJson(error));
+        }
+    }
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        chain.doFilter(req, res);
+    private String convertObjectToJson(Object object) throws JsonProcessingException {
+        if (object == null) {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(object);
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {

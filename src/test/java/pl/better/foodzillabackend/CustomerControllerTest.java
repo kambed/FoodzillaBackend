@@ -12,7 +12,7 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CustomerControllerTest extends TestBase {
+class CustomerControllerTest extends TestBase {
 
     @BeforeEach
     public void setUp() {

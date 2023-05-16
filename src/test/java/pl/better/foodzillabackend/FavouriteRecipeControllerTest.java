@@ -2,11 +2,8 @@ package pl.better.foodzillabackend;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
@@ -18,10 +15,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@AutoConfigureGraphQlTester
-@ActiveProfiles("test")
-public class FavouriteRecipeControllerTest extends TestBase {
+class FavouriteRecipeControllerTest extends TestBase {
 
     @BeforeEach
     public void setUp() {
@@ -89,7 +83,7 @@ public class FavouriteRecipeControllerTest extends TestBase {
                 .lastname("eerdna")
                 .username("Andree")
                 .password(passwordEncoder.encode("password"))
-                .favouriteRecipes(Set.of(r))
+                .favouriteRecipes(List.of(r))
                 .build();
 
         recipeRepository.saveAndFlush(r);
@@ -111,8 +105,9 @@ public class FavouriteRecipeControllerTest extends TestBase {
     @Test
     @WithMockUser(username = "Andree")
     void shouldAddRecipeToCustomersFavouriteRecipes() {
+        Recipe recipe = recipeRepository.findAllAndGet(1);
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-add")
-                .variable("recipeId",4)
+                .variable("recipeId", recipe.getId())
                 .execute();
         res.path("addRecipeToFavourites").entityList(Recipe.class).satisfies(result ->
                 assertEquals(2, result.size()));
@@ -121,11 +116,12 @@ public class FavouriteRecipeControllerTest extends TestBase {
     @Test
     @WithMockUser(username = "Andree")
     void shouldRemoveRecipeFromCustomersFavouriteRecipes() {
+        Recipe recipe = recipeRepository.findAllAndGet(1);
         GraphQlTester.Response res = graphQlTester.documentName("favourite-recipe-remove")
-                .variable("recipeId",5)
+                .variable("recipeId", recipe.getId())
                 .execute();
         res.path("removeRecipeFromFavourites").entityList(Recipe.class).satisfies(result ->
-                assertEquals(0, result.size()));
+                assertEquals(1, result.size()));
     }
 
 }

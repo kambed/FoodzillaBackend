@@ -8,52 +8,59 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
-import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.model.dto.SearchResultDto;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.filter.RecipeFilterPojo;
 import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo;
-import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
+import pl.better.foodzillabackend.utils.rabbitmq.Priority;
+import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RecipeSearchService {
 
     private final EntityManager entityManager;
-    private final RecipeDtoMapper mapper;
     private final CriteriaBuilder criteriaBuilder;
     private final CriteriaQuery<Long> criteriaQuery;
     private final Root<Recipe> root;
-    private final Join<Recipe, Ingredient> ingredientsJoin;
-    private final Join<Recipe, Tag> tagsJoin;
-    private final RecipeRepository recipeRepository;
+    private final Map<String, Join<Recipe, ?>> joins;
+    private final RecipeRepositoryAdapter recipeRepository;
     private final CompletionsAdapter completionsAdapter;
-
+    private final PublisherMq publisherMq;
     public RecipeSearchService(
             EntityManagerFactory entityManagerFactory,
-            RecipeDtoMapper mapper,
-            RecipeRepository recipeRepository,
+            RecipeRepositoryAdapter recipeRepository,
+            PublisherMq publisherMq,
             CompletionsAdapter completionsAdapter
     ) {
-        this.mapper = mapper;
         entityManager = entityManagerFactory.createEntityManager();
+        this.publisherMq = publisherMq;
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
-        ingredientsJoin = root.join("ingredients", JoinType.LEFT);
-        tagsJoin = root.join("tags", JoinType.LEFT);
+        joins = Map.of(
+                Recipe.INGREDIENTS, root.join(Recipe.INGREDIENTS, JoinType.LEFT),
+                Recipe.TAGS, root.join(Recipe.TAGS, JoinType.LEFT)
+        );
         this.recipeRepository = recipeRepository;
         this.completionsAdapter = completionsAdapter;
     }
 
+    @Transactional
     public SearchResultDto search(SearchPojo input) {
+
         Pageable pageable = PageRequest.of(input.currentPage() - 1, input.pageSize());
         List<Predicate> predicates = new ArrayList<>();
         predicates.addAll(getPhrasePredicates(input));
@@ -75,12 +82,22 @@ public class RecipeSearchService {
                 .limit(pageable.getPageSize())
                 .toList();
 
-        List<Recipe> recipes = recipeRepository.getRecipesIds(recipeIds);
+        List<RecipeDto> recipes = recipeRepository.getRecipesByIds(recipeIds);
 
-        List<RecipeDto> recipeDtos = recipes.stream()
-                .map(mapper)
+        recipes.forEach(
+                recipe -> publisherMq.send(Priority.NORMAL, recipe)
+        );
+
+        Page<RecipeDto> page = new PageImpl<>(recipes, pageable, results.size());
+
+        List<Long> recipeNextPageIds = results.stream()
+                .skip(pageable.getOffset() + pageable.getPageSize())
+                .limit(pageable.getPageSize())
                 .toList();
-        Page<RecipeDto> page = new PageImpl<>(recipeDtos, pageable, results.size());
+
+        recipeNextPageIds.forEach(
+                id -> publisherMq.send(Priority.LOW, recipeRepository.getRecipeById(id))
+        );
 
         return SearchResultDto.builder()
                 .currentPage(page.getNumber() + 1)
@@ -93,9 +110,10 @@ public class RecipeSearchService {
         if (input.phrase() == null) {
             return List.of();
         }
+        String searchPhrase = "%" + input.phrase().toLowerCase() + "%";
         return List.of(criteriaBuilder.or(
-                criteriaBuilder.like(root.get("name"), "%" + input.phrase() + "%"),
-                criteriaBuilder.like(root.get("description"), "%" + input.phrase() + "%")
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), searchPhrase),
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), searchPhrase)
         ));
     }
 
@@ -105,39 +123,57 @@ public class RecipeSearchService {
         }
         List<Predicate> predicates = new ArrayList<>();
         input.filters().forEach(filter -> {
-            Path<Object> path = resolvePath(filter.attribute());
+            Path<Object> path = resolvePath(filter.getAttribute(), joins);
             String type = path.getModel().getBindableJavaType().getName();
-            boolean isInt = type.equals("int");
-            if (isInt) {
-                path.as(Integer.class);
-            }
-            if (!isInt && (filter.from() != null || filter.to() != null)) {
+            if (!type.equals("int") && (filter.getFrom() != null || filter.getTo() != null)) {
                 throw new FilterInputException(
-                        "Cannot filter by range on non-number attribute " + filter.attribute() + "."
+                        "Cannot filter by range on non-number attribute " + filter.getAttribute() + "."
                 );
             }
-            if (filter.equals() != null) {
-                predicates.add(criteriaBuilder.equal(path, filter.equals()));
+            if (filter.getEquals() != null) {
+                predicates.add(criteriaBuilder.equal(path, filter.getEquals()));
             }
-            if (filter.from() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(filter.attribute()), filter.from()));
+            if (filter.getFrom() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(filter.getAttribute()), filter.getFrom()));
             }
-            if (filter.to() != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(filter.attribute()), filter.to()));
+            if (filter.getTo() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(filter.getAttribute()), filter.getTo()));
             }
-            if (filter.in() != null) {
-                predicates.add(path.in(filter.in()));
+            if (filter.getIn() != null) {
+                predicates.add(path.in(filter.getIn()));
+            }
+            if (filter.getHasOnly() != null) {
+                predicates.add(getHasOnlyPredicate(filter));
             }
         });
         return predicates;
     }
 
-    private Path<Object> resolvePath(String attribute) {
-        if (attribute.equals("ingredients")) {
-            return ingredientsJoin.get("name");
-        }
-        if (attribute.equals("tags")) {
-            return tagsJoin.get("name");
+    private Predicate getHasOnlyPredicate(RecipeFilterPojo filter) {
+        Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
+        Root<Recipe> subRoot = subquery.from(Recipe.class);
+        Join<Recipe, Ingredient> subIngredientsJoin = subRoot.join(Recipe.INGREDIENTS, JoinType.LEFT);
+        Join<Recipe, Tag> subTagsJoin = subRoot.join(Recipe.TAGS, JoinType.LEFT);
+        Path<Object> hasOnlyPath = resolvePath(
+                filter.getAttribute(),
+                Map.of(
+                        Recipe.INGREDIENTS, subIngredientsJoin,
+                        Recipe.TAGS, subTagsJoin
+                )
+        );
+
+        subquery.select(subRoot.get("id"))
+                .where(criteriaBuilder.or(
+                        criteriaBuilder.not(hasOnlyPath.in(filter.getHasOnly())),
+                        criteriaBuilder.isNull(hasOnlyPath)
+                ))
+                .distinct(true);
+        return criteriaBuilder.not(root.get("id").in(subquery));
+    }
+
+    private Path<Object> resolvePath(String attribute, Map<String, Join<Recipe, ?>> joins) {
+        if (joins.containsKey(attribute)) {
+            return joins.get(attribute).get("name");
         }
         return root.get(attribute);
     }
@@ -148,10 +184,10 @@ public class RecipeSearchService {
         }
         List<Order> orders = new ArrayList<>();
         input.sort().forEach(sort -> {
-            if (sort.direction().equals(SortDirectionPojo.ASC)) {
-                orders.add(criteriaBuilder.asc(root.get(sort.attribute())));
+            if (sort.getDirection().equals(SortDirectionPojo.ASC)) {
+                orders.add(criteriaBuilder.asc(root.get(sort.getAttribute())));
             } else {
-                orders.add(criteriaBuilder.desc(root.get(sort.attribute())));
+                orders.add(criteriaBuilder.desc(root.get(sort.getAttribute())));
             }
         });
         return orders;

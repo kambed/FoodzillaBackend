@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
+import pl.better.foodzillabackend.recipe.logic.listener.RateCalculateListener;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.utils.StringToListConverter;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
@@ -17,9 +18,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = {"reviews", "ingredients", "tags","customersWhoViewedRecently"})
+@EqualsAndHashCode(exclude = {"reviews", "ingredients", "tags", "customersWhoViewedRecently"})
 @Entity
+@EntityListeners(RateCalculateListener.class)
 public class Recipe {
+    public static final String INGREDIENTS = "ingredients";
+    public static final String TAGS = "tags";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,6 +42,7 @@ public class Recipe {
     private int saturatedFat;
     private int carbohydrates;
     private String image;
+    private double rating;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();
@@ -62,3 +67,5 @@ public class Recipe {
     @ManyToMany(mappedBy = "favouriteRecipes", cascade = CascadeType.REMOVE)
     private Set<Customer> customers = new HashSet<>();
 }
+
+

@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
+import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
+import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
+import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.listener.RecentlyViewedRecipesEvent;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
@@ -12,9 +14,10 @@ import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
-import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
-import pl.better.foodzillabackend.utils.retrofit.image.api.ImageGeneratorAdapter;
+import pl.better.foodzillabackend.utils.rabbitmq.Priority;
+import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -22,22 +25,29 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class RecipeService {
-    private final RecipeRepository recipeRepository;
+    private static final String ANONYMOUS = "anonymousUser";
+    private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
+    private final RecipeRepositoryAdapter recipeRepository;
     private final IngredientRepository ingredientRepository;
     private final TagRepository tagRepository;
     private final RecipeDtoMapper recipeDtoMapper;
-    private final RecipeMapper recipeMapper;
-    private final ImageGeneratorAdapter imageGeneratorAdapter;
+    private final CustomerRepository customerRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private static final String RECIPE_NOT_FOUND_MESSAGE = "Recipe with id %s not found";
+    private final RecipeMapper recipeMapper;
+    private final PublisherMq publisherMq;
 
     @Transactional
-    public RecipeDto getRecipeById(long id) {
-        Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
-                RECIPE_NOT_FOUND_MESSAGE.formatted(id)
-        ));
+    public RecipeDto getRecipeById(long id, String principal) {
+        RecipeDto recipe = recipeRepository.getRecipeById(id);
         publishCustomEvent(recipe);
-        return recipeDtoMapper.apply(recipe);
+        if (!principal.equals(ANONYMOUS)) {
+            Customer customer = customerRepository.findByUsername(principal)
+                    .orElseThrow(() -> new CustomerNotFoundException(String.format(CUSTOMER_NOT_FOUND, principal)));
+            recipe.setIsFavourite(customer.getFavouriteRecipes()
+                    .stream()
+                    .anyMatch(rec -> rec.getId() == id));
+        }
+        return recipe;
     }
 
     @Transactional
@@ -74,24 +84,22 @@ public class RecipeService {
         return recipeDtoMapper.apply(recipe);
     }
 
-    public String getRecipeImageById(RecipeDto recipe) {
-        Recipe r = recipeMapper.apply(recipe);
-        if (recipe.image() == null) {
-            generateImageForRecipe(r);
-            recipeRepository.saveAndFlush(r);
+    public String getRecipeImageById(RecipeDto recipe, Priority priority) {
+        if (recipe.getImage() != null) {
+            return recipe.getImage();
+        }
+        RecipeDto r = recipeRepository.getRecipeById(recipe.getId());
+        if (r.getImage() == null) {
+            r.setImage(publisherMq.sendAndReceive(priority, r));
+            recipeRepository.saveAndFlush(recipeMapper.apply(r));
         }
         return r.getImage();
     }
 
-    private void generateImageForRecipe(Recipe recipe) {
-        String image = imageGeneratorAdapter.generateImage(recipe.getName());
-        if (image != null) {
-            recipe.setImage(image);
-        }
-    }
-
-    private void publishCustomEvent(Recipe recipe) {
-        RecentlyViewedRecipesEvent recentlyViewedRecipesEvent = new RecentlyViewedRecipesEvent(this, recipe);
+    private void publishCustomEvent(RecipeDto recipe) {
+        RecentlyViewedRecipesEvent recentlyViewedRecipesEvent = new RecentlyViewedRecipesEvent(
+                this, recipeMapper.apply(recipe)
+        );
         applicationEventPublisher.publishEvent(recentlyViewedRecipesEvent);
     }
 }

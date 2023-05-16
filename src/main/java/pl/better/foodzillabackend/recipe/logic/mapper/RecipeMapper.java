@@ -1,34 +1,38 @@
 package pl.better.foodzillabackend.recipe.logic.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 
+import java.util.Set;
 import java.util.function.Function;
 
 @Component
+@RequiredArgsConstructor
 public class RecipeMapper implements Function<RecipeDto, Recipe> {
     @Override
-    public Recipe apply(RecipeDto recipeDto) {
+    public Recipe apply(RecipeDto recipe) {
         return Recipe.builder()
-                .id(recipeDto.id())
-                .name(recipeDto.name())
-                .description(recipeDto.description())
-                .timeOfPreparation(recipeDto.timeOfPreparation())
-                .numberOfSteps(recipeDto.numberOfSteps())
-                .steps(recipeDto.steps())
-                .numberOfIngredients(recipeDto.numberOfIngredients())
-                .calories(recipeDto.calories())
-                .fat(recipeDto.fat())
-                .sugar(recipeDto.sugar())
-                .sodium(recipeDto.sodium())
-                .protein(recipeDto.protein())
-                .saturatedFat(recipeDto.saturatedFat())
-                .carbohydrates(recipeDto.carbohydrates())
-                .image(recipeDto.image())
-                .reviews(recipeDto.reviews())
-                .ingredients(recipeDto.ingredients())
-                .tags(recipeDto.tags())
+                .id(recipe.getId())
+                .name(recipe.getName())
+                .description(recipe.getDescription())
+                .timeOfPreparation(recipe.getTimeOfPreparation())
+                .numberOfSteps(recipe.getNumberOfSteps())
+                .steps(recipe.getSteps())
+                .numberOfIngredients(recipe.getNumberOfIngredients())
+                .calories(recipe.getCalories())
+                .fat(recipe.getFat())
+                .sugar(recipe.getSugar())
+                .sodium(recipe.getSodium())
+                .protein(recipe.getProtein())
+                .saturatedFat(recipe.getSaturatedFat())
+                .carbohydrates(recipe.getCarbohydrates())
+                .rating(recipe.getRating())
+                .image(recipe.getImage())
+                .ingredients(Set.of())
+                .tags(Set.of())
+                .reviews(Set.of())
                 .build();
     }
 }

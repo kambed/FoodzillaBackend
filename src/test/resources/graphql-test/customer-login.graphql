@@ -5,6 +5,7 @@ mutation login($username: String!,
         password: $password
     ) {
         token
+        refreshToken
         customer {
             firstname
             lastname

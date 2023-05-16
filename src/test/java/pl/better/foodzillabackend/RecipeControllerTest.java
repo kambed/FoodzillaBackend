@@ -134,6 +134,7 @@ class RecipeControllerTest extends TestBase {
         });
     }
 
+
     @Test
     @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldReturnErrorWhenRecipeIdNotFound() {

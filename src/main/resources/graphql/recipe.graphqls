@@ -1,5 +1,6 @@
 extend type Query {
     recipe(id: ID!): Recipe
+    recentlyViewedRecipes: [Recipe]
 }
 
 extend type Mutation {
@@ -41,4 +42,6 @@ type Recipe {
     reviews: [Review]
     ingredients: [Ingredient]
     tags: [Tag]
+    rating: Float
+    isFavourite: Boolean
 }

@@ -1,5 +1,6 @@
 package pl.better.foodzillabackend.customer.logic.model.domain;
 
+import com.vladmihalcea.hibernate.type.json.JsonBlobType;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,13 +9,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.better.foodzillabackend.auth.model.domain.Role;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
+import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
+import pl.better.foodzillabackend.search.logic.model.domain.Search;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -34,9 +33,9 @@ public class Customer implements UserDetails {
     private String username;
     private String password;
 
-
     @Type(JsonStringType.class)
     private List<Long> recommendations;
+
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     private Set<Review> reviews = new HashSet<>();
@@ -46,14 +45,21 @@ public class Customer implements UserDetails {
             name = "customer_recipe",
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
-    private Set<Recipe> favouriteRecipes = new HashSet<>();
+    private List<Recipe> favouriteRecipes = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "recently_viewed_recipes",
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
-    private Set<Recipe> recentlyViewedRecipes = new HashSet<>();
+    private List<Recipe> recentlyViewedRecipes = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.REMOVE)
+    @JoinTable(
+            name = "user_saved_searches",
+            joinColumns = @JoinColumn(name = "customer_id"),
+            inverseJoinColumns = @JoinColumn(name = "search_id"))
+    private Set<Search> savedSearches = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

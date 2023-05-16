@@ -8,9 +8,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import pl.better.foodzillabackend.containers.MySQLContainerReusable;
+import pl.better.foodzillabackend.containers.RedisContainerReusable;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
-import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepository;
+import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
+import pl.better.foodzillabackend.search.logic.repository.SearchRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 
 import java.io.IOException;
@@ -18,14 +25,22 @@ import java.io.IOException;
 @SpringBootTest
 @AutoConfigureGraphQlTester
 @ActiveProfiles("test")
+@Testcontainers
 public class TestBase {
+
+    @Container
+    static MySQLContainer<?> mySQLContainer = MySQLContainerReusable.getInstance();
+    @Container
+    static GenericContainer<?> redisContainer = RedisContainerReusable.getInstance();
 
     @Autowired
     protected GraphQlTester graphQlTester;
     @Autowired
-    protected RecipeRepository recipeRepository;
+    protected RecipeRepositoryAdapter recipeRepository;
     @Autowired
     protected IngredientRepository ingredientRepository;
+    @Autowired
+    protected SearchRepository searchRepository;
     @Autowired
     protected TagRepository tagRepository;
     @Autowired
@@ -48,5 +63,6 @@ public class TestBase {
         ingredientRepository.deleteAll();
         tagRepository.deleteAll();
         customerRepository.deleteAll();
+        searchRepository.deleteAll();
     }
 }
