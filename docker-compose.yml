@@ -36,18 +36,10 @@ services:
       - "5672:5672"
       - "15672:15672"
   redis:
-    image: redis:latest
+    image: redis:7.0.11
     restart: unless-stopped
     ports:
       - "6379:6379"
-    env_file: .env
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-  test_redis:
-    image: redis:latest
-    restart: unless-stopped
-    ports:
-      - "6380:6379"
     env_file: .env
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
