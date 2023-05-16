@@ -2,6 +2,10 @@ spring:
   graphql:
     graphiql:
       enabled: true
+  datasource:
+    username: ${TEST_MYSQL_USER}
+    password: ${TEST_MYSQL_PASSWORD}
+    url: ${TEST_MYSQL_URL}
   data:
     redis:
       port: ${REDIS_TEST_PORT}
