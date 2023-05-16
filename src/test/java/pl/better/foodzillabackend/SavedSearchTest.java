@@ -27,7 +27,7 @@ class SavedSearchTest extends TestBase {
 
         filters1.add(RecipeFilterPojo.builder().attribute("name").equals("pyszna").build());
         filters2.add(RecipeFilterPojo.builder().attribute("name").equals("stek").build());
-        filters2.add(RecipeFilterPojo.builder().attribute("asdasd").equals("eeeeeeee").build());
+        filters2.add(RecipeFilterPojo.builder().attribute("calories").equals("100").build());
         sort1.add(RecipeSort.builder().attribute("name").direction(SortDirectionPojo.ASC).build());
 
         Search search1 = Search.builder()
@@ -36,13 +36,13 @@ class SavedSearchTest extends TestBase {
 
         Search search2 = Search.builder()
                 .phrase("pyszny stek")
-                .filters(new HashSet<>(filters1))
+                .filters(filters1)
                 .build();
 
         Search search3 = Search.builder()
-                .phrase("krewetki w sosie śmietanowym")
-                .filters(new HashSet<>(filters2))
-                .sort(new HashSet<>(sort1))
+                .phrase("krewetki w sosie smietanowym")
+                .filters(filters2)
+                .sort(sort1)
                 .build();
 
         Customer user = Customer.builder()
@@ -67,7 +67,7 @@ class SavedSearchTest extends TestBase {
             assertEquals(3, search.size());
             assertTrue(search.stream().anyMatch(x -> x.getPhrase().equals("pyszna jajecznica")));
             assertTrue(search.stream().anyMatch(x -> x.getPhrase().equals("pyszny stek")));
-            assertTrue(search.stream().anyMatch(x -> x.getPhrase().equals("krewetki w sosie śmietanowym")));
+            assertTrue(search.stream().anyMatch(x -> x.getPhrase().equals("krewetki w sosie smietanowym")));
         });
     }
 

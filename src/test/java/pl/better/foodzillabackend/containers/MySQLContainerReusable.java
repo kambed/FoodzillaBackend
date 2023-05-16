@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend;
+package pl.better.foodzillabackend.containers;
 
 import org.testcontainers.containers.MySQLContainer;
 

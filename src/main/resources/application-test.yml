@@ -8,5 +8,5 @@ spring:
     url: ${TEST_MYSQL_URL}
   data:
     redis:
-      port: ${REDIS_TEST_PORT}
+      port: ${TEST_REDIS_PORT}
       run-sync-task: false

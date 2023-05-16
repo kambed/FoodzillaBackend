@@ -8,9 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import pl.better.foodzillabackend.containers.MySQLContainerReusable;
+import pl.better.foodzillabackend.containers.RedisContainerReusable;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
@@ -27,6 +30,8 @@ public class TestBase {
 
     @Container
     static MySQLContainer<?> mySQLContainer = MySQLContainerReusable.getInstance();
+    @Container
+    static GenericContainer<?> redisContainer = RedisContainerReusable.getInstance();
 
     @Autowired
     protected GraphQlTester graphQlTester;
