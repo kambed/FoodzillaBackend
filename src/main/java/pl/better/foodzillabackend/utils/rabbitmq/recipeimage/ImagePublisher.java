@@ -1,4 +1,4 @@
-package pl.better.foodzillabackend.utils.rabbitmq;
+package pl.better.foodzillabackend.utils.rabbitmq.recipeimage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,12 +13,13 @@ import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.recipe.logic.model.domain.RecipeShort;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.utils.RecipePromptGenerator;
+import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 
 import java.util.concurrent.ExecutionException;
 
 @Component
 @RequiredArgsConstructor
-public class PublisherMq {
+public class ImagePublisher {
 
     private final RabbitTemplate rabbitTemplate;
     private final AsyncRabbitTemplate asyncRabbitTemplate;

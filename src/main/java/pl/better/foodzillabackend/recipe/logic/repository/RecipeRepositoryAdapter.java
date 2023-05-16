@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
+import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.redis.RecipeTemplate;
@@ -27,6 +28,7 @@ public class RecipeRepositoryAdapter {
     private final RecipeConsumer recipeConsumer;
     private final RecipeTemplate recipeTemplate;
     private final RecipeDtoMapper recipeDtoMapper;
+    private final RecipeMapper recipeMapper;
 
     private final IngredientRepository ingredientRepository;
     private final TagRepository tagRepository;
@@ -41,7 +43,7 @@ public class RecipeRepositoryAdapter {
     public RecipeDto getRecipeById(long id) {
         return recipeTemplate.getById(id).orElse(recipeDtoMapper.apply(getRecipeByIdFromSql(id)));
     }
-    protected Recipe getRecipeByIdFromSql(long id) {
+    public Recipe getRecipeByIdFromSql(long id) {
         Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
                 RECIPE_NOT_FOUND_MESSAGE.formatted(id)
         ));
@@ -68,6 +70,11 @@ public class RecipeRepositoryAdapter {
     public void saveAndFlush(Recipe recipe) {
         recipeRepository.saveAndFlush(recipe);
         recipeConsumer.saveToRedis(recipe);
+    }
+
+    public void saveAndFlush(RecipeDto recipe) {
+        recipeRepository.saveAndFlush(recipeMapper.apply(recipe));
+        recipeTemplate.save(recipe);
     }
 
     public void deleteAll() {
