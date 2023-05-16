@@ -19,10 +19,10 @@ public class StringToListConverter implements AttributeConverter<List<String>, S
 
     @Override
     public List<String> convertToEntityAttribute(String s) {
-        if (s == null) {
+        if (s == null || s.isEmpty() || s.equals("[]")) {
             return Collections.emptyList();
         }
         return Arrays.stream(s.substring(2, s.length() - 2).split("', '"))
-                        .filter(el -> !el.isBlank()).toList();
+                .filter(el -> !el.isBlank()).toList();
     }
 }
