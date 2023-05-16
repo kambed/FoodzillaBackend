@@ -2,11 +2,6 @@ spring:
   graphql:
     graphiql:
       enabled: true
-  datasource:
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
-    url: ${MYSQL_URL}
   data:
     redis:
-      port: ${REDIS_PORT}
       run-sync-task: false
