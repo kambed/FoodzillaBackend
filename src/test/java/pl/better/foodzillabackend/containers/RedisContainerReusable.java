@@ -25,10 +25,5 @@ public class RedisContainerReusable extends GenericContainer<RedisContainerReusa
         super.start();
         System.setProperty("TEST_REDIS_PORT", container.getMappedPort(6379).toString());
     }
-
-    @Override
-    public void stop() {
-        //do nothing, JVM handles shut down
-    }
 }
 

@@ -25,9 +25,4 @@ public class MySQLContainerReusable extends MySQLContainer<MySQLContainerReusabl
         System.setProperty("TEST_MYSQL_PASSWORD", container.getPassword());
         System.setProperty("TEST_MYSQL_URL", container.getJdbcUrl());
     }
-
-    @Override
-    public void stop() {
-        //do nothing, JVM handles shut down
-    }
 }
