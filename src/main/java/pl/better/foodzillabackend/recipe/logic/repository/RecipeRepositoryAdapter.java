@@ -3,6 +3,7 @@ package pl.better.foodzillabackend.recipe.logic.repository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.exceptions.type.RecipeNotFoundException;
+import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.redis.RecipeTemplate;
@@ -20,6 +21,7 @@ public class RecipeRepositoryAdapter {
     private final RecipeRepository recipeRepository;
     private final RecipeConsumer recipeConsumer;
     private final RecipeTemplate recipeTemplate;
+    private final RecipeDtoMapper recipeDtoMapper;
 
     public Recipe findById(long id) {
         return recipeRepository.findById(id).orElseThrow(() -> new RecipeNotFoundException(
@@ -28,9 +30,13 @@ public class RecipeRepositoryAdapter {
     }
 
     public RecipeDto getRecipeById(long id) {
-        return recipeTemplate.getById(id).orElseThrow(() -> new RecipeNotFoundException(
-                RECIPE_NOT_FOUND_MESSAGE.formatted(id)
-        ));
+        return recipeTemplate.getById(id).orElse(
+                recipeRepository.getRecipeDetailsById(id)
+                        .map(recipeDtoMapper)
+                        .orElseThrow(() -> new RecipeNotFoundException(
+                                RECIPE_NOT_FOUND_MESSAGE.formatted(id)
+                        ))
+        );
     }
 
     public List<RecipeDto> getRecipesByIds(List<Long> ids) {
