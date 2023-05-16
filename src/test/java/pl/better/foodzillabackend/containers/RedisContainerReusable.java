@@ -23,7 +23,7 @@ public class RedisContainerReusable extends GenericContainer<RedisContainerReusa
     @Override
     public void start() {
         super.start();
-        System.setProperty("TEST_REDIS_PORT", container.getMappedPort(6379).toString());
+        System.setProperty("REDIS_PORT", container.getMappedPort(6379).toString());
     }
 }
 
