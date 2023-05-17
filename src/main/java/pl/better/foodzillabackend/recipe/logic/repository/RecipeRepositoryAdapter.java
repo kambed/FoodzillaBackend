@@ -41,7 +41,7 @@ public class RecipeRepositoryAdapter {
     public RecipeDto getRecipeById(long id) {
         return recipeTemplate.getById(id).orElse(recipeDtoMapper.apply(getRecipeByIdFromSql(id)));
     }
-    protected Recipe getRecipeByIdFromSql(long id) {
+    public Recipe getRecipeByIdFromSql(long id) {
         Recipe recipe = recipeRepository.getRecipeDetailsById(id).orElseThrow(() -> new RecipeNotFoundException(
                 RECIPE_NOT_FOUND_MESSAGE.formatted(id)
         ));
@@ -62,7 +62,13 @@ public class RecipeRepositoryAdapter {
     }
 
     public List<RecipeDto> getRecipesByIds(List<Long> ids) {
-        return recipeTemplate.getRecipesByIds(ids);
+        List<RecipeDto> recipes = recipeTemplate.getRecipesByIds(ids);
+        if (recipes.size() != ids.size()) {
+            ids.stream()
+                    .filter(id -> recipes.stream().noneMatch(recipe -> recipe.getId().equals(id)))
+                    .forEach(id -> recipes.add(recipeDtoMapper.apply(getRecipeByIdFromSql(id))));
+        }
+        return recipes;
     }
 
     public void saveAndFlush(Recipe recipe) {

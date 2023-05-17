@@ -20,7 +20,7 @@ import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
-import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
+import pl.better.foodzillabackend.utils.rabbitmq.recipeimage.ImagePublisher;
 import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
 
 import java.util.ArrayList;
@@ -37,15 +37,15 @@ public class RecipeSearchService {
     private final Map<String, Join<Recipe, ?>> joins;
     private final RecipeRepositoryAdapter recipeRepository;
     private final CompletionsAdapter completionsAdapter;
-    private final PublisherMq publisherMq;
+    private final ImagePublisher imagePublisher;
     public RecipeSearchService(
             EntityManagerFactory entityManagerFactory,
             RecipeRepositoryAdapter recipeRepository,
-            PublisherMq publisherMq,
+            ImagePublisher imagePublisher,
             CompletionsAdapter completionsAdapter
     ) {
         entityManager = entityManagerFactory.createEntityManager();
-        this.publisherMq = publisherMq;
+        this.imagePublisher = imagePublisher;
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
@@ -83,10 +83,6 @@ public class RecipeSearchService {
 
         List<RecipeDto> recipes = recipeRepository.getRecipesByIds(recipeIds);
 
-        recipes.forEach(
-                recipe -> publisherMq.send(Priority.NORMAL, recipe)
-        );
-
         Page<RecipeDto> page = new PageImpl<>(recipes, pageable, results.size());
 
         List<Long> recipeNextPageIds = results.stream()
@@ -95,7 +91,7 @@ public class RecipeSearchService {
                 .toList();
 
         recipeNextPageIds.forEach(
-                id -> publisherMq.send(Priority.LOW, recipeRepository.getRecipeById(id))
+                id -> imagePublisher.send(Priority.LOW, recipeRepository.getRecipeById(id))
         );
 
         return SearchResultDto.builder()
