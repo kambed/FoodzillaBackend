@@ -10,7 +10,6 @@ import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.listener.RecentlyViewedRecipesEvent;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
-import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
@@ -33,7 +32,6 @@ public class RecipeService {
     private final RecipeDtoMapper recipeDtoMapper;
     private final CustomerRepository customerRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final RecipeMapper recipeMapper;
     private final ImagePublisher imagePublisher;
 
     @Transactional
@@ -97,7 +95,7 @@ public class RecipeService {
 
     private void publishCustomEvent(RecipeDto recipe) {
         RecentlyViewedRecipesEvent recentlyViewedRecipesEvent = new RecentlyViewedRecipesEvent(
-                this, recipeMapper.apply(recipe)
+                this, recipeRepository.findById(recipe.getId())
         );
         applicationEventPublisher.publishEvent(recentlyViewedRecipesEvent);
     }
