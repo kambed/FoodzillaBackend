@@ -3,6 +3,7 @@ package pl.better.foodzillabackend.utils.retrofit.image.api;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,11 @@ public class ImageGeneratorAdapter {
                 .build();
         StableDiffusionAPI stableDiffusionAPI = retrofit.create(StableDiffusionAPI.class);
 
+        return callApiAndGetResponse(prompt, stableDiffusionAPI);
+    }
+
+    @Nullable
+    private String callApiAndGetResponse(String prompt, StableDiffusionAPI stableDiffusionAPI) {
         try {
             Response<GenerateRecipeImageResponseDto> response = stableDiffusionAPI
                     .generateImage(new GenerateRecipeImageRequestDto(prompt, 1))
