@@ -36,6 +36,7 @@ public class CustomerService implements UserDetailsService {
                     .lastname(command.lastname())
                     .username(command.username())
                     .password(passwordEncoder.encode(command.password()))
+                    .email(command.email())
                     .build();
 
             repository.saveAndFlush(user);
@@ -48,16 +49,17 @@ public class CustomerService implements UserDetailsService {
 
     @Transactional
     public CustomerDto editCustomer(String principal, UpdateCustomerCommand command) {
-        Customer user = repository.findByUsername(principal).orElseThrow(() -> new CustomerNotFoundException(
+        Customer customer = repository.findByUsername(principal).orElseThrow(() -> new CustomerNotFoundException(
                 CUSTOMER_NOT_FOUND.formatted(principal)
         ));
         if (!repository.existsByUsername(command.username()) || principal.equals(command.username())) {
-            user.setFirstname(command.firstname());
-            user.setLastname(command.lastname());
-            user.setUsername(command.username());
-            user.setPassword(passwordEncoder.encode(command.password()));
-            repository.saveAndFlush(user);
-            return mapper.apply(user);
+            customer.setFirstname(command.firstname());
+            customer.setLastname(command.lastname());
+            customer.setUsername(command.username());
+            customer.setPassword(passwordEncoder.encode(command.password()));
+            customer.setEmail(command.email());
+            repository.saveAndFlush(customer);
+            return mapper.apply(customer);
         } else {
             throw new CustomerAlreadyExistsException(CUSTOMER_ALREADY_EXIST.formatted(command.username()));
         }
