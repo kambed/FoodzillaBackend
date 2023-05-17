@@ -7,7 +7,6 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 
 @SchemaMapping
 public record UpdateCustomerCommand(
-
         @NotNull
         @Size(min = 2, max = 100, message = "Firstname must be between 2 and 100 characters.")
         String firstname,
