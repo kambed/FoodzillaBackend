@@ -75,6 +75,7 @@ create table customer
     lastname        varchar(250) not null,
     username        varchar(250) not null,
     password        varchar(250) not null,
+    email           varchar(250) not null,
     recommendations varchar(250) null
 );
 
