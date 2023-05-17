@@ -24,7 +24,7 @@ public class ImageConsumer {
 
     @RabbitListener(queues = "imageGenerateQueue")
     @Async("rabbitMqTaskExecutor")
-    public synchronized CompletableFuture<String> generateImage(String recipeJson) throws JsonProcessingException {
+    public CompletableFuture<String> generateImage(String recipeJson) throws JsonProcessingException {
         RecipeShort recipe = objectMapper.readValue(recipeJson, RecipeShort.class);
         log.info("Generating image for recipe: {}", recipe.prompt());
         Recipe recipeInDb = recipeRepositoryAdapter.getRecipeByIdFromSql(recipe.id());

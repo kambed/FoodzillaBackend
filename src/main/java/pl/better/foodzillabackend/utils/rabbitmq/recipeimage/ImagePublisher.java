@@ -37,8 +37,9 @@ public class ImagePublisher {
                 .build();
 
         try {
-            rabbitTemplate.convertAndSend(
-                    "imageGenerateQueue",
+            asyncRabbitTemplate.sendAndReceive(
+                    exchange.getName(),
+                    "images",
                     converter.toMessage(objectMapper.writeValueAsString(recipeShort), messageProperties)
             );
         } catch (JsonProcessingException e) {
