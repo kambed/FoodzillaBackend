@@ -29,10 +29,14 @@ public class RecentlyViewedRecipesEventListener implements ApplicationListener<R
             Customer customer = customerRepository.findByUsername(principal).orElseThrow(
                     () -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND.formatted(principal)));
 
-            if (customer.getRecentlyViewedRecipes().contains(recipe)) {
-                customer.getRecentlyViewedRecipes().remove(recipe);
-                customerRepository.saveAndFlush(customer);
-            }
+            customer.getRecentlyViewedRecipes().forEach(
+                    recipe1 -> {
+                        if (recipe1.getId().equals(recipe.getId())) {
+                            customer.getRecentlyViewedRecipes().remove(recipe1);
+                        }
+                    }
+            );
+            customerRepository.saveAndFlush(customer);
             IntStream.range(19, customer.getRecentlyViewedRecipes().size()).forEach(i ->
                     customer.getRecentlyViewedRecipes().remove(
                             customer.getRecentlyViewedRecipes().iterator().next()
