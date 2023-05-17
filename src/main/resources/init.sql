@@ -146,3 +146,13 @@ create table user_saved_searches
         foreign key (search_id) references search (id)
 );
 
+create table recoveryCode
+(
+    id              int auto_increment
+        primary key,
+    email           varchar(250) not null,
+    code           varchar(250) not null
+);
+
+ALTER TABLE recoveryCode AUTO_INCREMENT=432123;
+

@@ -9,7 +9,7 @@ import pl.better.foodzillabackend.mail.service.MailServerService;
 
 @Controller
 @RequiredArgsConstructor
-public class MailController {
+public class MailServerController {
 
     private final MailServerService service;
 

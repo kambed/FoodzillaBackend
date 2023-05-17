@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
+@Entity(name = "recoveryCode")
 public class RecoveryCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
