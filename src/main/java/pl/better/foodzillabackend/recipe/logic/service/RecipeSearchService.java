@@ -83,10 +83,6 @@ public class RecipeSearchService {
 
         List<RecipeDto> recipes = recipeRepository.getRecipesByIds(recipeIds);
 
-        recipes.forEach(
-                recipe -> imagePublisher.send(Priority.NORMAL, recipe)
-        );
-
         Page<RecipeDto> page = new PageImpl<>(recipes, pageable, results.size());
 
         List<Long> recipeNextPageIds = results.stream()
