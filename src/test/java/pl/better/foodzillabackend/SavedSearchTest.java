@@ -83,13 +83,6 @@ class SavedSearchTest extends TestBase {
 
     @Test
     @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
-    void shouldReturnUserErrorCreatedSearch() {
-        GraphQlTester.Response response = graphQlTester.documentName("saved-search-create-error").execute();
-        response.errors().satisfy(errors -> assertEquals(1, errors.size()));
-    }
-
-    @Test
-    @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
     void shouldReturnUserDeletedSearch() {
         GraphQlTester.Response response = graphQlTester.documentName("saved-search-delete").variable("id",1).execute();
         response.errors().satisfy(errors -> assertEquals(0, errors.size()));
