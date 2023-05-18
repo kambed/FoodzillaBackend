@@ -10,14 +10,13 @@ import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
 import pl.better.foodzillabackend.recipe.logic.listener.RecentlyViewedRecipesEvent;
 import pl.better.foodzillabackend.recipe.logic.mapper.RecipeDtoMapper;
-import pl.better.foodzillabackend.recipe.logic.mapper.RecipeMapper;
 import pl.better.foodzillabackend.recipe.logic.model.command.CreateRecipeCommand;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
-import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
+import pl.better.foodzillabackend.utils.rabbitmq.recipeimage.ImagePublisher;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -33,8 +32,7 @@ public class RecipeService {
     private final RecipeDtoMapper recipeDtoMapper;
     private final CustomerRepository customerRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final RecipeMapper recipeMapper;
-    private final PublisherMq publisherMq;
+    private final ImagePublisher imagePublisher;
 
     @Transactional
     public RecipeDto getRecipeById(long id, String principal) {
@@ -90,15 +88,14 @@ public class RecipeService {
         }
         RecipeDto r = recipeRepository.getRecipeById(recipe.getId());
         if (r.getImage() == null) {
-            r.setImage(publisherMq.sendAndReceive(priority, r));
-            recipeRepository.saveAndFlush(recipeMapper.apply(r));
+            r.setImage(imagePublisher.sendAndReceive(priority, r));
         }
         return r.getImage();
     }
 
     private void publishCustomEvent(RecipeDto recipe) {
         RecentlyViewedRecipesEvent recentlyViewedRecipesEvent = new RecentlyViewedRecipesEvent(
-                this, recipeMapper.apply(recipe)
+                this, recipeRepository.findById(recipe.getId())
         );
         applicationEventPublisher.publishEvent(recentlyViewedRecipesEvent);
     }

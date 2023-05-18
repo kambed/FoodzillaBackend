@@ -12,9 +12,7 @@ import pl.better.foodzillabackend.recipe.logic.repository.sql.RecipeRepository;
 import pl.better.foodzillabackend.review.logic.repository.ReviewRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import static pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter.getRecipeItems;
 
 @Component
 @RequiredArgsConstructor
@@ -48,13 +46,5 @@ public class RecipeConsumer {
         RecipeDto recipeDto = recipeDtoMapper.apply(recipe);
         recipeDto.setIsFavourite(null);
         recipeTemplate.save(recipeDto);
-    }
-
-
-    private  <T> Set<T> getRecipeItems(List<T> items) {
-        if (items.size() == 1 && items.get(0) == null) {
-            items = List.of();
-        }
-        return new HashSet<>(items);
     }
 }
