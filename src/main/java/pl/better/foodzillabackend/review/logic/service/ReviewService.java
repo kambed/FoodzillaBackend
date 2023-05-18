@@ -49,6 +49,7 @@ public class ReviewService {
                 recipe);
 
         reviewRepository.saveAndFlush(review);
+        recipeRepository.updateRecipeInRedisById(recipe.getId());
         recommendationService.train();
         recommendationService.recommend(principal);
 
