@@ -38,10 +38,6 @@ public class RecipeRepositoryAdapter {
         ));
     }
 
-    public void updateRecipeInRedisById(long id) {
-        recipeConsumer.saveToRedis(getRecipeByIdFromSql(id));
-    }
-
     public RecipeDto getRecipeById(long id) {
         return recipeTemplate.getById(id).orElse(recipeDtoMapper.apply(getRecipeByIdFromSql(id)));
     }
