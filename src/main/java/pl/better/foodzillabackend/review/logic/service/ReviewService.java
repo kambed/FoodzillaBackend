@@ -41,7 +41,7 @@ public class ReviewService {
                         CUSTOMER_NOT_FOUND.formatted(principal)
                 ));
 
-        Recipe recipe = recipeRepository.findById(command.recipeId());
+        Recipe recipe = recipeRepository.getRecipeByIdFromSql(command.recipeId());
 
         Review review = new Review(command.review(),
                 command.rating(),
@@ -49,6 +49,7 @@ public class ReviewService {
                 recipe);
 
         reviewRepository.saveAndFlush(review);
+        recipeRepository.saveAndFlush(recipe);
         recommendationService.train();
         recommendationService.recommend(principal);
 
