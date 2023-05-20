@@ -68,6 +68,7 @@ class RecommendationsControllerTest extends TestBase {
         recommendationsMockWebServer.enqueue(recommendationsMockResponse);
         recommendationsMockWebServer.enqueue(recommendationsMockResponse);
         recommendationsMockWebServer.enqueue(recommendationsMockResponse);
+        recommendationsMockWebServer.enqueue(recommendationsMockResponse);
 
         GraphQlTester.Response response = graphQlTester.documentName("recommendations").execute();
         response.errors().satisfy(errors -> assertEquals(0, errors.size()));
