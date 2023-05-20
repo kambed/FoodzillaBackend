@@ -10,8 +10,11 @@ import pl.better.foodzillabackend.exceptions.type.CustomerNotFoundException;
 import pl.better.foodzillabackend.exceptions.type.RecommendationErrorException;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
+import pl.better.foodzillabackend.recommendation.logic.mapper.RecommendationDtoMapper;
+import pl.better.foodzillabackend.recommendation.logic.model.dto.RecommendationDto;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 import pl.better.foodzillabackend.utils.rabbitmq.recipeimage.ImagePublisher;
+import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
 import pl.better.foodzillabackend.utils.retrofit.recommendations.api.RecommendationAdapter;
 
 import java.util.List;
@@ -24,6 +27,8 @@ public class RecommendationService {
     private final RecipeRepositoryAdapter recipeRepository;
     private final RecommendationAdapter recommendationAdapter;
     private final ImagePublisher imagePublisher;
+    private final CompletionsAdapter completionsAdapter;
+    private final RecommendationDtoMapper recommendationDtoMapper;
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
 
     @Async("recommendationTaskExecutor")
@@ -46,7 +51,7 @@ public class RecommendationService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecipeDto> recommendationsFromCustomer(String principal) {
+    public RecommendationDto recommendationsFromCustomer(String principal) {
         Customer customer = customerRepository
                 .findByUsername(principal)
                 .orElseThrow(() -> new CustomerNotFoundException(
@@ -60,7 +65,7 @@ public class RecommendationService {
                 throw new RecommendationErrorException("Error during using recommendations module");
             }
         }
-        return recipeRepository.getRecipesByIds(recommendationIds);
+        return recommendationDtoMapper.apply(recipeRepository.getRecipesByIds(recommendationIds));
     }
 
     @Async("recommendationTaskExecutor")
@@ -70,5 +75,12 @@ public class RecommendationService {
         } catch (Exception e) {
             throw new RecommendationErrorException("Error during using python module");
         }
+    }
+
+
+    public String getOpinion(List<RecipeDto> recipes) {
+        return completionsAdapter.generateCompletion(
+                "What do you think about this recipes: " + recipes.toString()
+        );
     }
 }
