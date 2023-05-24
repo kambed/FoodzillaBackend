@@ -48,6 +48,7 @@ public class TestBase {
     @Autowired
     protected PasswordEncoder passwordEncoder;
     protected static MockWebServer completionsMockWebServer;
+    protected static MockWebServer recommendationsMockWebServer;
 
     @BeforeAll
     public static void setup() throws IOException {
@@ -55,6 +56,11 @@ public class TestBase {
             completionsMockWebServer = new MockWebServer();
             completionsMockWebServer.start();
             System.setProperty("COMPLETIONS_API_URL", completionsMockWebServer.url("/").toString());
+        }
+        if (recommendationsMockWebServer == null) {
+            recommendationsMockWebServer = new MockWebServer();
+            recommendationsMockWebServer.start();
+            System.setProperty("RECOMMENDATIONS_API_URL", recommendationsMockWebServer.url("/").toString());
         }
     }
 

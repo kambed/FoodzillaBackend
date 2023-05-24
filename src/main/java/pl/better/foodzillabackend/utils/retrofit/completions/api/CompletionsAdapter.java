@@ -57,7 +57,7 @@ public class CompletionsAdapter {
                     .findFirst()
                     .orElseThrow()
                     .text();
-        } catch (IOException e) {
+        } catch (IOException|NullPointerException e) {
             return null;
         }
     }

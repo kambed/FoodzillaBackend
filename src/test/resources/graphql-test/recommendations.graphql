@@ -1,0 +1,9 @@
+query  {
+    recommendations {
+        opinion
+        recipes {
+            id
+            name
+        }
+    }
+}

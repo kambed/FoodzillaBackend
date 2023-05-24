@@ -21,7 +21,6 @@ import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapte
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
 import pl.better.foodzillabackend.utils.rabbitmq.recipeimage.ImagePublisher;
-import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +35,11 @@ public class RecipeSearchService {
     private final Root<Recipe> root;
     private final Map<String, Join<Recipe, ?>> joins;
     private final RecipeRepositoryAdapter recipeRepository;
-    private final CompletionsAdapter completionsAdapter;
     private final ImagePublisher imagePublisher;
     public RecipeSearchService(
             EntityManagerFactory entityManagerFactory,
             RecipeRepositoryAdapter recipeRepository,
-            ImagePublisher imagePublisher,
-            CompletionsAdapter completionsAdapter
+            ImagePublisher imagePublisher
     ) {
         entityManager = entityManagerFactory.createEntityManager();
         this.imagePublisher = imagePublisher;
@@ -54,7 +51,6 @@ public class RecipeSearchService {
                 Recipe.TAGS, root.join(Recipe.TAGS, JoinType.LEFT)
         );
         this.recipeRepository = recipeRepository;
-        this.completionsAdapter = completionsAdapter;
     }
 
     @Transactional
@@ -186,11 +182,5 @@ public class RecipeSearchService {
             }
         });
         return orders;
-    }
-
-    public String getOpinion(SearchResultDto searchResult) {
-        return completionsAdapter.generateCompletion(
-                "What do you think about this recipes: " + searchResult.toString()
-        );
     }
 }
