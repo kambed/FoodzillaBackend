@@ -53,11 +53,9 @@ public class RecipeDto {
                 ", saturatedFat=" + saturatedFat +
                 ", carbohydrates=" + carbohydrates +
                 ", rating=" + rating +
-                ", image='" + image + '\'' +
                 ", reviews=" + reviews +
                 ", ingredients=" + ingredients +
                 ", tags=" + tags +
-                ", isFavourite=" + isFavourite +
                 '}';
     }
 }
