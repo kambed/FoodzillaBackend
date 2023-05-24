@@ -53,7 +53,6 @@ public class RecipeDto {
                 ", saturatedFat=" + saturatedFat +
                 ", carbohydrates=" + carbohydrates +
                 ", rating=" + rating +
-                ", reviews=" + reviews +
                 ", ingredients=" + ingredients +
                 ", tags=" + tags +
                 '}';
