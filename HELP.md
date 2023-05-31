@@ -64,9 +64,10 @@ Alternatively, for JetBrains Intellij users they can use green button on the lef
 ## To check sonar qube quality report
 
 Start SonarQube server container on Docker
-> docker run -d --name sonarqube -p 9000:9000 sonarqube
+> docker-compose -f docker-compose.yml up sonarqube
 
-Configure new local project using token specified in sonar properties from pom.xml file
+Login to SonarQube server on http://localhost:9000 with default credentials (admin/admin)
+Configure new local project and update sonar properties in pom.xml file with new project key and token
 
 Build project
 > mvn clean verify sonar:sonar -Pcoverage

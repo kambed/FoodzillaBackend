@@ -30,7 +30,7 @@
         <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.projectKey>Foodzilla-Backend</sonar.projectKey>
         <sonar.projectName>Foodzilla Backend</sonar.projectName>
-        <sonar.token>sqp_fac28253de13ad9a111a42d539dba5bf2209a534</sonar.token>
+        <sonar.token>sqp_b3470245189f92e1d4c878cfd378eb76f5333114</sonar.token>
     </properties>
 
     <dependencies>
