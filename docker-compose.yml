@@ -49,6 +49,11 @@ services:
     env_file: .env
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+  sonarqube:
+    image: sonarqube:latest
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
 volumes:
   db:
 networks:
