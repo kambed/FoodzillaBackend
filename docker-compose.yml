@@ -52,6 +52,8 @@ services:
   sonarqube:
     image: sonarqube:latest
     container_name: sonarqube
+    volumes:
+      - ./sonarqube/bitegarden-sonarqube-report-2.15.5.jar/:/opt/sonarqube/extensions/plugins/pdf.jar
     ports:
       - "9000:9000"
 volumes:
