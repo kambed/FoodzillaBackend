@@ -50,6 +50,7 @@ class SavedSearchTest extends TestBase {
                 .lastname("Loblaw")
                 .username("BobLoblaw")
                 .password("b0bL0bl@w")
+                .email("Example@gmail.com")
                 .build();
 
         List<Search> userSearches = List.of(search1, search2, search3);

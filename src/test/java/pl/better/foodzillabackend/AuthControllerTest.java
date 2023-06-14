@@ -22,6 +22,7 @@ class AuthControllerTest extends TestBase {
                 .lastname("obbo")
                 .password(passwordEncoder.encode("bOb@4321"))
                 .username("Boob123")
+                .email("Example@gmail.com")
                 .build();
         customerRepository.saveAndFlush(customer);
     }

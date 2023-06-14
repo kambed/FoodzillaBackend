@@ -82,6 +82,7 @@ class FavouriteRecipeControllerTest extends TestBase {
                 .firstname("Andree")
                 .lastname("eerdna")
                 .username("Andree")
+                .email("Example@gmail.com")
                 .password(passwordEncoder.encode("password"))
                 .favouriteRecipes(List.of(r))
                 .build();
