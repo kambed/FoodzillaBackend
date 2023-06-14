@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
@@ -27,7 +29,9 @@ import java.util.stream.Collectors;
 public class MailServerService {
 
     private static final String TITLE = "Password Restart ~ Foodzilla";
+    private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private final JavaMailSender javaMailSender;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Value("${spring.mail.username}")
     private String sender;
     @Value("classpath:email.html")
@@ -35,6 +39,7 @@ public class MailServerService {
     private final RecoveryCodeRepository codeRepository;
     private final CustomerRepository customerRepository;
 
+    @Transactional
     public boolean requestPasswordResetEmail(String email) {
         Optional<Customer> customer = customerRepository.findCustomerByEmail(email);
         return customer.isPresent() ? sendEmail(customer.get()) : false;
@@ -46,11 +51,12 @@ public class MailServerService {
                 command.email())) {
             Optional<Customer> customer = customerRepository.findCustomerByEmail(command.email());
             customer.ifPresent(customer1 -> {
-                customer1.setPassword(command.newPassword());
+                customer1.setPassword(passwordEncoder.encode(command.newPassword()));
                 customerRepository.saveAndFlush(customer1);
             });
-            return codeRepository.removeByCodeAndEmail(command.resetPasswordToken(),
+            codeRepository.removeByCodeAndEmail(command.resetPasswordToken(),
                     command.email());
+            return true;
         } else {
             return false;
         }
@@ -58,8 +64,8 @@ public class MailServerService {
 
     private boolean sendEmail(Customer customer) {
         try {
-            String code = generateCode();
-            codeRepository.saveAndFlush(new RecoveryCode(customer.getEmail(), generateCode()));
+            String code = saveNewCustomerCode(customer);
+
             MimeMessage message = javaMailSender.createMimeMessage();
             message.setSubject(TITLE);
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -80,10 +86,20 @@ public class MailServerService {
         return content.replace("*", code);
     }
 
+    private String saveNewCustomerCode(Customer customer) {
+        String code = generateCode();
+        if (codeRepository.existsByEmail(customer.getEmail())) {
+            codeRepository.removeByEmail(customer.getEmail());
+        }
+        codeRepository.saveAndFlush(new RecoveryCode(customer.getEmail(), code));
+        return code;
+    }
+
     private String generateCode() {
         return ThreadLocalRandom.current()
-                .ints(10, 33, 127)
-                .mapToObj(code -> String.valueOf((char) code))
+                .ints(10, 0, CHARACTERS.length())
+                .mapToObj(CHARACTERS::charAt)
+                .map(Object::toString)
                 .collect(Collectors.joining());
     }
 }

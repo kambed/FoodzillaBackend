@@ -19,7 +19,7 @@ public class MailServerController {
     }
 
     @MutationMapping
-    public boolean resetPassword(@Argument ResetPasswordCommand command) {
-        return service.resetPassword(command);
+    public boolean resetPassword(@Argument ResetPasswordCommand resetPassword) {
+        return service.resetPassword(resetPassword);
     }
 }
