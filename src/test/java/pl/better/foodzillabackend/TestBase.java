@@ -10,12 +10,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
+import pl.better.foodzillabackend.containers.GreenMailContainerReusable;
 import pl.better.foodzillabackend.containers.MySQLContainerReusable;
 import pl.better.foodzillabackend.containers.RedisContainerReusable;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
+import pl.better.foodzillabackend.mail.repository.RecoveryCodeRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.search.logic.repository.SearchRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
@@ -32,6 +36,8 @@ public class TestBase {
     static MySQLContainer<?> mySQLContainer = MySQLContainerReusable.getInstance();
     @Container
     static GenericContainer<?> redisContainer = RedisContainerReusable.getInstance();
+    @Container
+    static GenericContainer<?> greenMailGenericContainer = GreenMailContainerReusable.getInstance();
 
     @Autowired
     protected GraphQlTester graphQlTester;
@@ -47,6 +53,8 @@ public class TestBase {
     protected CustomerRepository customerRepository;
     @Autowired
     protected PasswordEncoder passwordEncoder;
+    @Autowired
+    protected RecoveryCodeRepository recoveryCodeRepository;
     protected static MockWebServer completionsMockWebServer;
     protected static MockWebServer recommendationsMockWebServer;
 
@@ -70,5 +78,6 @@ public class TestBase {
         tagRepository.deleteAll();
         customerRepository.deleteAll();
         searchRepository.deleteAll();
+        recoveryCodeRepository.deleteAll();
     }
 }
