@@ -32,3 +32,15 @@ spring:
       timeout: ${REDIS_TIMEOUT}
       url: redis://${REDIS_HOST}:${REDIS_PORT}
       run-sync-task: false # Set to true if db is filled on first run.
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
