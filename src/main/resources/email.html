@@ -118,9 +118,7 @@
             color: #3498db;
             text-decoration: underline;
         }
-        .btn {
-            box-sizing: border-box;
-            width: 100%; }
+
         .btn > tbody > tr > td {
             padding-bottom: 15px; }
         .btn table {
@@ -255,23 +253,8 @@
                                     <td>
                                         <p>Hi there,</p>
                                         <p>Your Reset Code:</p>
-                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
-                                            <tbody>
-                                            <tr>
-                                                <td align="left">
-                                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                                                        <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <a id="resetCode" onclick="myFunction()">*</a>
-                                                            </td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                        <b class="">*</b>
+                                        <p></p>
                                         <p>Good luck!</p>
                                     </td>
                                 </tr>
@@ -300,10 +283,4 @@
     </tr>
 </table>
 </body>
-<script>
-    function myFunction() {
-        const x = document.getElementById("resetCode");
-        navigator.clipboard.writeText(x.text);
-    }
-</script>
 </html>
