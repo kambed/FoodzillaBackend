@@ -14,6 +14,7 @@ public class CustomerDtoMapper implements Function<Customer, CustomerDto> {
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
                 .username(user.getUsername())
+                .email(user.getEmail())
                 .build();
     }
 }

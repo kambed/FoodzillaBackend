@@ -8,5 +8,5 @@ import pl.better.foodzillabackend.mail.model.domain.RecoveryCode;
 public interface RecoveryCodeRepository extends JpaRepository<RecoveryCode, Long> {
     boolean existsByCodeAndEmail(String code, String email);
 
-    void removeByCodeAndEmail(String code, String email);
+    boolean removeByCodeAndEmail(String code, String email);
 }

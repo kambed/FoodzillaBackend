@@ -18,4 +18,9 @@ public class RecoveryCode {
     private Long id;
     private String email;
     private String code;
+
+    public RecoveryCode(String email, String code) {
+        this.email = email;
+        this.code = code;
+    }
 }
