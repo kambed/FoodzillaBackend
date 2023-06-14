@@ -29,6 +29,7 @@ class RecipeControllerTest extends TestBase {
                 .lastname("Loblaw")
                 .username("BobLoblaw")
                 .password("b0bL0bl@w")
+                .email("Example@gmail.com")
                 .build();
         customerRepository.saveAndFlush(user);
     }
