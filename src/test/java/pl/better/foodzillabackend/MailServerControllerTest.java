@@ -33,7 +33,7 @@ class MailServerControllerTest extends TestBase {
     }
 
     private GraphQlTester.Response sendEmail(String email) {
-        return graphQlTester.documentName("customer-login")
+        return graphQlTester.documentName("customer-mail-send")
                 .variable("email", email)
                 .execute();
     }

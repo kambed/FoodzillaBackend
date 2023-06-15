@@ -11,7 +11,7 @@ public class GreenMailContainerReusable extends GenericContainer<GreenMailContai
     private GreenMailContainerReusable() {
     }
 
-    public static GenericContainer getInstance() {
+    public static GenericContainer<?> getInstance() {
         if (container == null) {
             container = new GenericContainer<>(DockerImageName.parse("greenmail/standalone:latest"))
                     .waitingFor(Wait.forLogMessage(".*Starting GreenMail standalone.*", 1))
