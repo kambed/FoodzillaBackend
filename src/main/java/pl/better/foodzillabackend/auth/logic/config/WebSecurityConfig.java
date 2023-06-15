@@ -14,6 +14,7 @@ import pl.better.foodzillabackend.auth.logic.service.token.JWTAuthorizationFilte
 import pl.better.foodzillabackend.auth.logic.service.token.TokenUtils;
 import pl.better.foodzillabackend.customer.logic.service.CustomerService;
 
+@SuppressWarnings("deprecation")
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
