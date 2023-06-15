@@ -51,6 +51,10 @@ public class RabbitMqConfiguration {
         return new Queue("recipes", true);
     }
 
+    @Bean
+    public Queue emailQueue() {
+        return new Queue("email", true);
+    }
 
     @Bean
     public DirectExchange exchange() {
