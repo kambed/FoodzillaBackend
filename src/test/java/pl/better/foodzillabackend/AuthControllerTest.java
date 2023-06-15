@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import pl.better.foodzillabackend.auth.model.domain.Token;
+import pl.better.foodzillabackend.auth.logic.model.domain.Token;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 
 import java.util.Objects;

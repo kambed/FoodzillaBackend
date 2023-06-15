@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
-import pl.better.foodzillabackend.mail.model.domain.RecoveryCode;
-import pl.better.foodzillabackend.mail.repository.RecoveryCodeRepository;
+import pl.better.foodzillabackend.email.logic.model.domain.RecoveryCode;
+import pl.better.foodzillabackend.email.logic.repository.RecoveryCodeRepository;
 
 import java.io.IOException;
 import java.nio.file.Files;

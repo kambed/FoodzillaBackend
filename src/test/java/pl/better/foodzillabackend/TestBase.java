@@ -17,7 +17,7 @@ import pl.better.foodzillabackend.containers.MySQLContainerReusable;
 import pl.better.foodzillabackend.containers.RedisContainerReusable;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
-import pl.better.foodzillabackend.mail.repository.RecoveryCodeRepository;
+import pl.better.foodzillabackend.email.logic.repository.RecoveryCodeRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.search.logic.repository.SearchRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;

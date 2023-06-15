@@ -5,7 +5,7 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import pl.better.foodzillabackend.auth.service.accesstype.LoggedInUser;
+import pl.better.foodzillabackend.auth.logic.service.accesstype.LoggedInUser;
 import pl.better.foodzillabackend.recommendation.logic.model.dto.RecommendationDto;
 import pl.better.foodzillabackend.recommendation.logic.service.RecommendationService;
 
