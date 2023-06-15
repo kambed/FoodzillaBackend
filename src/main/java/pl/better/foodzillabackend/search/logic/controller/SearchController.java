@@ -7,7 +7,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import pl.better.foodzillabackend.auth.service.accesstype.LoggedInUser;
+import pl.better.foodzillabackend.auth.logic.service.accesstype.LoggedInUser;
 import pl.better.foodzillabackend.search.logic.model.command.CreateSearchCommand;
 import pl.better.foodzillabackend.search.logic.model.dto.SearchDto;
 import pl.better.foodzillabackend.search.logic.service.SearchService;
