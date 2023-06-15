@@ -19,6 +19,8 @@ import pl.better.foodzillabackend.mail.repository.RecoveryCodeRepository;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -47,8 +49,17 @@ public class MailServerService {
 
     @Transactional
     public boolean resetPassword(ResetPasswordCommand command) {
-        if (codeRepository.existsByCodeAndEmail(command.resetPasswordToken(),
-                command.email())) {
+        Optional<RecoveryCode> recoveryCode = codeRepository.findByCodeAndEmail(command.resetPasswordToken(),
+                command.email());
+        if (recoveryCode.isPresent()) {
+            long days = ChronoUnit.DAYS.between(recoveryCode.get().getDate(),
+                    LocalDateTime.now());
+            if (days > 1) {
+                codeRepository.removeByCodeAndEmail(command.resetPasswordToken(),
+                        command.email());
+                return false;
+            }
+
             Optional<Customer> customer = customerRepository.findCustomerByEmail(command.email());
             customer.ifPresent(customer1 -> {
                 customer1.setPassword(passwordEncoder.encode(command.newPassword()));
