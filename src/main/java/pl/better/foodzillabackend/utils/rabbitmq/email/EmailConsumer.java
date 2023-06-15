@@ -32,7 +32,9 @@ public class EmailConsumer {
     @Value("${spring.mail.username}")
     private String sender;
     @Value("classpath:email.html")
-    private Resource resource;
+    private Resource emailTemplate;
+    @Value("classpath:logo.png")
+    private Resource logo;
 
     @RabbitListener(queues = "email")
     @Async("rabbitMqTaskExecutor")
@@ -46,16 +48,18 @@ public class EmailConsumer {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setFrom(sender);
             helper.setTo(customer.getEmail());
-            helper.setText(generateBody(code), true);
+            helper.setText(generateBody(customer.getFirstname(), code), true);
+            helper.addInline("logo", logo);
             javaMailSender.send(message);
         } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
 
-    private String generateBody(String code) throws IOException {
-        String content = Files.readString(resource.getFile().toPath());
-        return content.replace("*", code);
+    private String generateBody(String name, String code) throws IOException {
+        String content = Files.readString(emailTemplate.getFile().toPath());
+        return content.replace("{{name}}", name)
+                .replace("{{code}}", code);
     }
 
     private String saveNewCustomerCode(Customer customer) {
