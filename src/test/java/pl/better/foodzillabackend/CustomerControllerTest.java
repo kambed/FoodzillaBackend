@@ -67,7 +67,7 @@ class CustomerControllerTest extends TestBase {
                 "Example@gmail.com");
 
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST) &&
-                        Objects.equals(responseError.getMessage(), "Customer with username BobLoblaw already exists"))
+                        Objects.equals(responseError.getMessage(), "Customer with username BobLoblaw or Example@gmail.com email already exists"))
                 .verify().path("createCustomer").valueIsNull();
 
         assertEquals(1, customerRepository.findAll().size());
@@ -196,7 +196,7 @@ class CustomerControllerTest extends TestBase {
                     "Example@gmail.com");
 
             res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST) &&
-                            Objects.equals(responseError.getMessage(), "Customer with username Marian already exists"))
+                            Objects.equals(responseError.getMessage(), "Customer with username Marian or Example@gmail.com email already exists"))
                     .verify().path("editCustomer").valueIsNull();
 
             assertEquals(2, customerRepository.findAll().size());

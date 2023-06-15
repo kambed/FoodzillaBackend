@@ -23,7 +23,7 @@ import pl.better.foodzillabackend.recommendation.logic.service.RecommendationSer
 public class CustomerService implements UserDetailsService {
     private final RecommendationService recommendationService;
     private static final String CUSTOMER_NOT_FOUND = "Customer with username %s not found";
-    private static final String CUSTOMER_ALREADY_EXIST = "Customer with username %s already exists";
+    private static final String CUSTOMER_ALREADY_EXIST = "Customer with username %s or %s email already exists";
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final CustomerRepository repository;
     private final CustomerDtoMapper mapper;
@@ -43,7 +43,8 @@ public class CustomerService implements UserDetailsService {
             recommendationService.recommend(command.username());
             return mapper.apply(user);
         } else {
-            throw new CustomerAlreadyExistsException(CUSTOMER_ALREADY_EXIST.formatted(command.username()));
+            throw new CustomerAlreadyExistsException(CUSTOMER_ALREADY_EXIST
+                    .formatted(command.username(), command.email()));
         }
     }
 
@@ -61,7 +62,8 @@ public class CustomerService implements UserDetailsService {
             repository.saveAndFlush(customer);
             return mapper.apply(customer);
         } else {
-            throw new CustomerAlreadyExistsException(CUSTOMER_ALREADY_EXIST.formatted(command.username()));
+            throw new CustomerAlreadyExistsException(CUSTOMER_ALREADY_EXIST
+                    .formatted(command.username(), command.email()));
         }
     }
 
@@ -74,6 +76,6 @@ public class CustomerService implements UserDetailsService {
     }
 
     private boolean exists(CreateCustomerCommand command) {
-        return repository.existsByUsername(command.username());
+        return repository.existsByUsername(command.username()) || repository.existsByEmail(command.email());
     }
 }

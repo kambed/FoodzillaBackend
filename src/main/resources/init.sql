@@ -154,6 +154,3 @@ create table recovery_code
     code           varchar(250) not null,
     date    datetime not null
 );
-
-ALTER TABLE recovery_code AUTO_INCREMENT=432123;
-
