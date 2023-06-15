@@ -44,6 +44,5 @@ spring:
           auth: true
           starttls:
             enable: true
-  code:
     config:
-      taskDelay: "0 0 0 * * ?" # Every day at midnight
+      task-delay: "0 0 0 * * ?" # Every day at midnight

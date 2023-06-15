@@ -18,7 +18,7 @@ public class ScheduledRecoveryCodeConfig {
 
     private final RecoveryCodeRepository repository;
 
-    @Scheduled(cron = "${spring.code.config.taskDelay}")
+    @Scheduled(cron = "${spring.mail.config.task-delay}")
     @Transactional
     public void clearOldCodes() {
         repository.findAllByDateBefore(LocalDateTime.now().minusDays(1))
