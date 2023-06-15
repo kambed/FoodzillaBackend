@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RecipeProducer {
+
     private final RabbitTemplate rabbitTemplate;
 
     public void send(Long id) {
