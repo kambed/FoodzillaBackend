@@ -3,10 +3,10 @@ package pl.better.foodzillabackend.utils.rabbitmq.recipeimage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.stereotype.Component;
@@ -19,9 +19,9 @@ import java.util.concurrent.ExecutionException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ImagePublisher {
 
-    private final RabbitTemplate rabbitTemplate;
     private final AsyncRabbitTemplate asyncRabbitTemplate;
     private final DirectExchange exchange;
     private final MessageConverter converter = new SimpleMessageConverter();
@@ -43,7 +43,7 @@ public class ImagePublisher {
                     converter.toMessage(objectMapper.writeValueAsString(recipeShort), messageProperties)
             );
         } catch (JsonProcessingException e) {
-            //ignored
+            log.error(e.getMessage());
         }
     }
 
@@ -63,8 +63,9 @@ public class ImagePublisher {
                     converter.toMessage(objectMapper.writeValueAsString(recipeShort), messageProperties)
             ).get().getBody());
         } catch (JsonProcessingException | ExecutionException e) {
-            //ignored
+            log.error(e.getMessage());
         } catch (InterruptedException e) {
+            log.error(e.getMessage());
             Thread.currentThread().interrupt();
         }
         return null;
