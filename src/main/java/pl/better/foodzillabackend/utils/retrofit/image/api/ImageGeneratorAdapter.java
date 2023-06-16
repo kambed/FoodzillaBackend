@@ -51,6 +51,7 @@ public class ImageGeneratorAdapter {
             }
             return response.body().generatedImgs().get(0);
         } catch (Exception e) {
+            log.error("Error while calling Stable Diffusion API", e);
             return null;
         }
     }

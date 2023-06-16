@@ -49,6 +49,12 @@ services:
     env_file: .env
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+  mailcatcher:
+    image: schickling/mailcatcher
+    container_name: mailcatcher
+    ports:
+      - "1080:1080"
+      - "1025:1025"
   sonarqube:
     image: sonarqube:latest
     container_name: sonarqube

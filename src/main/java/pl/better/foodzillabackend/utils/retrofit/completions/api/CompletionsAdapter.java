@@ -1,5 +1,6 @@
 package pl.better.foodzillabackend.utils.retrofit.completions.api;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.springframework.core.env.Environment;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 @Controller
+@Slf4j
 public class CompletionsAdapter {
     private final String url;
     private final String apiKey;
@@ -58,6 +60,7 @@ public class CompletionsAdapter {
                     .orElseThrow()
                     .text();
         } catch (IOException|NullPointerException e) {
+            log.error("Error while calling OpenAI API", e);
             return null;
         }
     }
