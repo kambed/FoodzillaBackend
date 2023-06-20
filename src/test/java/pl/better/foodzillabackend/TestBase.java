@@ -14,6 +14,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.better.foodzillabackend.containers.GreenMailContainerReusable;
 import pl.better.foodzillabackend.containers.MySQLContainerReusable;
+import pl.better.foodzillabackend.containers.RabbitMqContainerReusable;
 import pl.better.foodzillabackend.containers.RedisContainerReusable;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
@@ -36,6 +37,8 @@ public class TestBase {
     static GenericContainer<?> redisContainer = RedisContainerReusable.getInstance();
     @Container
     static GenericContainer<?> greenMailGenericContainer = GreenMailContainerReusable.getInstance();
+    @Container
+    static GenericContainer<?> rabbitMqContainer = RabbitMqContainerReusable.getInstance();
 
     @Autowired
     protected GraphQlTester graphQlTester;
