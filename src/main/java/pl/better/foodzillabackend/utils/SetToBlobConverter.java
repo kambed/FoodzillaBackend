@@ -2,6 +2,8 @@ package pl.better.foodzillabackend.utils;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import pl.better.foodzillabackend.exceptions.type.SetBlobConversionException;
+
 import java.io.*;
 import java.util.Set;
 
@@ -15,7 +17,7 @@ public class SetToBlobConverter<T> implements AttributeConverter<Set<T>, byte[]>
             oos.writeObject(set);
             return baos.toByteArray();
         } catch (IOException e) {
-            throw new RuntimeException("Error serializing Set to byte[]", e);
+            throw new SetBlobConversionException("Error serializing Set to byte[]", e);
         }
     }
 
@@ -25,7 +27,7 @@ public class SetToBlobConverter<T> implements AttributeConverter<Set<T>, byte[]>
              ObjectInputStream ois = new ObjectInputStream(bais)) {
             return (Set<T>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Error deserializing byte[] to Set", e);
+            throw new SetBlobConversionException("Error deserializing byte[] to Set", e);
         }
     }
 }

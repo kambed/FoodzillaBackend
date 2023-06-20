@@ -1,0 +1,48 @@
+spring:
+  graphql:
+    graphiql:
+      enabled: true
+
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: foodzillabackend
+  datasource:
+    username: ${MYSQL_USER:#{user}}
+    password: ${MYSQL_PASSWORD:#{password}}
+    url: ${MYSQL_URL}
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  security:
+    jwt:
+      secret: ${SECRET_API_KEY}
+      expiration: ${EXPIRATION_LENGTH}
+      refresh-expiration: ${REFRESH_EXPIRATION_LENGTH}
+      header-name: ${HEADER_NAME}
+      prefix: ${PREFIX_NAME}
+  data:
+    redis:
+      database: ${REDIS_DATABASE}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      timeout: ${REDIS_TIMEOUT}
+      url: redis://${REDIS_HOST}:${REDIS_PORT}
+      run-sync-task: false # Set to true if db is filled on first run.
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+    config:
+      task-delay: "0 0 0 * * ?" # Every day at midnight

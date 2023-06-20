@@ -1,15 +1,13 @@
 package pl.better.foodzillabackend.customer.logic.model.domain;
 
-import com.vladmihalcea.hibernate.type.json.JsonBlobType;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import pl.better.foodzillabackend.auth.model.domain.Role;
+import pl.better.foodzillabackend.auth.logic.model.domain.Role;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
-import pl.better.foodzillabackend.recipe.logic.model.pojo.SearchPojo;
 import pl.better.foodzillabackend.review.logic.model.domain.Review;
 import pl.better.foodzillabackend.search.logic.model.domain.Search;
 
@@ -32,6 +30,7 @@ public class Customer implements UserDetails {
     private String lastname;
     private String username;
     private String password;
+    private String email;
 
     @Type(JsonStringType.class)
     private List<Long> recommendations;

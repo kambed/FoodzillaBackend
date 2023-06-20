@@ -61,6 +61,19 @@ Alternatively, for JetBrains Intellij users they can use green button on the lef
 
 [GraphiQL UI](http://localhost:8080/graphiql?path=/graphql)
 
+## To check sonar qube quality report
+
+Start SonarQube server container on Docker
+> docker-compose -f docker-compose.yml up sonarqube
+
+Login to SonarQube server on http://localhost:9000 with default credentials (admin/admin)
+Configure new local project and update sonar properties in pom.xml file with new project key and token
+
+Build project
+> mvn clean verify sonar:sonar -Pcoverage
+
+Check the report on http://localhost:9000
+
 ## Troubleshooting
 If MySQL drops error when using search endpoint, execute following query on database:
 

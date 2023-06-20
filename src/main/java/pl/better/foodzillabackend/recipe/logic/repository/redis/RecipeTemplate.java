@@ -7,8 +7,10 @@ import org.springframework.stereotype.Component;
 import pl.better.foodzillabackend.recipe.logic.model.dto.RecipeDto;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
+@SuppressWarnings("deprecation")
 @Component
 @RequiredArgsConstructor
 public class RecipeTemplate {
@@ -22,7 +24,10 @@ public class RecipeTemplate {
     }
 
     public List<RecipeDto> getRecipesByIds(List<Long> ids) {
-        return redisTemplate.opsForValue().multiGet(ids);
+        return Objects.requireNonNull(redisTemplate.opsForValue().multiGet(ids))
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public void deleteAll() {

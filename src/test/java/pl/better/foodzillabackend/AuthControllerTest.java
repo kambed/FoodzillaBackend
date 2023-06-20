@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import pl.better.foodzillabackend.auth.model.domain.Token;
+import pl.better.foodzillabackend.auth.logic.model.domain.Token;
 import pl.better.foodzillabackend.customer.logic.model.domain.Customer;
 
 import java.util.Objects;
@@ -22,6 +22,7 @@ class AuthControllerTest extends TestBase {
                 .lastname("obbo")
                 .password(passwordEncoder.encode("bOb@4321"))
                 .username("Boob123")
+                .email("Example@gmail.com")
                 .build();
         customerRepository.saveAndFlush(customer);
     }

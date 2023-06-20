@@ -1,13 +1,15 @@
 mutation create($firstname: String!,
     $lastname: String!
     $username: String!
-    $password: String!) {
+    $password: String!
+    $email: String!) {
     createCustomer(
         customer: {
             firstname: $firstname
             lastname: $lastname
             username: $username
             password: $password
+            email: $email
         }
     ) {
         firstname

@@ -26,7 +26,8 @@ class CustomerControllerTest extends TestBase {
         GraphQlTester.Response res = sendCreate("Boob",
                 "obbo",
                 "Boob123",
-                "bOb@4321");
+                "bOb@4321",
+                "Example@gmail.com");
         res.path("createCustomer").entity(Customer.class).satisfies(user -> {
             assertEquals("Boob", user.getFirstname());
             assertEquals("obbo", user.getLastname());
@@ -41,7 +42,8 @@ class CustomerControllerTest extends TestBase {
         GraphQlTester.Response res = sendCreate("b",
                 "o",
                 "b",
-                "sdaD936245");
+                "sdaD936245",
+                "Example@gmail.com");
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST))
                 .verify().path("createCustomer").valueIsNull();
     }
@@ -53,6 +55,7 @@ class CustomerControllerTest extends TestBase {
                 .lastname("Loblaw")
                 .username("BobLoblaw")
                 .password("b0bL0bl@w")
+                .email("Example@gmail.com")
                 .build();
         customerRepository.saveAndFlush(user);
         assertEquals(1, customerRepository.findAll().size());
@@ -60,10 +63,11 @@ class CustomerControllerTest extends TestBase {
         GraphQlTester.Response res = sendCreate("Obi-Wan",
                 "Kenobi",
                 "BobLoblaw",
-                "IlovESt@rwars321");
+                "IlovESt@rwars321",
+                "Example@gmail.com");
 
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST) &&
-                        Objects.equals(responseError.getMessage(), "Customer with username BobLoblaw already exists"))
+                        Objects.equals(responseError.getMessage(), "Customer with username BobLoblaw or Example@gmail.com email already exists"))
                 .verify().path("createCustomer").valueIsNull();
 
         assertEquals(1, customerRepository.findAll().size());
@@ -73,24 +77,28 @@ class CustomerControllerTest extends TestBase {
     private GraphQlTester.Response sendCreate(String firstname,
                                               String lastname,
                                               String username,
-                                              String password) {
+                                              String password,
+                                              String email) {
         return graphQlTester.documentName("customer-create")
                 .variable("firstname", firstname)
                 .variable("lastname", lastname)
                 .variable("username", username)
                 .variable("password", password)
+                .variable("email", email)
                 .execute();
     }
 
     private GraphQlTester.Response sendEdit(String firstname,
                                             String lastname,
                                             String username,
-                                            String password) {
+                                            String password,
+                                            String email) {
         return graphQlTester.documentName("customer-edit")
                 .variable("firstname", firstname)
                 .variable("lastname", lastname)
                 .variable("username", username)
                 .variable("password", password)
+                .variable("email", email)
                 .execute();
     }
 
@@ -102,26 +110,29 @@ class CustomerControllerTest extends TestBase {
                 .lastname("Loblaw")
                 .username("BobLoblaw")
                 .password("b0bL0bl@w")
+                .email("Example@gmail.com")
                 .build();
         customerRepository.saveAndFlush(user);
         GraphQlTester.Response res = sendEdit("b",
                 "o",
                 "b",
-                "sdaD936245");
+                "sdaD936245",
+                "Example@gmail.com");
         res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST))
                 .verify().path("editCustomer").valueIsNull();
     }
 
     @Nested
     class LoggedInCustomerControllerTest {
+
         @BeforeEach
         public void setUp() {
-
             Customer user = Customer.builder()
                     .firstname("Bob")
                     .lastname("Loblaw")
                     .username("BobLoblaw")
                     .password("b0bL0bl@w")
+                    .email("Example@gmail.com")
                     .build();
             customerRepository.saveAndFlush(user);
         }
@@ -135,7 +146,8 @@ class CustomerControllerTest extends TestBase {
                     "Tomek",
                     "Hajto",
                     "RozjechalemBabeNaPasach",
-                    "bOb@4321");
+                    "bOb@4321",
+                    "Example@gmail.com");
             res.path("editCustomer").entity(Customer.class).satisfies(userResponse -> {
                 assertEquals("Tomek", userResponse.getFirstname());
                 assertEquals("Hajto", userResponse.getLastname());
@@ -153,7 +165,8 @@ class CustomerControllerTest extends TestBase {
             GraphQlTester.Response res = sendEdit("Obi-Wan",
                     "Kenobi",
                     "BobLoblaw",
-                    "IlovESt@rwars321");
+                    "IlovESt@rwars321",
+                    "Example@gmail.com");
 
             res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.NOT_FOUND) &&
                             Objects.equals(responseError.getMessage(), "Customer with username Stefania not found"))
@@ -171,6 +184,7 @@ class CustomerControllerTest extends TestBase {
                     .lastname("Loblaw")
                     .username("Marian")
                     .password("b0bL0bl@w")
+                    .email("Example@gmail.com")
                     .build();
             customerRepository.saveAndFlush(user);
             assertEquals(2, customerRepository.findAll().size());
@@ -178,10 +192,11 @@ class CustomerControllerTest extends TestBase {
             GraphQlTester.Response res = sendEdit("Obi-Wan",
                     "Kenobi",
                     "Marian",
-                    "IlovESt@rwars321");
+                    "IlovESt@rwars321",
+                    "Example@gmail.com");
 
             res.errors().expect(responseError -> responseError.getErrorType().equals(ErrorType.BAD_REQUEST) &&
-                            Objects.equals(responseError.getMessage(), "Customer with username Marian already exists"))
+                            Objects.equals(responseError.getMessage(), "Customer with username Marian or Example@gmail.com email already exists"))
                     .verify().path("editCustomer").valueIsNull();
 
             assertEquals(2, customerRepository.findAll().size());

@@ -7,7 +7,6 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 
 @SchemaMapping
 public record UpdateCustomerCommand(
-
         @NotNull
         @Size(min = 2, max = 100, message = "Firstname must be between 2 and 100 characters.")
         String firstname,
@@ -21,6 +20,11 @@ public record UpdateCustomerCommand(
         @Pattern(regexp = "^(?=.*[A-Z])(?=.*[\\W_]).{5,}$",
                 message = "Password must contain at least 8 characters, a capital letter and a special character")
         @Size(min = 8, max = 250)
-        String password
+        String password,
+        @NotNull
+        @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$",
+                message = "Email must match pattern")
+        @Size(min = 5, max = 250)
+                String email
 ) {
 }

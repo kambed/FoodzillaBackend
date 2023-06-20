@@ -14,6 +14,12 @@ services:
     volumes:
       - ./src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./src/main/resources/testData.sql:/docker-entrypoint-initdb.d/testData.sql
+  ai:
+    build: ./recommendations
+    container_name: recommendation_module
+    env_file: .env
+    ports:
+      - "5000:5000"
   app:
     depends_on:
       db:
@@ -43,6 +49,19 @@ services:
     env_file: .env
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+  mailcatcher:
+    image: schickling/mailcatcher
+    container_name: mailcatcher
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+  sonarqube:
+    image: sonarqube:latest
+    container_name: sonarqube
+    volumes:
+      - ./sonarqube/bitegarden-sonarqube-report-2.15.5.jar/:/opt/sonarqube/extensions/plugins/pdf.jar
+    ports:
+      - "9000:9000"
 volumes:
   db:
 networks:

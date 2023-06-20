@@ -9,7 +9,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.exceptions.type.FilterInputException;
 import pl.better.foodzillabackend.ingredient.logic.model.domain.Ingredient;
 import pl.better.foodzillabackend.recipe.logic.model.domain.Recipe;
@@ -21,8 +20,7 @@ import pl.better.foodzillabackend.recipe.logic.model.pojo.sort.SortDirectionPojo
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.tag.logic.model.domain.Tag;
 import pl.better.foodzillabackend.utils.rabbitmq.Priority;
-import pl.better.foodzillabackend.utils.rabbitmq.PublisherMq;
-import pl.better.foodzillabackend.utils.retrofit.completions.api.CompletionsAdapter;
+import pl.better.foodzillabackend.utils.rabbitmq.recipeimage.ImagePublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,16 +35,14 @@ public class RecipeSearchService {
     private final Root<Recipe> root;
     private final Map<String, Join<Recipe, ?>> joins;
     private final RecipeRepositoryAdapter recipeRepository;
-    private final CompletionsAdapter completionsAdapter;
-    private final PublisherMq publisherMq;
+    private final ImagePublisher imagePublisher;
     public RecipeSearchService(
             EntityManagerFactory entityManagerFactory,
             RecipeRepositoryAdapter recipeRepository,
-            PublisherMq publisherMq,
-            CompletionsAdapter completionsAdapter
+            ImagePublisher imagePublisher
     ) {
         entityManager = entityManagerFactory.createEntityManager();
-        this.publisherMq = publisherMq;
+        this.imagePublisher = imagePublisher;
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Long.class);
         root = criteriaQuery.from(Recipe.class);
@@ -55,7 +51,6 @@ public class RecipeSearchService {
                 Recipe.TAGS, root.join(Recipe.TAGS, JoinType.LEFT)
         );
         this.recipeRepository = recipeRepository;
-        this.completionsAdapter = completionsAdapter;
     }
 
     @Transactional
@@ -84,10 +79,6 @@ public class RecipeSearchService {
 
         List<RecipeDto> recipes = recipeRepository.getRecipesByIds(recipeIds);
 
-        recipes.forEach(
-                recipe -> publisherMq.send(Priority.NORMAL, recipe)
-        );
-
         Page<RecipeDto> page = new PageImpl<>(recipes, pageable, results.size());
 
         List<Long> recipeNextPageIds = results.stream()
@@ -96,7 +87,7 @@ public class RecipeSearchService {
                 .toList();
 
         recipeNextPageIds.forEach(
-                id -> publisherMq.send(Priority.LOW, recipeRepository.getRecipeById(id))
+                id -> imagePublisher.send(Priority.LOW, recipeRepository.getRecipeById(id))
         );
 
         return SearchResultDto.builder()
@@ -191,11 +182,5 @@ public class RecipeSearchService {
             }
         });
         return orders;
-    }
-
-    public String getOpinion(SearchResultDto searchResult) {
-        return completionsAdapter.generateCompletion(
-                "What do you think about this recipes: " + searchResult.toString()
-        );
     }
 }

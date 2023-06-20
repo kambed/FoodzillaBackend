@@ -75,6 +75,7 @@ create table customer
     lastname        varchar(250) not null,
     username        varchar(250) not null,
     password        varchar(250) not null,
+    email           varchar(250) not null,
     recommendations varchar(250) null
 );
 
@@ -145,3 +146,13 @@ create table user_saved_searches
         foreign key (search_id) references search (id)
 );
 
+create table recovery_code
+(
+    id              int auto_increment
+        primary key,
+    email           varchar(250) not null,
+    code           varchar(250) not null,
+    date    datetime not null
+);
+
+ALTER TABLE recovery_code AUTO_INCREMENT=1;

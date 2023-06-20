@@ -12,10 +12,12 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import pl.better.foodzillabackend.containers.GreenMailContainerReusable;
 import pl.better.foodzillabackend.containers.MySQLContainerReusable;
 import pl.better.foodzillabackend.containers.RedisContainerReusable;
 import pl.better.foodzillabackend.customer.logic.repository.CustomerRepository;
 import pl.better.foodzillabackend.ingredient.logic.repository.IngredientRepository;
+import pl.better.foodzillabackend.email.logic.repository.RecoveryCodeRepository;
 import pl.better.foodzillabackend.recipe.logic.repository.RecipeRepositoryAdapter;
 import pl.better.foodzillabackend.search.logic.repository.SearchRepository;
 import pl.better.foodzillabackend.tag.logic.repository.TagRepository;
@@ -32,6 +34,8 @@ public class TestBase {
     static MySQLContainer<?> mySQLContainer = MySQLContainerReusable.getInstance();
     @Container
     static GenericContainer<?> redisContainer = RedisContainerReusable.getInstance();
+    @Container
+    static GenericContainer<?> greenMailGenericContainer = GreenMailContainerReusable.getInstance();
 
     @Autowired
     protected GraphQlTester graphQlTester;
@@ -47,7 +51,10 @@ public class TestBase {
     protected CustomerRepository customerRepository;
     @Autowired
     protected PasswordEncoder passwordEncoder;
+    @Autowired
+    protected RecoveryCodeRepository recoveryCodeRepository;
     protected static MockWebServer completionsMockWebServer;
+    protected static MockWebServer recommendationsMockWebServer;
 
     @BeforeAll
     public static void setup() throws IOException {
@@ -55,6 +62,11 @@ public class TestBase {
             completionsMockWebServer = new MockWebServer();
             completionsMockWebServer.start();
             System.setProperty("COMPLETIONS_API_URL", completionsMockWebServer.url("/").toString());
+        }
+        if (recommendationsMockWebServer == null) {
+            recommendationsMockWebServer = new MockWebServer();
+            recommendationsMockWebServer.start();
+            System.setProperty("RECOMMENDATIONS_API_URL", recommendationsMockWebServer.url("/").toString());
         }
     }
 
@@ -64,5 +76,6 @@ public class TestBase {
         tagRepository.deleteAll();
         customerRepository.deleteAll();
         searchRepository.deleteAll();
+        recoveryCodeRepository.deleteAll();
     }
 }

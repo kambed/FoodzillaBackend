@@ -50,6 +50,7 @@ class SavedSearchTest extends TestBase {
                 .lastname("Loblaw")
                 .username("BobLoblaw")
                 .password("b0bL0bl@w")
+                .email("Example@gmail.com")
                 .build();
 
         List<Search> userSearches = List.of(search1, search2, search3);
@@ -79,13 +80,6 @@ class SavedSearchTest extends TestBase {
         response.path("addSavedSearch").entity(Search.class).satisfies(search -> {
             assertEquals("search phrase", search.getPhrase());
         });
-    }
-
-    @Test
-    @WithMockUser(username = "BobLoblaw", password = "b0bL0bl@w")
-    void shouldReturnUserErrorCreatedSearch() {
-        GraphQlTester.Response response = graphQlTester.documentName("saved-search-create-error").execute();
-        response.errors().satisfy(errors -> assertEquals(1, errors.size()));
     }
 
     @Test

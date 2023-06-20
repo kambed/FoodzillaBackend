@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ENG">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Simple Transactional Email</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f6f6f6;
+            font-family: sans-serif;
+            -webkit-font-smoothing: antialiased;
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 0;
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        .container {
+            max-width: 580px;
+            margin: 0 auto;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .content {
+            background: #ffffff;
+            border-radius: 3px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .logo {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        h1, p {
+            margin-bottom: 20px;
+        }
+
+        .copy-button {
+            display: inline-block;
+            background-color: #3498db;
+            border: none;
+            color: #ffffff;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 10px 20px;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .copy-button:hover {
+            background-color: #258cd1;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .powered-by a {
+            text-decoration: none;
+            color: #999999;
+            font-size: 12px;
+        }
+
+        .good-luck {
+            margin-top: 20px;
+        }
+
+        @media only screen and (max-width: 620px) {
+            .container {
+                width: 100% !important;
+                padding: 0 !important;
+            }
+
+            .content {
+                padding: 0 !important;
+            }
+        }
+    </style>
+    <script>
+        function copyCode() {
+            const codeElement = document.getElementById("code");
+            const code = codeElement.textContent;
+
+            navigator.clipboard.writeText(code)
+                .catch(function (error) {
+                    console.error("Unable to copy code to clipboard.", error);
+                });
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <img src="cid:logo" alt="Logo" class="logo"/>
+    <div class="content">
+        <h1>Hi {{name}},</h1>
+        <p>Your Reset Code:</p>
+        <p id="code"><b>{{code}}</b></p>
+        <button class="copy-button" onclick="copyCode()">Copy Code</button>
+        <p class="good-luck">Good luck!</p>
+    </div>
+    <div class="footer">
+        <p class="powered-by">Powered by <a href="#">Spring boot</a>.</p>
+    </div>
+</div>
+</body>
+</html>

@@ -8,6 +8,7 @@ input CustomerInput {
     lastname: String!
     username: String!
     password: String!
+    email: String!
 }
 
 input CustomerEditInput {
@@ -15,10 +16,12 @@ input CustomerEditInput {
     lastname: String!
     username: String!
     password: String!
+    email: String!
 }
 
 type Customer {
     firstname: String!
     lastname: String!
     username: String!
+    email: String!
 }
