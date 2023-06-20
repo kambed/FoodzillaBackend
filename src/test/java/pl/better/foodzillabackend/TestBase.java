@@ -1,6 +1,7 @@
 package pl.better.foodzillabackend;
 
 import okhttp3.mockwebserver.MockWebServer;
+import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
@@ -81,4 +82,5 @@ public class TestBase {
         searchRepository.deleteAll();
         recoveryCodeRepository.deleteAll();
     }
+
 }
