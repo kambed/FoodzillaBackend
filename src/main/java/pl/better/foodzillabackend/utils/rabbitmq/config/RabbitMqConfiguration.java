@@ -1,5 +1,7 @@
 package pl.better.foodzillabackend.utils.rabbitmq.config;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -15,11 +17,16 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Map;
 
 @Configuration
+@RequiredArgsConstructor
 public class RabbitMqConfiguration {
+
+    private final Environment environment;
 
     @Bean
     public CachingConnectionFactory connectionFactory() {
-        return new CachingConnectionFactory();
+        CachingConnectionFactory cf = new CachingConnectionFactory();
+        cf.setPort(environment.getProperty("RABBIT_MQ_PORT", Integer.class, 5672));
+        return cf;
     }
 
     @Bean
